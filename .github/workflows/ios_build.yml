@@ -12,13 +12,13 @@ jobs:
 
       - name: Setup Godot Engine
         run: |
-          curl -LO https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_macos.universal.zip
-          unzip -q Godot_v4.3-stable_macos.universal.zip
+          curl -LO https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_macos.universal.zip
+          unzip -q Godot_v4.7-stable_macos.universal.zip
           sudo mv Godot.app /Applications/Godot.app
-          mkdir -p ~/.local/share/godot/export_templates/4.3.stable
-          curl -LO https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
-          unzip -q Godot_v4.3-stable_export_templates.tpz
-          mv templates/* ~/.local/share/godot/export_templates/4.3.stable/
+          mkdir -p ~/.local/share/godot/export_templates/4.7.stable
+          curl -LO https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_export_templates.tpz
+          unzip -q Godot_v4.7-stable_export_templates.tpz
+          mv templates/* ~/.local/share/godot/export_templates/4.7.stable/
 
       - name: Install Certificates and Provisioning Profile
         env:
@@ -39,9 +39,12 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "$PROVISIONING_PROFILE_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
 
-      - name: Export Godot iOS Project
+      - name: Import Assets and Export Godot iOS Project
         run: |
           mkdir -p build/ios
+          # Pass 1: import all assets into .godot/ (it is gitignored, so CI starts empty)
+          /Applications/Godot.app/Contents/MacOS/Godot --headless --editor --quit || true
+          # Pass 2: export
           /Applications/Godot.app/Contents/MacOS/Godot --headless --export-release "iOS" build/ios/PearlyWhites.ipa
 
       - name: Upload to App Store Connect / TestFlight

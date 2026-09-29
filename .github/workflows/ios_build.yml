@@ -5,10 +5,24 @@ on:
 
 jobs:
   build-and-upload:
-    runs-on: macos-14
+    runs-on: macos-26
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Show runner and select Xcode 26
+        run: |
+          sw_vers
+          ls -d /Applications/Xcode*.app
+          XCODE=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$XCODE" ]; then
+            echo "ERROR: No Xcode 26 found on this runner"
+            exit 1
+          fi
+          echo "Selecting $XCODE"
+          sudo xcode-select -s "$XCODE/Contents/Developer"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i ios
 
       - name: Setup Godot Engine
         run: |

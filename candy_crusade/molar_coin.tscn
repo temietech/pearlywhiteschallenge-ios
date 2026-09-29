@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://candy_crusade/scripts/molar_coin.gd" id="1_molar_coin"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_coin"]
+radius = 0.35
+
+[node name="MolarCoin" type="Area3D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_molar_coin")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
+shape = SubResource("SphereShape3D_coin")

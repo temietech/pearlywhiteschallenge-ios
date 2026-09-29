@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://qbks5vbmmqcr"
+path="res://.godot/imported/Candy Bomb Frenzy (3.20).mp3-21f7b3326c3fb6fb6dab0f111b424f70.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Candy Bomb Frenzy (3.20).mp3"
+dest_files=["res://.godot/imported/Candy Bomb Frenzy (3.20).mp3-21f7b3326c3fb6fb6dab0f111b424f70.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

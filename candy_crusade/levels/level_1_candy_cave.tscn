@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://b1candy1cave01"]
+
+[ext_resource type="Script" path="res://candy_crusade/scripts/level_preview_launcher.gd" id="1_launcher"]
+[ext_resource type="PackedScene" uid="uid://dlqyrexcusemb" path="res://assets/candy_crusade/regions/CandyCave-Region1.glb" id="2_model"]
+[ext_resource type="PackedScene" uid="uid://camguide001editor" path="res://candy_crusade/editor_camera_guide.tscn" id="3_guide"]
+
+[node name="Level1_CandyCave" type="Node3D"]
+script = ExtResource("1_launcher")
+level_index = 0
+
+[node name="EditorCameraGuide" parent="." instance=ExtResource("3_guide")]
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 2.4224687, -12.446005)

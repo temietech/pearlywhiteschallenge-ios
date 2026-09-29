@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://c8xsnvp0nyxdb"
+path="res://.godot/imported/Brush the Pearly White way! (1).mp3-6214ae98cd3fa20dc89304a76ec222cd.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Brush the Pearly White way! (1).mp3"
+dest_files=["res://.godot/imported/Brush the Pearly White way! (1).mp3-6214ae98cd3fa20dc89304a76ec222cd.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,0 +1,6 @@
+.godot/
+/android/build/
+*.tmp
+
+# Summer Engine local-only state (SummerGit, caches, locks)
+.summer/local/

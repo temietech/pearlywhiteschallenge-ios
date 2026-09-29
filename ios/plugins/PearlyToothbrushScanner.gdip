@@ -1,0 +1,19 @@
+[config]
+name="PearlyToothbrushScanner"
+; build_ios_plugin.sh creates PearlyToothbrushScanner.debug.a and PearlyToothbrushScanner.release.a
+binary="PearlyToothbrushScanner.a"
+
+initialization="pearly_toothbrush_scanner_init"
+deinitialization="pearly_toothbrush_scanner_deinit"
+
+[dependencies]
+; TensorFlow Lite is a static framework: link it, don't embed it (embedding fails App Store validation)
+linked=["TensorFlowLiteC.xcframework"]
+embedded=[]
+system=["AVFoundation.framework", "CoreMedia.framework", "CoreVideo.framework", "Accelerate.framework"]
+capabilities=[]
+; copied into the app bundle so the plugin can load it with NSBundle
+files=["res://models/efficientdet_lite0.tflite"]
+
+[plist]
+NSCameraUsageDescription="Pearly Whites uses the camera to check that your toothbrush is ready before brushing. Pictures never leave your device."

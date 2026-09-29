@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cmqg88mf136pd"]
+
+[ext_resource type="Script" uid="uid://b5pa8mw6f4vnm" path="res://candy_crusade/scripts/level_preview_launcher.gd" id="1_launcher"]
+[ext_resource type="PackedScene" uid="uid://bb5raw0d1yyhi" path="res://assets/candy_crusade/regions/SugarBridge-Region2.glb" id="2_model"]
+[ext_resource type="PackedScene" uid="uid://bkeewlk2wk5ir" path="res://candy_crusade/editor_camera_guide.tscn" id="3_guide"]
+
+[node name="Level2_SugarBridge" type="Node3D" unique_id=1382739618]
+script = ExtResource("1_launcher")
+level_index = 1
+
+[node name="EditorCameraGuide" parent="." unique_id=2096757161 instance=ExtResource("3_guide")]
+transform = Transform3D(1, 0, 0, 0, 0.9979904, 0.06336446, 0, -0.06336446, 0.9979904, 0, 0, 0)
+
+[node name="Model" parent="." unique_id=2021796552 instance=ExtResource("2_model")]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0.52170944, -14)

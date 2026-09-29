@@ -1,0 +1,8 @@
+[config]
+name="PearlyToothbrushScanner"
+binary_type="local"
+binary="PearlyToothbrushScanner-release.aar"
+
+[dependencies]
+remote=["androidx.core:core-ktx:1.13.1", "androidx.appcompat:appcompat:1.7.0", "androidx.camera:camera-core:1.3.4", "androidx.camera:camera-camera2:1.3.4", "androidx.camera:camera-lifecycle:1.3.4", "androidx.camera:camera-view:1.3.4", "org.tensorflow:tensorflow-lite-task-vision:0.4.4", "org.tensorflow:tensorflow-lite-gpu-delegate-plugin:0.4.4", "org.tensorflow:tensorflow-lite-support:0.4.4"]
+custom_maven_repos=[]

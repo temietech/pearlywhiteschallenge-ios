@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://drwdvs3bofrh5"
+path="res://.godot/imported/Let's do this Flora.mp3-987f194fc8b53a97df2b77dcc2d15ed0.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/voices/Let's do this Flora.mp3"
+dest_files=["res://.godot/imported/Let's do this Flora.mp3-987f194fc8b53a97df2b77dcc2d15ed0.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

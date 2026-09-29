@@ -1,0 +1,449 @@
+# scripts/main.gd
+extends Control
+
+var content_container: Control
+var top_bar: Control
+var bottom_nav: Control
+var achievement_overlay: Control
+var toast_overlay: Control
+var tutorial_overlay: Control
+var notification_manager: Node
+
+var current_screen_node: Control
+var current_screen_name: String = ""
+
+const SCRIPTS = {
+	"start": "res://scripts/start_screen.gd",
+	"profiles": "res://scripts/profiles_screen.gd",
+	"create_profile": "res://scripts/create_profile_screen.gd",
+	"map": "res://scripts/map_screen.gd",
+	"floss": "res://scripts/floss_screen.gd",
+	"brush_check": "res://scripts/brush_check_screen.gd",
+	"brushing": "res://scripts/brushing_screen.gd",
+	"quiz": "res://scripts/quiz_screen.gd",
+	"combat": "res://scripts/combat_screen.gd",
+	"whack": "res://scripts/whack_screen.gd",
+	"memory": "res://scripts/memory_screen.gd",
+	"surprise": "res://scripts/surprise_screen.gd",
+	"candy_trap": "res://scripts/candy_trap_screen.gd",
+	"shop": "res://scripts/shop_screen.gd",
+	"badges": "res://scripts/badges_screen.gd",
+	"facts": "res://scripts/facts_screen.gd",
+	"story": "res://scripts/story_screen.gd",
+	"profile": "res://scripts/profile_screen.gd",
+	"select_player": "res://scripts/select_player_screen.gd",
+	"character_select": "res://scripts/character_select_screen.gd",
+	"settings": "res://scripts/settings_screen.gd",
+	"avatar_care": "res://scripts/avatar_care_screen.gd",
+	"dev_menu": "res://scripts/dev_menu_screen.gd"
+}
+var _cached_scripts: Dictionary = {}
+
+func _ready():
+	anchors_preset = Control.PRESET_FULL_RECT
+	anchor_right = 1.0
+	anchor_bottom = 1.0
+	custom_minimum_size = Vector2(450, 800)
+	
+	UIHelper.get_pause_button_texture()
+	
+	_build_framework()
+	
+	# Preload Candy Crusade 3D scene asynchronously in background
+	call_deferred("_preload_background_assets")
+	
+	# Cold boot: always show Start Screen
+	navigate_to("start")
+
+func _preload_background_assets():
+	if GameState and GameState.has_method("preload_candy_crusade_in_background"):
+		GameState.preload_candy_crusade_in_background()
+
+func _build_framework():
+	# Background Base Color
+	var bg = ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.anchor_right = 1.0
+	bg.anchor_bottom = 1.0
+	bg.offset_right = 0
+	bg.offset_bottom = 0
+	bg.color = UIHelper.SKY_BLUE
+	add_child(bg)
+	
+	# Content Container for Active Screen
+	content_container = Control.new()
+	content_container.set_anchors_preset(Control.PRESET_FULL_RECT)
+	content_container.anchor_right = 1.0
+	content_container.anchor_bottom = 1.0
+	content_container.offset_right = 0
+	content_container.offset_bottom = 0
+	add_child(content_container)
+	
+	# Top Bar (anchored full-width at top)
+	var top_bar_script = preload("res://scripts/top_bar.gd")
+	top_bar = Control.new()
+	top_bar.set_script(top_bar_script)
+	top_bar.anchor_left = 0.0
+	top_bar.anchor_right = 1.0
+	top_bar.anchor_top = 0.0
+	top_bar.anchor_bottom = 0.0
+	top_bar.offset_top = 0
+	top_bar.offset_bottom = 80
+	top_bar.z_index = 100
+	top_bar.z_as_relative = false
+	top_bar.avatar_pressed.connect(func(): navigate_to("profile"))
+	top_bar.settings_pressed.connect(func(): navigate_to("settings"))
+	top_bar.back_pressed.connect(func(): navigate_to("map"))
+	add_child(top_bar)
+	
+	# Bottom Navigation (anchored full-width at bottom)
+	var bottom_nav_script = preload("res://scripts/bottom_nav.gd")
+	bottom_nav = Control.new()
+	bottom_nav.set_script(bottom_nav_script)
+	bottom_nav.anchor_left = 0.0
+	bottom_nav.anchor_right = 1.0
+	bottom_nav.anchor_top = 1.0
+	bottom_nav.anchor_bottom = 1.0
+	bottom_nav.offset_top = -88
+	bottom_nav.offset_bottom = 0
+	bottom_nav.z_index = 100
+	bottom_nav.z_as_relative = false
+	bottom_nav.tab_selected.connect(_on_tab_selected)
+	add_child(bottom_nav)
+	
+	# Overlays
+	var toast_script = preload("res://scripts/toast_overlay.gd")
+	toast_overlay = Control.new()
+	toast_overlay.set_script(toast_script)
+	toast_overlay.z_index = 200
+	toast_overlay.z_as_relative = false
+	add_child(toast_overlay)
+	
+	var achieve_script = preload("res://scripts/achievement_overlay.gd")
+	achievement_overlay = Control.new()
+	achievement_overlay.set_script(achieve_script)
+	achievement_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	achievement_overlay.anchor_right = 1.0
+	achievement_overlay.anchor_bottom = 1.0
+	achievement_overlay.offset_left = 0
+	achievement_overlay.offset_top = 0
+	achievement_overlay.offset_right = 0
+	achievement_overlay.offset_bottom = 0
+	achievement_overlay.z_index = 210
+	achievement_overlay.z_as_relative = false
+	add_child(achievement_overlay)
+	
+	# Push Notification & Event Reminders Manager
+	var notif_script = preload("res://scripts/notification_manager.gd")
+	notification_manager = Node.new()
+	notification_manager.name = "NotificationManager"
+	notification_manager.set_script(notif_script)
+	add_child(notification_manager)
+
+func navigate_to(screen_name: String, extra_args: Dictionary = {}):
+	if not SCRIPTS.has(screen_name):
+		return
+		
+	current_screen_name = screen_name
+	
+	if current_screen_node:
+		current_screen_node.queue_free()
+		current_screen_node = null
+		
+	var script: Script = null
+	if _cached_scripts.has(screen_name):
+		script = _cached_scripts[screen_name]
+	else:
+		script = load(SCRIPTS[screen_name])
+		if script:
+			_cached_scripts[screen_name] = script
+			
+	if not script:
+		return
+		
+	var new_screen = Control.new()
+	new_screen.set_script(script)
+	new_screen.set_anchors_preset(Control.PRESET_FULL_RECT)
+	new_screen.anchor_right = 1.0
+	new_screen.anchor_bottom = 1.0
+	new_screen.offset_right = 0
+	new_screen.offset_bottom = 0
+	
+	if screen_name == "start":
+		new_screen.start_pressed.connect(func():
+			var count = GameState.profiles.size()
+			if count == 0:
+				navigate_to("create_profile")
+			elif count == 1:
+				var p = GameState.profiles[0]
+				GameState.set_active_profile(p.get("id", ""))
+				navigate_to("map")
+			else:
+				navigate_to("select_player")
+		)
+	elif screen_name == "profiles":
+		new_screen.profile_picked.connect(func(id):
+			GameState.set_active_profile(id)
+			navigate_to("map")
+		)
+		new_screen.submit_pressed.connect(func():
+			if GameState.get_active_profile().is_empty() and GameState.profiles.size() > 0:
+				GameState.set_active_profile(GameState.profiles[0]["id"])
+			navigate_to("map")
+		)
+		new_screen.create_profile_requested.connect(func():
+			navigate_to("create_profile")
+		)
+		new_screen.edit_profile_requested.connect(func(id):
+			navigate_to("create_profile", {"edit_id": id})
+		)
+	elif screen_name == "create_profile":
+		if extra_args.has("edit_id"):
+			new_screen.call_deferred("setup_edit", extra_args["edit_id"])
+		
+		new_screen.done_pressed.connect(func():
+			navigate_to("map")
+		)
+		new_screen.back_pressed.connect(func():
+			if GameState.profiles.size() == 0:
+				navigate_to("start")
+			else:
+				navigate_to("select_player")
+		)
+	elif screen_name == "select_player":
+		new_screen.player_chosen.connect(func(id):
+			if id != "":
+				GameState.set_active_profile(id)
+			navigate_to("map")
+		)
+		new_screen.manage_players_requested.connect(func():
+			navigate_to("profiles")
+		)
+	elif screen_name == "map":
+		new_screen.launch_node.connect(_on_map_node_launched)
+		new_screen.launch_minigame.connect(func(game): navigate_to(game))
+	elif screen_name == "floss":
+		new_screen.floss_completed.connect(func(): navigate_to("brush_check"))
+		new_screen.no_floss_proceed.connect(func(): navigate_to("brush_check"))
+		new_screen.back_pressed.connect(func(): navigate_to("map"))
+	elif screen_name == "brushing":
+		if new_screen.has_signal("claim_rewards_pressed"):
+			new_screen.claim_rewards_pressed.connect(func(day):
+				navigate_to("facts", {"auto_show_day": day, "is_review": false})
+			)
+		if new_screen.has_signal("review_fact_pressed"):
+			new_screen.review_fact_pressed.connect(func():
+				navigate_to("facts", {"is_review": true})
+			)
+		new_screen.brushing_completed.connect(func():
+			pass
+		)
+		new_screen.quit_requested.connect(func(): navigate_to("map"))
+		if new_screen.has_signal("settings_requested"):
+			new_screen.settings_requested.connect(func(): navigate_to("settings"))
+	elif screen_name == "story":
+		if extra_args.has("auto_show_day") and new_screen.has_method("setup_story_view"):
+			new_screen.call_deferred("setup_story_view", extra_args["auto_show_day"])
+		new_screen.back_pressed.connect(func(): navigate_to("map"))
+	elif screen_name == "quiz":
+		var quiz_done = false
+		new_screen.quiz_completed.connect(func():
+			if quiz_done: return
+			quiz_done = true
+			var p = GameState.get_active_profile()
+			var cur_node = int(p.get("currentNode", 0))
+			var node_info = GameState.get_node_data(cur_node)
+			var n_type = node_info.get("type", "")
+			if cur_node == 0 or n_type == "intro":
+				GameState.finish_node(false)
+			elif n_type == "quiz":
+				GameState.finish_node(false)
+			navigate_to("map")
+		)
+	elif screen_name == "avatar_care":
+		if new_screen.has_signal("back_pressed"):
+			new_screen.back_pressed.connect(func(): navigate_to("map"))
+	elif screen_name == "facts":
+		if extra_args.has("auto_show_day") and new_screen.has_method("setup_fact_view"):
+			new_screen.call_deferred("setup_fact_view", extra_args.get("auto_show_day", 1), extra_args.get("is_review", false))
+		elif extra_args.get("is_review", false) and new_screen.has_method("setup_fact_view"):
+			new_screen.call_deferred("setup_fact_view", 0, true)
+		new_screen.back_pressed.connect(func():
+			navigate_to("map")
+		)
+	elif screen_name == "shop":
+		if (extra_args.has("expand_weapon") or extra_args.has("tab")) and new_screen.has_method("setup_view"):
+			var w_id = str(extra_args.get("expand_weapon", ""))
+			var tab_id = str(extra_args.get("tab", "powerups"))
+			new_screen.setup_view(w_id, tab_id)
+		if new_screen.has_signal("back_pressed"):
+			new_screen.back_pressed.connect(func(): navigate_to("map"))
+	elif screen_name == "badges":
+		if new_screen.has_signal("back_pressed"):
+			new_screen.back_pressed.connect(func(): navigate_to("map"))
+	elif screen_name == "combat":
+		UIHelper.create_candy_crusade_loading_overlay(self)
+		var is_boss_match = extra_args.get("is_boss", false)
+		new_screen.call_deferred("setup_fight", is_boss_match)
+		var combat_done = false
+		new_screen.combat_finished.connect(func(win):
+			if combat_done: return
+			combat_done = true
+			UIHelper.dismiss_candy_crusade_loading_overlay(self)
+			if win:
+				var p = GameState.get_active_profile()
+				var cur_node = int(p.get("currentNode", 0))
+				var node_info = GameState.get_node_data(cur_node)
+				var n_type = node_info.get("type", "")
+				if cur_node == 0 or n_type == "intro":
+					GameState.set_node_stage(0, 1)
+					navigate_to("quiz")
+					return
+				elif n_type == "evening":
+					GameState.set_node_stage(cur_node, 1)
+				elif n_type == "morning":
+					GameState.finish_node(false)
+				elif n_type == "minigame":
+					GameState.finish_node(false)
+				else:
+					GameState.finish_node(false)
+			navigate_to("map")
+		)
+	elif screen_name == "whack" or screen_name == "memory" or screen_name == "surprise":
+		var minigame_completed = false
+		var p_start = GameState.get_active_profile()
+		var launched_node = int(p_start.get("currentNode", 0))
+		
+		var handle_minigame_done = func(completed_successfully: bool = true):
+			if minigame_completed:
+				return
+			minigame_completed = true
+			
+			var p = GameState.get_active_profile()
+			var cur_node = int(p.get("currentNode", 0))
+			if cur_node != launched_node:
+				navigate_to("map")
+				return
+				
+			if completed_successfully:
+				var node_info = GameState.get_node_data(cur_node)
+				var n_type = node_info.get("type", "")
+				if n_type == "morning":
+					GameState.finish_node(false)
+				elif n_type == "evening":
+					GameState.set_node_stage(cur_node, 1)
+				elif n_type == "minigame":
+					GameState.finish_node(false)
+			navigate_to("map")
+			
+		if new_screen.has_signal("game_ended"):
+			new_screen.game_ended.connect(func(): handle_minigame_done.call(false))
+		if new_screen.has_signal("surprise_claimed"):
+			new_screen.surprise_claimed.connect(func(): handle_minigame_done.call(true))
+		if new_screen.has_signal("game_won"):
+			new_screen.game_won.connect(func(): handle_minigame_done.call(true))
+	elif screen_name == "profile":
+		new_screen.change_avatar_requested.connect(func(): navigate_to("character_select"))
+		new_screen.switch_player_requested.connect(func(): navigate_to("select_player"))
+		if new_screen.has_signal("back_pressed"):
+			new_screen.back_pressed.connect(func(): navigate_to("map"))
+	elif screen_name == "character_select":
+		new_screen.character_selected.connect(func(): navigate_to("profile"))
+		if new_screen.has_signal("back_pressed"):
+			new_screen.back_pressed.connect(func(): navigate_to("profile"))
+	elif screen_name == "settings":
+		new_screen.switch_profile_requested.connect(func(): navigate_to("select_player"))
+		new_screen.reset_completed.connect(func(): navigate_to("start"))
+		if new_screen.has_signal("back_pressed"):
+			new_screen.back_pressed.connect(func(): navigate_to("map"))
+	elif screen_name == "brush_check":
+		new_screen.back_pressed.connect(func(): navigate_to("map"))
+		new_screen.start_brushing_pressed.connect(func(): navigate_to("brushing"))
+	elif screen_name == "candy_trap":
+		new_screen.closed.connect(func(): navigate_to("map"))
+		new_screen.completed.connect(func(): navigate_to("map"))
+	elif screen_name == "dev_menu":
+		new_screen.navigate_requested.connect(func(sn): navigate_to(sn))
+		new_screen.back_pressed.connect(func(): navigate_to("settings"))
+		
+	content_container.add_child(new_screen)
+	current_screen_node = new_screen
+	
+	_update_chrome_visibility(screen_name)
+	if bottom_nav and bottom_nav.has_method("set_active"):
+		bottom_nav.set_active(screen_name)
+		
+	if AudioManager:
+		AudioManager.play_screen_bgm(screen_name)
+
+func _update_chrome_visibility(screen_name: String):
+	# Global top bar is ONLY visible on map
+	top_bar.visible = (screen_name == "map")
+	
+	# Global bottom navigation is visible on map and avatar care
+	bottom_nav.visible = (screen_name == "map" or screen_name == "avatar_care")
+	
+	# Achievement / Level Up overlay is strictly restricted to map main page
+	if achievement_overlay and achievement_overlay.has_method("on_screen_changed"):
+		achievement_overlay.on_screen_changed(screen_name)
+		
+	# Toast notification overlay disabled per user request
+	if toast_overlay and toast_overlay.has_method("dismiss"):
+		toast_overlay.dismiss()
+	
+	if top_bar.visible and top_bar.has_method("set_screen"):
+		top_bar.set_screen(screen_name)
+
+		
+	# First-run coach-mark tutorial on map for first time users (only)
+	if screen_name == "map":
+		var p = GameState.get_active_profile()
+		if not p.is_empty() and not p.get("tutorial_done", false):
+			call_deferred("_start_tutorial")
+	else:
+		if tutorial_overlay and is_instance_valid(tutorial_overlay):
+			tutorial_overlay.queue_free()
+			tutorial_overlay = null
+
+
+func _start_tutorial():
+	if tutorial_overlay and is_instance_valid(tutorial_overlay):
+		return
+	var tut_script = preload("res://scripts/tutorial_overlay.gd")
+	tutorial_overlay = Control.new()
+	tutorial_overlay.set_script(tut_script)
+	tutorial_overlay.z_index = 200
+	tutorial_overlay.tutorial_finished.connect(func(): tutorial_overlay = null)
+	add_child(tutorial_overlay)
+
+func _on_map_node_launched(day: int, node_type: String):
+	if node_type == "brush":
+		navigate_to("floss")
+	elif node_type == "quiz":
+		navigate_to("quiz")
+	elif node_type == "combat":
+		UIHelper.show_pre_battle_ammo_check_modal(self, func():
+			UIHelper.create_candy_crusade_loading_overlay(self)
+			await get_tree().process_frame
+			await get_tree().process_frame
+			navigate_to("combat", {"is_boss": (day == 28 or day in [1, 9, 19, 28])})
+		, func():
+			navigate_to("shop", {"tab": "powerups"})
+		)
+	elif node_type == "minigame":
+		var p = GameState.get_active_profile()
+		var cur_node = int(p.get("currentNode", 0))
+		var n_info = GameState.get_node_data(cur_node)
+		var is_evening = (n_info.get("type", "") == "evening")
+		var games = ["whack", "memory", "surprise"]
+		var offset = 1 if is_evening else 0
+		var pick = games[(day + offset) % games.size()]
+		navigate_to(pick)
+	elif node_type == "surprise":
+		navigate_to("surprise")
+	elif node_type == "trap":
+		navigate_to("candy_trap")
+
+func _on_tab_selected(tab_name: String):
+	if tab_name != current_screen_name:
+		navigate_to(tab_name)

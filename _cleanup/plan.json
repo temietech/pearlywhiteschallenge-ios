@@ -1,0 +1,2041 @@
+{
+ "moves": [
+  {
+   "src": "public/audio/songs/Brush the Pearly White way! (1).mp3",
+   "dst": "assets/audio/music/Brush the Pearly White way! (1).mp3"
+  },
+  {
+   "src": "public/audio/songs/Candy Bomb Frenzy (3.20).mp3",
+   "dst": "assets/audio/music/Candy Bomb Frenzy (3.20).mp3"
+  },
+  {
+   "src": "public/audio/songs/Candy Meadow.mp3",
+   "dst": "assets/audio/music/Candy Meadow.mp3"
+  },
+  {
+   "src": "public/audio/songs/Candyland Dreams.mp3",
+   "dst": "assets/audio/music/Candyland Dreams.mp3"
+  },
+  {
+   "src": "public/audio/songs/Healthy Heroes CleanMatch.mp3",
+   "dst": "assets/audio/music/Healthy Heroes CleanMatch.mp3"
+  },
+  {
+   "src": "public/audio/songs/PW Intro Audio 5.mp3",
+   "dst": "assets/audio/music/PW Intro Audio 5.mp3"
+  },
+  {
+   "src": "public/audio/songs/PW Intro Audio.mp3",
+   "dst": "assets/audio/music/PW Intro Audio.mp3"
+  },
+  {
+   "src": "public/audio/songs/Spark.mp3",
+   "dst": "assets/audio/music/Spark.mp3"
+  },
+  {
+   "src": "public/audio/songs/into the lair - i like.MP3",
+   "dst": "assets/audio/music/into the lair - i like.MP3"
+  },
+  {
+   "src": "public/audio/sfx/CleanMatch/powerUp4.mp3",
+   "dst": "assets/audio/sfx/CleanMatch/powerUp4.mp3"
+  },
+  {
+   "src": "public/audio/sfx/LvlResults/Level Complete.mp3",
+   "dst": "assets/audio/sfx/LvlResults/Level Complete.mp3"
+  },
+  {
+   "src": "public/audio/sfx/LvlResults/Pearly Whites.mp3",
+   "dst": "assets/audio/sfx/LvlResults/Pearly Whites.mp3"
+  },
+  {
+   "src": "public/audio/sfx/LvlResults/Stage Cleared.mp3",
+   "dst": "assets/audio/sfx/LvlResults/Stage Cleared.mp3"
+  },
+  {
+   "src": "public/audio/sfx/LvlResults/Victory.mp3",
+   "dst": "assets/audio/sfx/LvlResults/Victory.mp3"
+  },
+  {
+   "src": "public/audio/sfx/LvlResults/You Lose.mp3",
+   "dst": "assets/audio/sfx/LvlResults/You Lose.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/ahhhh-choir.mp3",
+   "dst": "assets/audio/sfx/MP3/ahhhh-choir.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/brushing-teeth.mp3",
+   "dst": "assets/audio/sfx/MP3/brushing-teeth.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/click_001.mp3",
+   "dst": "assets/audio/sfx/MP3/click_001.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/close_004.mp3",
+   "dst": "assets/audio/sfx/MP3/close_004.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/confirmation_002.mp3",
+   "dst": "assets/audio/sfx/MP3/confirmation_002.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/drop_004.mp3",
+   "dst": "assets/audio/sfx/MP3/drop_004.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/drum-roll-please-6921.mp3",
+   "dst": "assets/audio/sfx/MP3/drum-roll-please-6921.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/eating-sound-effect-36186.mp3",
+   "dst": "assets/audio/sfx/MP3/eating-sound-effect-36186.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/error1.mp3",
+   "dst": "assets/audio/sfx/MP3/error1.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/hurt2.mp3",
+   "dst": "assets/audio/sfx/MP3/hurt2.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/item-pick-up-38258.mp3",
+   "dst": "assets/audio/sfx/MP3/item-pick-up-38258.mp3"
+  },
+  {
+   "src": "public/audio/sfx/MP3/powerUp8.mp3",
+   "dst": "assets/audio/sfx/MP3/powerUp8.mp3"
+  },
+  {
+   "src": "public/audio/sfx/Character Speech/Bring it on Dash.mp3",
+   "dst": "assets/audio/voices/Bring it on Dash.mp3"
+  },
+  {
+   "src": "public/audio/sfx/Character Speech/Let's do this Flora.mp3",
+   "dst": "assets/audio/voices/Let's do this Flora.mp3"
+  },
+  {
+   "src": "public/audio/sfx/Character Speech/Mission Accepted Blaze.mp3",
+   "dst": "assets/audio/voices/Mission Accepted Blaze.mp3"
+  },
+  {
+   "src": "public/audio/sfx/Character Speech/Spark Online .mp3",
+   "dst": "assets/audio/voices/Spark Online .mp3"
+  },
+  {
+   "src": "public/audio/sfx/Character Speech/Time to eat Nibbles.mp3",
+   "dst": "assets/audio/voices/Time to eat Nibbles.mp3"
+  },
+  {
+   "src": "public/audio/sfx/Character Speech/Time to shine Pearl.mp3",
+   "dst": "assets/audio/voices/Time to shine Pearl.mp3"
+  },
+  {
+   "src": "public/audio/sfx/Character Speech/alright Ash.mp3",
+   "dst": "assets/audio/voices/alright Ash.mp3"
+  },
+  {
+   "src": "public/audio/sfx/Character Speech/new character unlocked.mp3",
+   "dst": "assets/audio/voices/new character unlocked.mp3"
+  },
+  {
+   "src": "public/fonts/CantoraOne-Regular.ttf",
+   "dst": "assets/fonts/CantoraOne-Regular.ttf"
+  },
+  {
+   "src": "public/fonts/PearlyWhitesFont.ttf",
+   "dst": "assets/fonts/PearlyWhitesFont.ttf"
+  },
+  {
+   "src": "public/fonts/Roboto-Regular.ttf",
+   "dst": "assets/fonts/Roboto-Regular.ttf"
+  },
+  {
+   "src": "public/fonts/Rubik-Regular.ttf",
+   "dst": "assets/fonts/Rubik-Regular.ttf"
+  },
+  {
+   "src": "public/fonts/WorkSans-Regular.ttf",
+   "dst": "assets/fonts/WorkSans-Regular.ttf"
+  },
+  {
+   "src": "public/favicon.ico",
+   "dst": "assets/icon/favicon.ico"
+  },
+  {
+   "src": "public/sorted_assets/addprofilescreen/add_player_button_1.png",
+   "dst": "assets/images/addprofilescreen/add_player_button_1.png"
+  },
+  {
+   "src": "public/sorted_assets/addprofilescreen/submit_button.png",
+   "dst": "assets/images/addprofilescreen/submit_button.png"
+  },
+  {
+   "src": "public/backgrounds/Start-Page-tablet.jpeg",
+   "dst": "assets/images/backgrounds/Start-Page-tablet.jpeg"
+  },
+  {
+   "src": "public/backgrounds/Start-Page.jpg",
+   "dst": "assets/images/backgrounds/Start-Page.jpg"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/Pointsmaster_bronze.png",
+   "dst": "assets/images/badgescreen/Pointsmaster_bronze.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/Pointsmaster_gold.png",
+   "dst": "assets/images/badgescreen/Pointsmaster_gold.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/badges_background.jpg",
+   "dst": "assets/images/badgescreen/badges_background.jpg"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/blue_back_button.png",
+   "dst": "assets/images/badgescreen/blue_back_button.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/coincollector_bronze.png",
+   "dst": "assets/images/badgescreen/coincollector_bronze.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/coincollector_gold.png",
+   "dst": "assets/images/badgescreen/coincollector_gold.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/coincollector_silver.png",
+   "dst": "assets/images/badgescreen/coincollector_silver.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/factfinder_bronze.png",
+   "dst": "assets/images/badgescreen/factfinder_bronze.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/factfinder_gold.png",
+   "dst": "assets/images/badgescreen/factfinder_gold.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/factfinder_silver.png",
+   "dst": "assets/images/badgescreen/factfinder_silver.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/firstsparkle.png",
+   "dst": "assets/images/badgescreen/firstsparkle.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/game_blue_windo_b.png",
+   "dst": "assets/images/badgescreen/game_blue_windo_b.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/minionmasher_bronze.png",
+   "dst": "assets/images/badgescreen/minionmasher_bronze.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/minionmasher_gold.png",
+   "dst": "assets/images/badgescreen/minionmasher_gold.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/minionmasher_silver.png",
+   "dst": "assets/images/badgescreen/minionmasher_silver.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/onaroll_bronze.png",
+   "dst": "assets/images/badgescreen/onaroll_bronze.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/onaroll_gold.png",
+   "dst": "assets/images/badgescreen/onaroll_gold.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/onaroll_silver.png",
+   "dst": "assets/images/badgescreen/onaroll_silver.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/pearlychampion.png",
+   "dst": "assets/images/badgescreen/pearlychampion.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/pointmaster_silver.png",
+   "dst": "assets/images/badgescreen/pointmaster_silver.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/quizwhiz-bronze.png",
+   "dst": "assets/images/badgescreen/quizwhiz-bronze.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/quizwhiz-silver.png",
+   "dst": "assets/images/badgescreen/quizwhiz-silver.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/quizwhiz.png",
+   "dst": "assets/images/badgescreen/quizwhiz.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/seeinventorybtn.png",
+   "dst": "assets/images/badgescreen/seeinventorybtn.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/sweetdefeat_bronze.png",
+   "dst": "assets/images/badgescreen/sweetdefeat_bronze.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/sweetdefeat_gold.png",
+   "dst": "assets/images/badgescreen/sweetdefeat_gold.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/sweetdefeat_silver.png",
+   "dst": "assets/images/badgescreen/sweetdefeat_silver.png"
+  },
+  {
+   "src": "public/sorted_assets/badgescreen/trophy_collection_title.png",
+   "dst": "assets/images/badgescreen/trophy_collection_title.png"
+  },
+  {
+   "src": "public/sorted_assets/bonbonbashmini/bonbonbash_hole.png",
+   "dst": "assets/images/bonbonbashmini/bonbonbash_hole.png"
+  },
+  {
+   "src": "public/sorted_assets/bonbonbashmini/whack_bg.jpg",
+   "dst": "assets/images/bonbonbashmini/whack_bg.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/bacteria.png",
+   "dst": "assets/images/brushing/bacteria.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/brushing_bathroom_bg.jpg",
+   "dst": "assets/images/brushing/brushing_bathroom_bg.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/brushingmascot.png",
+   "dst": "assets/images/brushing/brushingmascot.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/brushingpagemouth.png",
+   "dst": "assets/images/brushing/brushingpagemouth.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/brushingpageprogressbarbadge.png",
+   "dst": "assets/images/brushing/brushingpageprogressbarbadge.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/brushingpagestatusbar.png",
+   "dst": "assets/images/brushing/brushingpagestatusbar.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/bubble_asset.png",
+   "dst": "assets/images/brushing/bubble_asset.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/bubble_icon.png",
+   "dst": "assets/images/brushing/bubble_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/colorful_bubble.png",
+   "dst": "assets/images/brushing/colorful_bubble.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/finished_brushing_ash.jpg",
+   "dst": "assets/images/brushing/finished_brushing_ash.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/finished_brushing_blaze.jpg",
+   "dst": "assets/images/brushing/finished_brushing_blaze.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/finished_brushing_chef.jpg",
+   "dst": "assets/images/brushing/finished_brushing_chef.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/finished_brushing_chip.jpg",
+   "dst": "assets/images/brushing/finished_brushing_chip.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/finished_brushing_dash.jpg",
+   "dst": "assets/images/brushing/finished_brushing_dash.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/finished_brushing_flora.jpg",
+   "dst": "assets/images/brushing/finished_brushing_flora.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/finished_brushing_penelope.jpg",
+   "dst": "assets/images/brushing/finished_brushing_penelope.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/finished_brushing_spark.jpg",
+   "dst": "assets/images/brushing/finished_brushing_spark.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/finished_brushing_sparkette.jpg",
+   "dst": "assets/images/brushing/finished_brushing_sparkette.jpg"
+  },
+  {
+   "src": "public/sorted_assets/brushing/mouth_q_bl.png",
+   "dst": "assets/images/brushing/mouth_q_bl.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/mouth_q_br.png",
+   "dst": "assets/images/brushing/mouth_q_br.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/mouth_q_tl.png",
+   "dst": "assets/images/brushing/mouth_q_tl.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/mouth_q_tr.png",
+   "dst": "assets/images/brushing/mouth_q_tr.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/purple_star_points.png",
+   "dst": "assets/images/brushing/purple_star_points.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/speech_bubble.png",
+   "dst": "assets/images/brushing/speech_bubble.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/start_brushing_button.png",
+   "dst": "assets/images/brushing/start_brushing_button.png"
+  },
+  {
+   "src": "public/sorted_assets/brushing/toothbrush_icon.png",
+   "dst": "assets/images/brushing/toothbrush_icon.png"
+  },
+  {
+   "src": "public/buttons/adduserbtn.png",
+   "dst": "assets/images/buttons/adduserbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/audiosettings_btn.png",
+   "dst": "assets/images/buttons/audiosettings_btn.png"
+  },
+  {
+   "src": "public/buttons/audiotogglesbtn.png",
+   "dst": "assets/images/buttons/audiotogglesbtn.png"
+  },
+  {
+   "src": "public/buttons/awesomebtn.png",
+   "dst": "assets/images/buttons/awesomebtn.png"
+  },
+  {
+   "src": "public/buttons/backbtn.png",
+   "dst": "assets/images/buttons/backbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/backtosettings_btn.png",
+   "dst": "assets/images/buttons/backtosettings_btn.png"
+  },
+  {
+   "src": "public/buttons/cancelbtn.png",
+   "dst": "assets/images/buttons/cancelbtn.png"
+  },
+  {
+   "src": "public/buttons/changeavatarbtn.png",
+   "dst": "assets/images/buttons/changeavatarbtn.png"
+  },
+  {
+   "src": "public/buttons/changedifficultybtn.png",
+   "dst": "assets/images/buttons/changedifficultybtn.png"
+  },
+  {
+   "src": "public/buttons/chooseplayerbtn.png",
+   "dst": "assets/images/buttons/chooseplayerbtn.png"
+  },
+  {
+   "src": "public/buttons/close-donebtn.png",
+   "dst": "assets/images/buttons/close-donebtn.png"
+  },
+  {
+   "src": "public/buttons/closebtn.png",
+   "dst": "assets/images/buttons/closebtn.png"
+  },
+  {
+   "src": "public/buttons/completesession.png",
+   "dst": "assets/images/buttons/completesession.png"
+  },
+  {
+   "src": "public/buttons/confirmbtn.png",
+   "dst": "assets/images/buttons/confirmbtn.png"
+  },
+  {
+   "src": "public/buttons/createfamcodebtn.png",
+   "dst": "assets/images/buttons/createfamcodebtn.png"
+  },
+  {
+   "src": "public/buttons/crossbtn.png",
+   "dst": "assets/images/buttons/crossbtn.png"
+  },
+  {
+   "src": "public/buttons/datawipe-resetbtn.png",
+   "dst": "assets/images/buttons/datawipe-resetbtn.png"
+  },
+  {
+   "src": "public/buttons/dismissbtn.png",
+   "dst": "assets/images/buttons/dismissbtn.png"
+  },
+  {
+   "src": ".godot/buttons/doneflossing_btn.png",
+   "dst": "assets/images/buttons/doneflossing_btn.png"
+  },
+  {
+   "src": "public/buttons/easybtn.png",
+   "dst": "assets/images/buttons/easybtn.png"
+  },
+  {
+   "src": "public/buttons/editbtn.png",
+   "dst": "assets/images/buttons/editbtn.png"
+  },
+  {
+   "src": "public/buttons/exitbtn.png",
+   "dst": "assets/images/buttons/exitbtn.png"
+  },
+  {
+   "src": "public/buttons/exitgamebtn.png",
+   "dst": "assets/images/buttons/exitgamebtn.png"
+  },
+  {
+   "src": "public/buttons/finishbtn.png",
+   "dst": "assets/images/buttons/finishbtn.png"
+  },
+  {
+   "src": "public/buttons/finishfactbtn.png",
+   "dst": "assets/images/buttons/finishfactbtn.png"
+  },
+  {
+   "src": ".godot/buttons/flossingtime_btn.png",
+   "dst": "assets/images/buttons/flossingtime_btn.png"
+  },
+  {
+   "src": "public/buttons/gifticon.png",
+   "dst": "assets/images/buttons/gifticon.png"
+  },
+  {
+   "src": "public/buttons/gotitbtn.png",
+   "dst": "assets/images/buttons/gotitbtn.png"
+  },
+  {
+   "src": "public/buttons/hardbtn.png",
+   "dst": "assets/images/buttons/hardbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/hideinventorybtn.png",
+   "dst": "assets/images/buttons/hideinventorybtn.png"
+  },
+  {
+   "src": ".godot/buttons/idonthavefloss_btn.png",
+   "dst": "assets/images/buttons/idonthavefloss_btn.png"
+  },
+  {
+   "src": "public/buttons/joinfamilycodebtn.png",
+   "dst": "assets/images/buttons/joinfamilycodebtn.png"
+  },
+  {
+   "src": "public/buttons/keepbrushingbtn.png",
+   "dst": "assets/images/buttons/keepbrushingbtn.png"
+  },
+  {
+   "src": "public/buttons/keepbtn.png",
+   "dst": "assets/images/buttons/keepbtn.png"
+  },
+  {
+   "src": "public/buttons/keepgoingbtn.png",
+   "dst": "assets/images/buttons/keepgoingbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/learnnewfact_btn.png",
+   "dst": "assets/images/buttons/learnnewfact_btn.png"
+  },
+  {
+   "src": "public/buttons/leavebtn.png",
+   "dst": "assets/images/buttons/leavebtn.png"
+  },
+  {
+   "src": "public/buttons/letsbrushbtn.png",
+   "dst": "assets/images/buttons/letsbrushbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/listen_btn.png",
+   "dst": "assets/images/buttons/listen_btn.png"
+  },
+  {
+   "src": "public/buttons/mediumbtn.png",
+   "dst": "assets/images/buttons/mediumbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/next_btn.png",
+   "dst": "assets/images/buttons/next_btn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/off_btn.png",
+   "dst": "assets/images/buttons/off_btn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/on_btn.png",
+   "dst": "assets/images/buttons/on_btn.png"
+  },
+  {
+   "src": "public/buttons/ownedbtn.png",
+   "dst": "assets/images/buttons/ownedbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/parentalcontrol_btn.png",
+   "dst": "assets/images/buttons/parentalcontrol_btn.png"
+  },
+  {
+   "src": "public/buttons/pausebtn.png",
+   "dst": "assets/images/buttons/pausebtn.png"
+  },
+  {
+   "src": "public/buttons/playagainbtn.png",
+   "dst": "assets/images/buttons/playagainbtn.png"
+  },
+  {
+   "src": "public/buttons/quitbrushingbtn.png",
+   "dst": "assets/images/buttons/quitbrushingbtn.png"
+  },
+  {
+   "src": "public/buttons/quitbtn.png",
+   "dst": "assets/images/buttons/quitbtn.png"
+  },
+  {
+   "src": "public/buttons/quitgamebtn.png",
+   "dst": "assets/images/buttons/quitgamebtn.png"
+  },
+  {
+   "src": "public/buttons/readbtn.png",
+   "dst": "assets/images/buttons/readbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/replaytutorial_btn.png",
+   "dst": "assets/images/buttons/replaytutorial_btn.png"
+  },
+  {
+   "src": "public/buttons/restartbtn.png",
+   "dst": "assets/images/buttons/restartbtn.png"
+  },
+  {
+   "src": "public/buttons/resume.png",
+   "dst": "assets/images/buttons/resume.png"
+  },
+  {
+   "src": "public/buttons/resumebtn.png",
+   "dst": "assets/images/buttons/resumebtn.png"
+  },
+  {
+   "src": "public/buttons/returntomapbtn.png",
+   "dst": "assets/images/buttons/returntomapbtn.png"
+  },
+  {
+   "src": "public/buttons/reviewfactbtn.png",
+   "dst": "assets/images/buttons/reviewfactbtn.png"
+  },
+  {
+   "src": "public/buttons/savebtn.png",
+   "dst": "assets/images/buttons/savebtn.png"
+  },
+  {
+   "src": "public/buttons/seeinventorybtn.png",
+   "dst": "assets/images/buttons/seeinventorybtn.png"
+  },
+  {
+   "src": "public/buttons/selectbtn.png",
+   "dst": "assets/images/buttons/selectbtn.png"
+  },
+  {
+   "src": "public/buttons/skipcheckbtn.png",
+   "dst": "assets/images/buttons/skipcheckbtn.png"
+  },
+  {
+   "src": "public/buttons/skiptutorialbtn.png",
+   "dst": "assets/images/buttons/skiptutorialbtn.png"
+  },
+  {
+   "src": ".godot/buttons/start_btn.png",
+   "dst": "assets/images/buttons/start_btn.png"
+  },
+  {
+   "src": "public/buttons/startbrushingsessionbtn.png",
+   "dst": "assets/images/buttons/startbrushingsessionbtn.png"
+  },
+  {
+   "src": "public/buttons/startgamebtn.png",
+   "dst": "assets/images/buttons/startgamebtn.png"
+  },
+  {
+   "src": "public/buttons/submitanswerbtn.png",
+   "dst": "assets/images/buttons/submitanswerbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/supportdev_btn.png",
+   "dst": "assets/images/buttons/supportdev_btn.png"
+  },
+  {
+   "src": ".godot/buttons/switchback_btn.png",
+   "dst": "assets/images/buttons/switchback_btn.png"
+  },
+  {
+   "src": "public/buttons/switchuserbtn.png",
+   "dst": "assets/images/buttons/switchuserbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/taptoopen_btn.png",
+   "dst": "assets/images/buttons/taptoopen_btn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/termsandpriv_btn.png",
+   "dst": "assets/images/buttons/termsandpriv_btn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/tryagain_btn.png",
+   "dst": "assets/images/buttons/tryagain_btn.png"
+  },
+  {
+   "src": "public/sorted_assets/buttons/unlock_btn.png",
+   "dst": "assets/images/buttons/unlock_btn.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/Blue-Candor.png",
+   "dst": "assets/images/candycrusadegame/Blue-Candor.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/BonBon-Minion-Hit-Toothbrush.png",
+   "dst": "assets/images/candycrusadegame/BonBon-Minion-Hit-Toothbrush.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/BonBon-Minion.png",
+   "dst": "assets/images/candycrusadegame/BonBon-Minion.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/boss_fight_mini_game_BG_candy.jpg",
+   "dst": "assets/images/candycrusadegame/boss_fight_mini_game_BG_candy.jpg"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/bubble_asset.png",
+   "dst": "assets/images/candycrusadegame/bubble_asset.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/bubble_icon.png",
+   "dst": "assets/images/candycrusadegame/bubble_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/colorful_bubble.png",
+   "dst": "assets/images/candycrusadegame/colorful_bubble.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/colorful_bubble_1.png",
+   "dst": "assets/images/candycrusadegame/colorful_bubble_1.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/colorful_bubble_2.png",
+   "dst": "assets/images/candycrusadegame/colorful_bubble_2.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/crosshair_reticle.png",
+   "dst": "assets/images/candycrusadegame/crosshair_reticle.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/dental_floss_icon.png",
+   "dst": "assets/images/candycrusadegame/dental_floss_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/flossweapon.png",
+   "dst": "assets/images/candycrusadegame/flossweapon.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/paste_pistol_2_front.png",
+   "dst": "assets/images/candycrusadegame/paste_pistol_2_front.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/paste_pistol_3_front.png",
+   "dst": "assets/images/candycrusadegame/paste_pistol_3_front.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/pasteweapon.png",
+   "dst": "assets/images/candycrusadegame/pasteweapon.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/right_arrow_button.png",
+   "dst": "assets/images/candycrusadegame/right_arrow_button.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/star.png",
+   "dst": "assets/images/candycrusadegame/star.png"
+  },
+  {
+   "src": "public/sorted_assets/candycrusadegame/washweapon.png",
+   "dst": "assets/images/candycrusadegame/washweapon.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/bubble_icon.png",
+   "dst": "assets/images/candytrap/bubble_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/candytrap_ash.png",
+   "dst": "assets/images/candytrap/candytrap_ash.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/candytrap_blaze.png",
+   "dst": "assets/images/candytrap/candytrap_blaze.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/candytrap_block.png",
+   "dst": "assets/images/candytrap/candytrap_block.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/candytrap_chef.png",
+   "dst": "assets/images/candytrap/candytrap_chef.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/candytrap_chip.png",
+   "dst": "assets/images/candytrap/candytrap_chip.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/candytrap_dash.png",
+   "dst": "assets/images/candytrap/candytrap_dash.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/candytrap_flora.png",
+   "dst": "assets/images/candytrap/candytrap_flora.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/candytrap_penelope.png",
+   "dst": "assets/images/candytrap/candytrap_penelope.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/candytrap_spark.png",
+   "dst": "assets/images/candytrap/candytrap_spark.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/candytrap_sparkette.png",
+   "dst": "assets/images/candytrap/candytrap_sparkette.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/right_arrow_button.png",
+   "dst": "assets/images/candytrap/right_arrow_button.png"
+  },
+  {
+   "src": "public/sorted_assets/candytrap/sad_tooth_character.png",
+   "dst": "assets/images/candytrap/sad_tooth_character.png"
+  },
+  {
+   "src": "public/sorted_assets/cardmatchmini/DentalMatch-Title.png",
+   "dst": "assets/images/cardmatchmini/DentalMatch-Title.png"
+  },
+  {
+   "src": "public/sorted_assets/cardmatchmini/beforetapcardface.png",
+   "dst": "assets/images/cardmatchmini/beforetapcardface.png"
+  },
+  {
+   "src": "public/sorted_assets/cardmatchmini/cardmatchback.png",
+   "dst": "assets/images/cardmatchmini/cardmatchback.png"
+  },
+  {
+   "src": "public/sorted_assets/cardmatchmini/dental_match_title.png",
+   "dst": "assets/images/cardmatchmini/dental_match_title.png"
+  },
+  {
+   "src": "public/sorted_assets/cardmatchmini/gold_tooth_coin.png",
+   "dst": "assets/images/cardmatchmini/gold_tooth_coin.png"
+  },
+  {
+   "src": "public/sorted_assets/cardmatchmini/purple_star_points.png",
+   "dst": "assets/images/cardmatchmini/purple_star_points.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/SirCrown-nobg.png",
+   "dst": "assets/images/characters/SirCrown-nobg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/ash-bg.png",
+   "dst": "assets/images/characters/ash-bg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/ash-nobg.png",
+   "dst": "assets/images/characters/ash-nobg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/blaze-bg.png",
+   "dst": "assets/images/characters/blaze-bg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/blaze-nobg.png",
+   "dst": "assets/images/characters/blaze-nobg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/chef-bg.png",
+   "dst": "assets/images/characters/chef-bg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/chef-nobg.png",
+   "dst": "assets/images/characters/chef-nobg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/chip-bg.png",
+   "dst": "assets/images/characters/chip-bg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/chip-nobg.png",
+   "dst": "assets/images/characters/chip-nobg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/dash-bg.png",
+   "dst": "assets/images/characters/dash-bg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/dash-nobg.png",
+   "dst": "assets/images/characters/dash-nobg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/flora-bg.png",
+   "dst": "assets/images/characters/flora-bg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/flora-nobg.png",
+   "dst": "assets/images/characters/flora-nobg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/penelope-bg.png",
+   "dst": "assets/images/characters/penelope-bg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/penelope-nobg.png",
+   "dst": "assets/images/characters/penelope-nobg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/spark-bg.png",
+   "dst": "assets/images/characters/spark-bg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/spark-nobg.png",
+   "dst": "assets/images/characters/spark-nobg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/sparkette-bg.png",
+   "dst": "assets/images/characters/sparkette-bg.png"
+  },
+  {
+   "src": "public/sorted_assets/characters/sparkette-nobg.png",
+   "dst": "assets/images/characters/sparkette-nobg.png"
+  },
+  {
+   "src": "public/sorted_assets/cleanmolar/sad_tooth_character.png",
+   "dst": "assets/images/cleanmolar/sad_tooth_character.png"
+  },
+  {
+   "src": "public/sorted_assets/cleanmolar/toothbrush_icon.png",
+   "dst": "assets/images/cleanmolar/toothbrush_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/congratulations/bubble_asset.png",
+   "dst": "assets/images/congratulations/bubble_asset.png"
+  },
+  {
+   "src": "public/sorted_assets/congratulations/bubble_icon.png",
+   "dst": "assets/images/congratulations/bubble_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/congratulations/claim_rewards_button.png",
+   "dst": "assets/images/congratulations/claim_rewards_button.png"
+  },
+  {
+   "src": "public/sorted_assets/congratulations/colorful_bubble.png",
+   "dst": "assets/images/congratulations/colorful_bubble.png"
+  },
+  {
+   "src": "public/sorted_assets/congratulations/gold_tooth_coin.png",
+   "dst": "assets/images/congratulations/gold_tooth_coin.png"
+  },
+  {
+   "src": "public/sorted_assets/congratulations/molar_coins_icon.png",
+   "dst": "assets/images/congratulations/molar_coins_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/congratulations/plain_tooth_icon.png",
+   "dst": "assets/images/congratulations/plain_tooth_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/congratulations/purple_star_points.png",
+   "dst": "assets/images/congratulations/purple_star_points.png"
+  },
+  {
+   "src": "public/sorted_assets/congratulations/right_arrow_button.png",
+   "dst": "assets/images/congratulations/right_arrow_button.png"
+  },
+  {
+   "src": "public/sorted_assets/createprofilescreen/colorful_bubble.png",
+   "dst": "assets/images/createprofilescreen/colorful_bubble.png"
+  },
+  {
+   "src": "public/sorted_assets/createprofilescreen/left_arrow_button.png",
+   "dst": "assets/images/createprofilescreen/left_arrow_button.png"
+  },
+  {
+   "src": "public/sorted_assets/createprofilescreen/right_arrow_button.png",
+   "dst": "assets/images/createprofilescreen/right_arrow_button.png"
+  },
+  {
+   "src": "public/sorted_assets/createprofilescreen/transparent_bubble.png",
+   "dst": "assets/images/createprofilescreen/transparent_bubble.png"
+  },
+  {
+   "src": "public/sorted_assets/general/adduserbtn.png",
+   "dst": "assets/images/general/adduserbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/awesomebtn.png",
+   "dst": "assets/images/general/awesomebtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/backbtn.png",
+   "dst": "assets/images/general/backbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/blue_modal_card_portrait.png",
+   "dst": "assets/images/general/blue_modal_card_portrait.png"
+  },
+  {
+   "src": "public/sorted_assets/general/cancelbtn.png",
+   "dst": "assets/images/general/cancelbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/changeavatarbtn.png",
+   "dst": "assets/images/general/changeavatarbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/choose_avatar_title.png",
+   "dst": "assets/images/general/choose_avatar_title.png"
+  },
+  {
+   "src": "public/sorted_assets/general/chooseplayerbtn.png",
+   "dst": "assets/images/general/chooseplayerbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/claim_rewards_button.png",
+   "dst": "assets/images/general/claim_rewards_button.png"
+  },
+  {
+   "src": "public/sorted_assets/general/closebtn.png",
+   "dst": "assets/images/general/closebtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/completesession.png",
+   "dst": "assets/images/general/completesession.png"
+  },
+  {
+   "src": "public/sorted_assets/general/crossbtn.png",
+   "dst": "assets/images/general/crossbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/datawipe-resetbtn.png",
+   "dst": "assets/images/general/datawipe-resetbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/editbtn.png",
+   "dst": "assets/images/general/editbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/exitbtn.png",
+   "dst": "assets/images/general/exitbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/exitgamebtn.png",
+   "dst": "assets/images/general/exitgamebtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/finishbtn.png",
+   "dst": "assets/images/general/finishbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/gifticon.png",
+   "dst": "assets/images/general/gifticon.png"
+  },
+  {
+   "src": "public/sorted_assets/general/keep_button.png",
+   "dst": "assets/images/general/keep_button.png"
+  },
+  {
+   "src": "public/sorted_assets/general/keepbtn.png",
+   "dst": "assets/images/general/keepbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/keepgoingbtn.png",
+   "dst": "assets/images/general/keepgoingbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/leavebtn.png",
+   "dst": "assets/images/general/leavebtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/letsbrushbtn.png",
+   "dst": "assets/images/general/letsbrushbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/pausebtn.png",
+   "dst": "assets/images/general/pausebtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/playagainbtn.png",
+   "dst": "assets/images/general/playagainbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/quitbrushingbtn.png",
+   "dst": "assets/images/general/quitbrushingbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/restartbtn.png",
+   "dst": "assets/images/general/restartbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/resumebtn.png",
+   "dst": "assets/images/general/resumebtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/returntomapbtn.png",
+   "dst": "assets/images/general/returntomapbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/reviewfactbtn.png",
+   "dst": "assets/images/general/reviewfactbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/save_button.png",
+   "dst": "assets/images/general/save_button.png"
+  },
+  {
+   "src": "public/sorted_assets/general/savebtn.png",
+   "dst": "assets/images/general/savebtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/seeinventorybtn.png",
+   "dst": "assets/images/general/seeinventorybtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/select_button.png",
+   "dst": "assets/images/general/select_button.png"
+  },
+  {
+   "src": "public/sorted_assets/general/selectbtn.png",
+   "dst": "assets/images/general/selectbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/general/switchuserbtn.png",
+   "dst": "assets/images/general/switchuserbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/journal/blue_back_button.png",
+   "dst": "assets/images/journal/blue_back_button.png"
+  },
+  {
+   "src": "public/sorted_assets/journal/blue_notepad.png",
+   "dst": "assets/images/journal/blue_notepad.png"
+  },
+  {
+   "src": "public/sorted_assets/journal/daily_dental_facts_title.png",
+   "dst": "assets/images/journal/daily_dental_facts_title.png"
+  },
+  {
+   "src": "public/sorted_assets/journal/diary_background.jpg",
+   "dst": "assets/images/journal/diary_background.jpg"
+  },
+  {
+   "src": "public/sorted_assets/journal/left_arrow_button.png",
+   "dst": "assets/images/journal/left_arrow_button.png"
+  },
+  {
+   "src": "public/sorted_assets/journal/magnifying_glass.png",
+   "dst": "assets/images/journal/magnifying_glass.png"
+  },
+  {
+   "src": "public/sorted_assets/journal/white_rectangle_button.png",
+   "dst": "assets/images/journal/white_rectangle_button.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/Map.jpg",
+   "dst": "assets/images/mainmap/Map.jpg"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/Persistent_bar_on_wh_item_1.png",
+   "dst": "assets/images/mainmap/Persistent_bar_on_wh_item_1.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/gold_star_counter.png",
+   "dst": "assets/images/mainmap/gold_star_counter.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapbuttonsdown_green.png",
+   "dst": "assets/images/mainmap/mapbuttonsdown_green.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapbuttonsdown_purple.png",
+   "dst": "assets/images/mainmap/mapbuttonsdown_purple.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapbuttonsdown_red.png",
+   "dst": "assets/images/mainmap/mapbuttonsdown_red.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapbuttonsdown_yellow.png",
+   "dst": "assets/images/mainmap/mapbuttonsdown_yellow.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapbuttonsup_blue.png",
+   "dst": "assets/images/mainmap/mapbuttonsup_blue.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapbuttonsup_green.png",
+   "dst": "assets/images/mainmap/mapbuttonsup_green.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapbuttonsup_purple.png",
+   "dst": "assets/images/mainmap/mapbuttonsup_purple.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapbuttonsup_red.png",
+   "dst": "assets/images/mainmap/mapbuttonsup_red.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapbuttonsup_yellow.png",
+   "dst": "assets/images/mainmap/mapbuttonsup_yellow.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapicons_badges.png",
+   "dst": "assets/images/mainmap/mapicons_badges.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapicons_diary.png",
+   "dst": "assets/images/mainmap/mapicons_diary.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapicons_map.png",
+   "dst": "assets/images/mainmap/mapicons_map.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapicons_shop.png",
+   "dst": "assets/images/mainmap/mapicons_shop.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/mapicons_story.png",
+   "dst": "assets/images/mainmap/mapicons_story.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/right_arrow_button.png",
+   "dst": "assets/images/mainmap/right_arrow_button.png"
+  },
+  {
+   "src": "public/sorted_assets/mainmap/topuimap_item_1.png",
+   "dst": "assets/images/mainmap/topuimap_item_1.png"
+  },
+  {
+   "src": "public/assets/Map.jpg",
+   "dst": "assets/images/misc/Map.jpg"
+  },
+  {
+   "src": "public/assets/add_player_button_1.png",
+   "dst": "assets/images/misc/add_player_button_1.png"
+  },
+  {
+   "src": "public/assets/back_button.png",
+   "dst": "assets/images/misc/back_button.png"
+  },
+  {
+   "src": "public/assets/blue_back_button.png",
+   "dst": "assets/images/misc/blue_back_button.png"
+  },
+  {
+   "src": "public/assets/blue_notepad.png",
+   "dst": "assets/images/misc/blue_notepad.png"
+  },
+  {
+   "src": "public/assets/brush_a_tee_scrapbook.png",
+   "dst": "assets/images/misc/brush_a_tee_scrapbook.png"
+  },
+  {
+   "src": "public/assets/bubble_asset.png",
+   "dst": "assets/images/misc/bubble_asset.png"
+  },
+  {
+   "src": "public/assets/bubble_icon.png",
+   "dst": "assets/images/misc/bubble_icon.png"
+  },
+  {
+   "src": "public/assets/cancel_button.png",
+   "dst": "assets/images/misc/cancel_button.png"
+  },
+  {
+   "src": "public/assets/claim_rewards_button.png",
+   "dst": "assets/images/misc/claim_rewards_button.png"
+  },
+  {
+   "src": "public/assets/colorful_bubble.png",
+   "dst": "assets/images/misc/colorful_bubble.png"
+  },
+  {
+   "src": "public/assets/crosshair_reticle.png",
+   "dst": "assets/images/misc/crosshair_reticle.png"
+  },
+  {
+   "src": "public/assets/current_streak_icon.png",
+   "dst": "assets/images/misc/current_streak_icon.png"
+  },
+  {
+   "src": "public/assets/edit_avatar_button_1.png",
+   "dst": "assets/images/misc/edit_avatar_button_1.png"
+  },
+  {
+   "src": "public/assets/gifticon.png",
+   "dst": "assets/images/misc/gifticon.png"
+  },
+  {
+   "src": "public/assets/gold_tooth_coin.png",
+   "dst": "assets/images/misc/gold_tooth_coin.png"
+  },
+  {
+   "src": "public/assets/left_arrow_button.png",
+   "dst": "assets/images/misc/left_arrow_button.png"
+  },
+  {
+   "src": "public/assets/magnifying_glass.png",
+   "dst": "assets/images/misc/magnifying_glass.png"
+  },
+  {
+   "src": "public/assets/metal_lock_icon.png",
+   "dst": "assets/images/misc/metal_lock_icon.png"
+  },
+  {
+   "src": "public/assets/molar_coins_icon.png",
+   "dst": "assets/images/misc/molar_coins_icon.png"
+  },
+  {
+   "src": "public/assets/points_star_button.png",
+   "dst": "assets/images/misc/points_star_button.png"
+  },
+  {
+   "src": "public/assets/red_false_button.png",
+   "dst": "assets/images/misc/red_false_button.png"
+  },
+  {
+   "src": "public/assets/right_arrow_button.png",
+   "dst": "assets/images/misc/right_arrow_button.png"
+  },
+  {
+   "src": "public/assets/sad_tooth_character.png",
+   "dst": "assets/images/misc/sad_tooth_character.png"
+  },
+  {
+   "src": "public/assets/settings_icon.png",
+   "dst": "assets/images/misc/settings_icon.png"
+  },
+  {
+   "src": "public/assets/start_brushing_button.png",
+   "dst": "assets/images/misc/start_brushing_button.png"
+  },
+  {
+   "src": "public/assets/submit_button.png",
+   "dst": "assets/images/misc/submit_button.png"
+  },
+  {
+   "src": "public/assets/title-whoisplaying.png",
+   "dst": "assets/images/misc/title-whoisplaying.png"
+  },
+  {
+   "src": "public/assets/toothbrush_icon.png",
+   "dst": "assets/images/misc/toothbrush_icon.png"
+  },
+  {
+   "src": "public/assets/total_brushing_time_icon.png",
+   "dst": "assets/images/misc/total_brushing_time_icon.png"
+  },
+  {
+   "src": "public/assets/transparent_bubble.png",
+   "dst": "assets/images/misc/transparent_bubble.png"
+  },
+  {
+   "src": "public/assets/transparent_panel.png",
+   "dst": "assets/images/misc/transparent_panel.png"
+  },
+  {
+   "src": "public/assets/true_button.png",
+   "dst": "assets/images/misc/true_button.png"
+  },
+  {
+   "src": "public/assets/whack_bg.jpg",
+   "dst": "assets/images/misc/whack_bg.jpg"
+  },
+  {
+   "src": "public/assets/white_rectangle_button.png",
+   "dst": "assets/images/misc/white_rectangle_button.png"
+  },
+  {
+   "src": "public/sorted_assets/parentalcontrol/metal_lock_icon.png",
+   "dst": "assets/images/parentalcontrol/metal_lock_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/parentalcontrol/transparent_panel.png",
+   "dst": "assets/images/parentalcontrol/transparent_panel.png"
+  },
+  {
+   "src": "public/sorted_assets/popbubblemini/bubble_pop_title.png",
+   "dst": "assets/images/popbubblemini/bubble_pop_title.png"
+  },
+  {
+   "src": "public/sorted_assets/popbubblemini/gifticon.png",
+   "dst": "assets/images/popbubblemini/gifticon.png"
+  },
+  {
+   "src": "public/sorted_assets/popbubblemini/pop_bubble_back.png",
+   "dst": "assets/images/popbubblemini/pop_bubble_back.png"
+  },
+  {
+   "src": "public/sorted_assets/profile/current_streak_icon.png",
+   "dst": "assets/images/profile/current_streak_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/profile/edit_avatar_button_1.png",
+   "dst": "assets/images/profile/edit_avatar_button_1.png"
+  },
+  {
+   "src": "public/sorted_assets/profile/molar_coins_icon.png",
+   "dst": "assets/images/profile/molar_coins_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/profile/points_star_button.png",
+   "dst": "assets/images/profile/points_star_button.png"
+  },
+  {
+   "src": "public/sorted_assets/profile/switch_player_button.png",
+   "dst": "assets/images/profile/switch_player_button.png"
+  },
+  {
+   "src": "public/sorted_assets/profile/total_brushing_time_icon.png",
+   "dst": "assets/images/profile/total_brushing_time_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/profile/transparent_panel.png",
+   "dst": "assets/images/profile/transparent_panel.png"
+  },
+  {
+   "src": "public/sorted_assets/quiz2/red_false_button.png",
+   "dst": "assets/images/quiz2/red_false_button.png"
+  },
+  {
+   "src": "public/sorted_assets/quiz2/sircrown_correct.png",
+   "dst": "assets/images/quiz2/sircrown_correct.png"
+  },
+  {
+   "src": "public/sorted_assets/quiz2/sircrown_incorrect.png",
+   "dst": "assets/images/quiz2/sircrown_incorrect.png"
+  },
+  {
+   "src": "public/sorted_assets/quiz2/true_button.png",
+   "dst": "assets/images/quiz2/true_button.png"
+  },
+  {
+   "src": "public/sorted_assets/quiz2/weekly_quiz_title.png",
+   "dst": "assets/images/quiz2/weekly_quiz_title.png"
+  },
+  {
+   "src": "public/sorted_assets/quizpage1/red_false_button.png",
+   "dst": "assets/images/quizpage1/red_false_button.png"
+  },
+  {
+   "src": "public/sorted_assets/quizpage1/true_button.png",
+   "dst": "assets/images/quizpage1/true_button.png"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/10_Energy_Refill_Fruit.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/10_Energy_Refill_Fruit.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/11_Friendly_Banana.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/11_Friendly_Banana.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/12_Unchartered_Waters.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/12_Unchartered_Waters.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/13_See_some_fish.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/13_See_some_fish.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/14_Trap.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/14_Trap.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/15_Spot_Blue_Fur.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/15_Spot_Blue_Fur.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/16_Hide_in_water.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/16_Hide_in_water.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/17_Veggie_Village.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/17_Veggie_Village.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/18_Flora_Seeds.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/18_Flora_Seeds.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/19_Second_Candy_Combat.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/19_Second_Candy_Combat.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/1_Start_Blue_Pursue.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/1_Start_Blue_Pursue.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/20_Run_for_it.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/20_Run_for_it.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/21_Help_eachother_up.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/21_Help_eachother_up.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/22_Scouting.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/22_Scouting.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/23_Plant_Seeds.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/23_Plant_Seeds.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/24_Drinking_Well.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/24_Drinking_Well.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/25_Caterpillar_in_hiding.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/25_Caterpillar_in_hiding.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/26_Frosty_Butterfly.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/26_Frosty_Butterfly.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/27_Near_Mulinia.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/27_Near_Mulinia.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/28_Finish.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/28_Finish.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/2_Run.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/2_Run.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/3_Ask_gingerbread.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/3_Ask_gingerbread.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/4_Gingerbread_Chase_.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/4_Gingerbread_Chase_.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/5_Peppermint_Defense_.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/5_Peppermint_Defense_.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/6_Crossroads.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/6_Crossroads.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/7_Choco_River.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/7_Choco_River.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/8_Fountain_Hiding.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/8_Fountain_Hiding.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/StoryPanels/9_First_Candy_Combat.jpeg",
+   "dst": "assets/images/scrapbook/StoryPanels/9_First_Candy_Combat.jpeg"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/brush_a_tee_scrapbook.png",
+   "dst": "assets/images/scrapbook/brush_a_tee_scrapbook.png"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/bubble_asset.png",
+   "dst": "assets/images/scrapbook/bubble_asset.png"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/metal_lock_icon.png",
+   "dst": "assets/images/scrapbook/metal_lock_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/right_arrow_button.png",
+   "dst": "assets/images/scrapbook/right_arrow_button.png"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/storybookbgpage.png",
+   "dst": "assets/images/scrapbook/storybookbgpage.png"
+  },
+  {
+   "src": "public/sorted_assets/scrapbook/transparent_bubble.png",
+   "dst": "assets/images/scrapbook/transparent_bubble.png"
+  },
+  {
+   "src": "public/sorted_assets/settings/settings_icon.png",
+   "dst": "assets/images/settings/settings_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/settings/settings_title.png",
+   "dst": "assets/images/settings/settings_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/1of3owned_bar.png",
+   "dst": "assets/images/shop/1of3owned_bar.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/2of3owned_bar.png",
+   "dst": "assets/images/shop/2of3owned_bar.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/3of3owned_bar.png",
+   "dst": "assets/images/shop/3of3owned_bar.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/BubbleBrush.png",
+   "dst": "assets/images/shop/BubbleBrush.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/BubblePaste.png",
+   "dst": "assets/images/shop/BubblePaste.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/BubbleWash.png",
+   "dst": "assets/images/shop/BubbleWash.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/Bubble_Battery.png",
+   "dst": "assets/images/shop/Bubble_Battery.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/Gold_Battery.png",
+   "dst": "assets/images/shop/Gold_Battery.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/Lvl1Paste.png",
+   "dst": "assets/images/shop/Lvl1Paste.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/Lvl1ToothpastePistoleProjectile.png",
+   "dst": "assets/images/shop/Lvl1ToothpastePistoleProjectile.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/Lvl2ToothpastePistoleProjectile.png",
+   "dst": "assets/images/shop/Lvl2ToothpastePistoleProjectile.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/Lvl3ToothpastePistoleProjectile.png",
+   "dst": "assets/images/shop/Lvl3ToothpastePistoleProjectile.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/MouthwashBlast-1.png",
+   "dst": "assets/images/shop/MouthwashBlast-1.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/PasteGold2.png",
+   "dst": "assets/images/shop/PasteGold2.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/QuestionMark.png",
+   "dst": "assets/images/shop/QuestionMark.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/ToothbrushPack.png",
+   "dst": "assets/images/shop/ToothbrushPack.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/WashGold2.png",
+   "dst": "assets/images/shop/WashGold2.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/WeaponHolder.png",
+   "dst": "assets/images/shop/WeaponHolder.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/ammobtn.png",
+   "dst": "assets/images/shop/ammobtn.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/backbtnshop.png",
+   "dst": "assets/images/shop/backbtnshop.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/blue_arrow_button.png",
+   "dst": "assets/images/shop/blue_arrow_button.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/blue_back_button.png",
+   "dst": "assets/images/shop/blue_back_button.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/blue_panels_long.png",
+   "dst": "assets/images/shop/blue_panels_long.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/boostersbtn.png",
+   "dst": "assets/images/shop/boostersbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/brushboomerang_title.png",
+   "dst": "assets/images/shop/brushboomerang_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/brushweapon_1.png",
+   "dst": "assets/images/shop/brushweapon_1.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/brushweapon_2.png",
+   "dst": "assets/images/shop/brushweapon_2.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/bubble_icon.png",
+   "dst": "assets/images/shop/bubble_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/bubblebrush_title.png",
+   "dst": "assets/images/shop/bubblebrush_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/bubblefloss_title.png",
+   "dst": "assets/images/shop/bubblefloss_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/bubblepaste_title.png",
+   "dst": "assets/images/shop/bubblepaste_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/bubblewash_title.png",
+   "dst": "assets/images/shop/bubblewash_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/coinmultiplier.png",
+   "dst": "assets/images/shop/coinmultiplier.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/coinmultiplier_title.png",
+   "dst": "assets/images/shop/coinmultiplier_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/colorful_bubble.png",
+   "dst": "assets/images/shop/colorful_bubble.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/colorful_bubble_1.png",
+   "dst": "assets/images/shop/colorful_bubble_1.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/colorful_bubble_2.png",
+   "dst": "assets/images/shop/colorful_bubble_2.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/flosslasso_title.png",
+   "dst": "assets/images/shop/flosslasso_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/flossweapon_1.png",
+   "dst": "assets/images/shop/flossweapon_1.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/flossweapon_2.png",
+   "dst": "assets/images/shop/flossweapon_2.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/flossweapon_3.png",
+   "dst": "assets/images/shop/flossweapon_3.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/fluorideshield.png",
+   "dst": "assets/images/shop/fluorideshield.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/fluorideshield_title.png",
+   "dst": "assets/images/shop/fluorideshield_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/game_blue_windo_b.png",
+   "dst": "assets/images/shop/game_blue_windo_b.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/game_blue_window_tall.png",
+   "dst": "assets/images/shop/game_blue_window_tall.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/gold_tooth_coin.png",
+   "dst": "assets/images/shop/gold_tooth_coin.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/golden_tooth_coin.png",
+   "dst": "assets/images/shop/golden_tooth_coin.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/itembackpanel.png",
+   "dst": "assets/images/shop/itembackpanel.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/level1flosstring.png",
+   "dst": "assets/images/shop/level1flosstring.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/level2flosstring.png",
+   "dst": "assets/images/shop/level2flosstring.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/level3flosstring.png",
+   "dst": "assets/images/shop/level3flosstring.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/mouthwashblast_title.png",
+   "dst": "assets/images/shop/mouthwashblast_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/newdentalitemunlockedtext.png",
+   "dst": "assets/images/shop/newdentalitemunlockedtext.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/ownedbtn.png",
+   "dst": "assets/images/shop/ownedbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/pastepistol_title.png",
+   "dst": "assets/images/shop/pastepistol_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/pearly_whites_store.png",
+   "dst": "assets/images/shop/pearly_whites_store.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/pointsbundle.png",
+   "dst": "assets/images/shop/pointsbundle.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/pointsbundle_title.png",
+   "dst": "assets/images/shop/pointsbundle_title.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/powerupsbtn.png",
+   "dst": "assets/images/shop/powerupsbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/purchasebtn.png",
+   "dst": "assets/images/shop/purchasebtn.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/purple_star_points.png",
+   "dst": "assets/images/shop/purple_star_points.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/pwshoptitle.png",
+   "dst": "assets/images/shop/pwshoptitle.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/streakfreeze.png",
+   "dst": "assets/images/shop/streakfreeze.png"
+  },
+  {
+   "src": "public/sorted_assets/shop/streakfreeze_title.png",
+   "dst": "assets/images/shop/streakfreeze_title.png"
+  },
+  {
+   "src": "public/sorted_assets/titles/bonbonbash_title.png",
+   "dst": "assets/images/titles/bonbonbash_title.png"
+  },
+  {
+   "src": "public/sorted_assets/titles/candytrap_title.png",
+   "dst": "assets/images/titles/candytrap_title.png"
+  },
+  {
+   "src": "public/sorted_assets/titles/chooseavatar_title.png",
+   "dst": "assets/images/titles/chooseavatar_title.png"
+  },
+  {
+   "src": "public/sorted_assets/titles/playersetup_title.png",
+   "dst": "assets/images/titles/playersetup_title.png"
+  },
+  {
+   "src": "public/sorted_assets/titles/settings_title.png",
+   "dst": "assets/images/titles/settings_title.png"
+  },
+  {
+   "src": "public/sorted_assets/titles/weeklyquiz_title.png",
+   "dst": "assets/images/titles/weeklyquiz_title.png"
+  },
+  {
+   "src": "public/sorted_assets/upgradeitem/bubble_asset.png",
+   "dst": "assets/images/upgradeitem/bubble_asset.png"
+  },
+  {
+   "src": "public/sorted_assets/upgradeitem/bubble_icon.png",
+   "dst": "assets/images/upgradeitem/bubble_icon.png"
+  },
+  {
+   "src": "public/sorted_assets/upgradeitem/colorful_bubble.png",
+   "dst": "assets/images/upgradeitem/colorful_bubble.png"
+  },
+  {
+   "src": "public/sorted_assets/upgradeitem/transparent_bubble.png",
+   "dst": "assets/images/upgradeitem/transparent_bubble.png"
+  },
+  {
+   "src": "public/sorted_assets/whoisplayingpick/chooseplayerbtn.png",
+   "dst": "assets/images/whoisplayingpick/chooseplayerbtn.png"
+  },
+  {
+   "src": "public/sorted_assets/whoisplayingpick/title-whoisplaying.png",
+   "dst": "assets/images/whoisplayingpick/title-whoisplaying.png"
+  },
+  {
+   "src": "public/videos/howtofloss.mp4",
+   "dst": "assets/videos/howtofloss.mp4"
+  },
+  {
+   "src": "public/videos/howtofloss.ogv",
+   "dst": "assets/videos/howtofloss.ogv"
+  }
+ ],
+ "map": [
+  {
+   "from": "res://candy_crusade/assets/",
+   "to": "res://assets/candy_crusade/"
+  },
+  {
+   "from": "res://assets/ui/",
+   "to": "res://assets/candy_crusade/ui/"
+  },
+  {
+   "from": "res://assets/models/",
+   "to": "res://assets/candy_crusade/models/"
+  },
+  {
+   "from": "res://assets/regions/",
+   "to": "res://assets/candy_crusade/regions/"
+  },
+  {
+   "from": "res://assets/characters/",
+   "to": "res://assets/candy_crusade/characters/"
+  },
+  {
+   "from": "res://assets/sky_background.jpg",
+   "to": "res://assets/candy_crusade/sky_background.jpg"
+  },
+  {
+   "from": "res://../public/sorted_assets/",
+   "to": "res://assets/images/"
+  },
+  {
+   "from": "res://public/sorted_assets/",
+   "to": "res://assets/images/"
+  },
+  {
+   "from": "res://sorted_assets/",
+   "to": "res://assets/images/"
+  },
+  {
+   "from": "res://public/assets/brushing/",
+   "to": "res://assets/images/brushing/"
+  },
+  {
+   "from": "res://public/assets/",
+   "to": "res://assets/images/misc/"
+  },
+  {
+   "from": "res://public/buttons/",
+   "to": "res://assets/images/buttons/"
+  },
+  {
+   "from": "res://public/backgrounds/",
+   "to": "res://assets/images/backgrounds/"
+  },
+  {
+   "from": "res://public/audio/songs/",
+   "to": "res://assets/audio/music/"
+  },
+  {
+   "from": "res://public/audio/",
+   "to": "res://assets/audio/"
+  },
+  {
+   "from": "res://public/fonts/",
+   "to": "res://assets/fonts/"
+  },
+  {
+   "from": "res://public/videos/",
+   "to": "res://assets/videos/"
+  },
+  {
+   "from": "res://public/favicon.ico",
+   "to": "res://assets/icon/favicon.ico"
+  },
+  {
+   "from": "res://.godot/buttons/Rubik-Regular.ttf",
+   "to": "res://assets/fonts/Rubik-Regular.ttf"
+  },
+  {
+   "from": "res://.godot/buttons/Roboto-Regular.ttf",
+   "to": "res://assets/fonts/Roboto-Regular.ttf"
+  },
+  {
+   "from": "res://.godot/buttons/CantoraOne-Regular.ttf",
+   "to": "res://assets/fonts/CantoraOne-Regular.ttf"
+  },
+  {
+   "from": "res://.godot/buttons/WorkSans-Regular.ttf",
+   "to": "res://assets/fonts/WorkSans-Regular.ttf"
+  },
+  {
+   "from": "res://.godot/buttons/",
+   "to": "res://assets/images/buttons/"
+  },
+  {
+   "from": "res://.godot/titles/",
+   "to": "res://assets/images/titles/"
+  },
+  {
+   "from": "res://.godot/Bacteria.png",
+   "to": "res://assets/images/brushing/bacteria.png"
+  },
+  {
+   "from": "res://.godot/bacteria.png",
+   "to": "res://assets/images/brushing/bacteria.png"
+  },
+  {
+   "from": "res://.godot/howtofloss",
+   "to": "res://assets/videos/howtofloss"
+  },
+  {
+   "from": "res://.godot/",
+   "to": "res://assets/videos/"
+  }
+ ],
+ "to_backup": [
+  "candy_crusade/project.godot",
+  "candy_crusade/project.godot.bak",
+  "candy_crusade/export_presets.cfg",
+  "candy_crusade/icon.svg",
+  "candy_crusade/icon.svg.import",
+  "candy_crusade/.editorconfig",
+  "candy_crusade/.gitattributes",
+  "candy_crusade/.gitignore",
+  "candy_crusade/scratch_inspect.gd",
+  "candy_crusade/scratch_inspect.gd.uid",
+  "AGENTS.md",
+  "README.md",
+  "MISSING_ASSETS.md",
+  "APP_SPECIFICATION.md",
+  "Pearly Whites Godot Screen Specs.pdf",
+  ".gitignore",
+  "ios/PearlyWhitesSaga",
+  "scripts/parental_gate_modal.txt",
+  "scripts/privacy_policy_modal.txt",
+  "public",
+  ".godot"
+ ]
+}

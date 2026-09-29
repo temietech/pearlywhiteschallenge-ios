@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://bkeewlk2wk5ir"]
+
+[ext_resource type="Script" path="res://candy_crusade/scripts/editor_camera_guide.gd" id="1_guide"]
+
+[sub_resource type="StandardMaterial3D" id="mat_lane_guide"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.2, 0.7, 1, 0.2)
+
+[sub_resource type="BoxMesh" id="mesh_lane_guide"]
+material = SubResource("mat_lane_guide")
+size = Vector3(8, 0.05, 24)
+
+[sub_resource type="StandardMaterial3D" id="mat_spawn_line"]
+shading_mode = 0
+albedo_color = Color(1, 0.8, 0.2, 0.7)
+
+[sub_resource type="BoxMesh" id="mesh_spawn_line"]
+material = SubResource("mat_spawn_line")
+size = Vector3(8, 0.06, 0.2)
+
+[node name="EditorCameraGuide" type="Node3D"]
+script = ExtResource("1_guide")
+
+[node name="CameraGuide" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9961947, -0.08715574, 0, 0.08715574, 0.9961947, 0, 0.8, 0.6)
+fov = 75.0
+
+[node name="LaneReference" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.025, -12)
+mesh = SubResource("mesh_lane_guide")
+
+[node name="SpawnLine" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -13.8)
+mesh = SubResource("mesh_spawn_line")

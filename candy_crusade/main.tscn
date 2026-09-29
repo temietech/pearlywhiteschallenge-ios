@@ -1,0 +1,116 @@
+[gd_scene format=3 uid="uid://dgf2tf6j8l1uy"]
+
+[ext_resource type="Script" uid="uid://51yklfgddykl" path="res://candy_crusade/scripts/player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://hpyfpbj63yk0" path="res://candy_crusade/scripts/enemy_spawner.gd" id="2_spawner"]
+[ext_resource type="Script" uid="uid://cay0jjsj0oof6" path="res://candy_crusade/scripts/hud.gd" id="3_hud"]
+[ext_resource type="PackedScene" path="res://candy_crusade/minion.tscn" id="4_minion"]
+[ext_resource type="PackedScene" path="res://candy_crusade/projectile.tscn" id="5_projectile"]
+[ext_resource type="PackedScene" path="res://candy_crusade/boomerang.tscn" id="6_boomerang"]
+[ext_resource type="PackedScene" path="res://candy_crusade/grenade.tscn" id="7_grenade"]
+[ext_resource type="Script" uid="uid://c22vibo6r8qn4" path="res://candy_crusade/scripts/region_controller.gd" id="8_regions"]
+[ext_resource type="PackedScene" path="res://candy_crusade/blue_candor.tscn" id="9_boss"]
+[ext_resource type="PackedScene" uid="uid://bdhlxxx14dg2h" path="res://assets/candy_crusade/models/toothpaste_pistol.glb" id="10_pistol"]
+[ext_resource type="Texture2D" uid="uid://ckjndfeau6fqe" path="res://assets/candy_crusade/sky_background.jpg" id="11_sky"]
+[ext_resource type="PackedScene" uid="uid://cc5li48jsuank" path="res://candy_crusade/levels/level_1_candy_cave.tscn" id="12_reg1"]
+[ext_resource type="PackedScene" uid="uid://cmqg88mf136pd" path="res://candy_crusade/levels/level_2_sugar_bridge.tscn" id="13_reg2"]
+[ext_resource type="PackedScene" uid="uid://u2c2ren8lhvu" path="res://candy_crusade/levels/level_3_plain_path.tscn" id="14_reg3"]
+[ext_resource type="PackedScene" uid="uid://rfbfuni4qe5h" path="res://candy_crusade/levels/level_4_enamel_border.tscn" id="15_reg4"]
+
+[sub_resource type="StandardMaterial3D" id="mat_sky"]
+cull_mode = 2
+shading_mode = 0
+albedo_texture = ExtResource("11_sky")
+
+[sub_resource type="QuadMesh" id="mesh_sky"]
+material = SubResource("mat_sky")
+size = Vector2(60, 35)
+
+[sub_resource type="Environment" id="Environment_world"]
+background_mode = 1
+background_color = Color(0.82, 0.72, 0.85, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 0.98, 0.95, 1)
+ambient_light_energy = 0.36
+
+[sub_resource type="StandardMaterial3D" id="mat_lane"]
+albedo_color = Color(0.32, 0.78, 0.9, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lane"]
+material = SubResource("mat_lane")
+size = Vector3(8, 1, 36)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lane"]
+size = Vector3(8, 1, 36)
+
+[node name="World" type="Node3D" unique_id=203145561]
+
+[node name="Regions" type="Node3D" parent="." unique_id=701000000]
+
+[node name="Level1_CandyCave" parent="Regions" unique_id=701000001 instance=ExtResource("12_reg1")]
+
+[node name="Level2_SugarBridge" parent="Regions" unique_id=701000002 instance=ExtResource("13_reg2")]
+visible = false
+
+[node name="Level3_PlainPath" parent="Regions" unique_id=701000003 instance=ExtResource("14_reg3")]
+visible = false
+
+[node name="Level4_EnamelBorder" parent="Regions" unique_id=701000004 instance=ExtResource("15_reg4")]
+visible = false
+
+[node name="SkyPlane" type="MeshInstance3D" parent="." unique_id=901234569]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -29)
+cast_shadow = 0
+mesh = SubResource("mesh_sky")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1138814610]
+environment = SubResource("Environment_world")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1146274100]
+transform = Transform3D(0.86602527, -0.43301305, 0.2499999, 0, 0.49999955, 0.8660257, -0.50000024, -0.7500001, 0.43301225, 0, 0, 0)
+light_energy = 0.6
+shadow_enabled = true
+
+[node name="Lane" type="StaticBody3D" parent="." unique_id=1501542284]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -14)
+collision_layer = 0
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Lane" unique_id=29718835]
+visible = false
+mesh = SubResource("BoxMesh_lane")
+
+[node name="Collision" type="CollisionShape3D" parent="Lane" unique_id=894946786]
+shape = SubResource("BoxShape3D_lane")
+disabled = true
+
+[node name="Player" type="Node3D" parent="." unique_id=1259536822]
+script = ExtResource("1_player")
+projectile_scene = ExtResource("5_projectile")
+boomerang_scene = ExtResource("6_boomerang")
+grenade_scene = ExtResource("7_grenade")
+
+[node name="Camera3D" type="Camera3D" parent="Player" unique_id=2068031209]
+transform = Transform3D(1, 0, 0, 0, 0.9961947, -0.08715574, 0, 0.08715574, 0.9961947, 0, 0.8, 0.6)
+current = true
+
+[node name="Pistol" type="Node3D" parent="Player/Camera3D" unique_id=53391114]
+transform = Transform3D(0.0987235, 0.0103762, 0.0175039, -0.0105364, 0.1002478, 0, -0.0174087, -0.0018295, 0.0992684, 0.26, -0.18, -0.52)
+
+[node name="Model" parent="Player/Camera3D/Pistol" unique_id=638709610 instance=ExtResource("10_pistol")]
+transform = Transform3D(0.2700249, -0.13522255, -0.9533107, 0.26560348, 0.96213526, -0.061242305, 0.9254947, -0.23666573, 0.2957164, -1.03074, -0.34212065, -0.30092216)
+
+[node name="Muzzle" type="Node3D" parent="Player/Camera3D" unique_id=1791363487]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, -0.12, -0.63)
+
+[node name="EnemySpawner" type="Node3D" parent="." unique_id=1680704652]
+script = ExtResource("2_spawner")
+minion_scene = ExtResource("4_minion")
+
+[node name="RegionController" type="Node" parent="." unique_id=61461908]
+script = ExtResource("8_regions")
+blue_candor_scene = ExtResource("9_boss")
+
+[node name="Projectiles" type="Node3D" parent="." unique_id=1879367994]
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1437057789]
+script = ExtResource("3_hud")

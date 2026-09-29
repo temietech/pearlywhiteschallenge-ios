@@ -1,0 +1,23 @@
+[gd_resource type="StandardMaterial3D" load_steps=3 format=3]
+
+[ext_resource type="Texture2D" uid="uid://dh0aj11a61o6w" path="res://assets/candy_crusade/models/Goldbrushlvl2_0.jpg" id="1_albedo"]
+[ext_resource type="Texture2D" uid="uid://utsixol7gw8y" path="res://assets/candy_crusade/models/Goldbrushlvl2_2.jpg" id="2_normal"]
+
+[resource]
+resource_name = "Goldbrushlvl2_Material"
+cull_mode = 2
+albedo_color = Color(1, 0.95, 0.85, 1)
+albedo_texture = ExtResource("1_albedo")
+metallic = 0.45
+metallic_specular = 0.85
+roughness = 0.28
+emission_enabled = true
+emission = Color(0.25, 0.18, 0.04, 1)
+emission_energy_multiplier = 0.35
+emission_texture = ExtResource("1_albedo")
+normal_enabled = true
+normal_scale = 1.0
+normal_texture = ExtResource("2_normal")
+rim_enabled = true
+rim = 0.45
+rim_tint = 0.5

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://uadaoustv2bt"
+path="res://.godot/imported/Time to shine Pearl.mp3-92fe271508488adc5a9406c6abbe9268.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/voices/Time to shine Pearl.mp3"
+dest_files=["res://.godot/imported/Time to shine Pearl.mp3-92fe271508488adc5a9406c6abbe9268.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

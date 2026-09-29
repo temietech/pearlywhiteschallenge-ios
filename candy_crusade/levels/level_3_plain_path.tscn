@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://u2c2ren8lhvu"]
+
+[ext_resource type="Script" uid="uid://b5pa8mw6f4vnm" path="res://candy_crusade/scripts/level_preview_launcher.gd" id="1_launcher"]
+[ext_resource type="PackedScene" uid="uid://dpu8ixjb1a6yi" path="res://assets/candy_crusade/regions/PlainPath-Region3.glb" id="2_model"]
+[ext_resource type="PackedScene" uid="uid://bkeewlk2wk5ir" path="res://candy_crusade/editor_camera_guide.tscn" id="3_guide"]
+
+[node name="Level3_PlainPath" type="Node3D" unique_id=1964524751]
+script = ExtResource("1_launcher")
+level_index = 2
+
+[node name="EditorCameraGuide" parent="." unique_id=2038186357 instance=ExtResource("3_guide")]
+transform = Transform3D(1, 0, 0, 0, 0.998869, 0.047546647, 0, -0.047546647, 0.998869, 0, -0.65, 0)
+
+[node name="Model" parent="." unique_id=702791222 instance=ExtResource("2_model")]
+transform = Transform3D(-0.15529087, 0, 19.999397, 0, 20, 0, -19.999397, 0, -0.15529087, 0, 1.1117301, -11.129543)

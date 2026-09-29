@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://rfbfuni4qe5h"]
+
+[ext_resource type="Script" uid="uid://b5pa8mw6f4vnm" path="res://candy_crusade/scripts/level_preview_launcher.gd" id="1_launcher"]
+[ext_resource type="PackedScene" uid="uid://u2ysy853p6x6" path="res://assets/candy_crusade/regions/EnamelBorder-Region4.glb" id="2_model"]
+[ext_resource type="PackedScene" uid="uid://bkeewlk2wk5ir" path="res://candy_crusade/editor_camera_guide.tscn" id="3_guide"]
+
+[node name="Level4_EnamelBorder" type="Node3D" unique_id=176448407]
+script = ExtResource("1_launcher")
+level_index = 3
+
+[node name="EditorCameraGuide" parent="." unique_id=1905327800 instance=ExtResource("3_guide")]
+transform = Transform3D(1, 0, 0, 0, 0.99844074, -0.05582229, 0, 0.05582229, 0.99844074, 0, 0, 0)
+
+[node name="Model" parent="." unique_id=845860822 instance=ExtResource("2_model")]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0.5964699, -18.079933)

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ccs1kkh55webl"
+path="res://.godot/imported/Candy Meadow.mp3-c997aa9f6a2814e37810e9e41d3729d9.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/music/Candy Meadow.mp3"
+dest_files=["res://.godot/imported/Candy Meadow.mp3-c997aa9f6a2814e37810e9e41d3729d9.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

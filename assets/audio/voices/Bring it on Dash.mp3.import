@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://be28pmu8lq07i"
+path="res://.godot/imported/Bring it on Dash.mp3-c3947e2784ae8cdb04816fff1ff133dc.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/voices/Bring it on Dash.mp3"
+dest_files=["res://.godot/imported/Bring it on Dash.mp3-c3947e2784ae8cdb04816fff1ff133dc.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

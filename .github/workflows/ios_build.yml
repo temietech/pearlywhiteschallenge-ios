@@ -1,25 +1,26 @@
 name: Export iOS and Upload to TestFlight
-
+ 
 on:
   workflow_dispatch:
-
+ 
 jobs:
   build-and-upload:
     runs-on: macos-14
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
+ 
       - name: Setup Godot Engine
         run: |
           curl -LO https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_macos.universal.zip
           unzip -q Godot_v4.7-stable_macos.universal.zip
           sudo mv Godot.app /Applications/Godot.app
-          mkdir -p ~/.local/share/godot/export_templates/4.7.stable
+          mkdir -p "$HOME/Library/Application Support/Godot/export_templates/4.7.stable"
           curl -LO https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_export_templates.tpz
           unzip -q Godot_v4.7-stable_export_templates.tpz
-          mv templates/* ~/.local/share/godot/export_templates/4.7.stable/
-
+          mv templates/* "$HOME/Library/Application Support/Godot/export_templates/4.7.stable/"
+          ls "$HOME/Library/Application Support/Godot/export_templates/4.7.stable/" | grep -i ios
+ 
       - name: Install Certificates and Provisioning Profile
         env:
           P12_BASE64: ${{ secrets.P12_BASE64 }}
@@ -31,14 +32,14 @@ jobs:
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-
+ 
           echo "$P12_BASE64" | base64 --decode > $RUNNER_TEMP/cert.p12
           security import $RUNNER_TEMP/cert.p12 -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-
+ 
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "$PROVISIONING_PROFILE_BASE64" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
-
+ 
       - name: Import Assets and Export Godot iOS Project
         run: |
           mkdir -p build/ios
@@ -46,7 +47,7 @@ jobs:
           /Applications/Godot.app/Contents/MacOS/Godot --headless --editor --quit || true
           # Pass 2: export
           /Applications/Godot.app/Contents/MacOS/Godot --headless --export-release "iOS" build/ios/PearlyWhites.ipa
-
+ 
       - name: Upload to App Store Connect / TestFlight
         env:
           APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}

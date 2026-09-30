@@ -415,17 +415,35 @@ func _build_audio_card():
 	
 	# Separator line
 	vbox.add_child(_create_h_separator())
-	
-	# 3. Text-to-Speech Toggle Row
+
+	# 3. Master Mute/Unmute Toggle Row
+	var mute_toggle = _create_toggle_row("Master Mute", func(val):
+		AudioManager.is_muted = val
+	, AudioManager.is_muted)
+	vbox.add_child(mute_toggle)
+
+	# Separator line
+	vbox.add_child(_create_h_separator())
+
+	# 4. Text-to-Speech Toggle Row
 	var r1 = _create_toggle_row("Text-to-Speech", func(val):
 		tts_enabled = val
 		AudioManager.tts_enabled = val
 	, AudioManager.tts_enabled)
 	vbox.add_child(r1)
-	
+
 	# Separator line
 	vbox.add_child(_create_h_separator())
-	
+
+	# 5. Reminder Notifications (brushing reminders, streak & Candy Crusade alerts)
+	var notif_row = _create_toggle_row("Reminder Notifications", func(val):
+		LocalNotifications.set_enabled(val)
+	, LocalNotifications.enabled)
+	vbox.add_child(notif_row)
+
+	# Separator line
+	vbox.add_child(_create_h_separator())
+
 	# Bottom Back Button
 	var back_to_set_btn = UIHelper.create_image_button("res://assets/images/buttons/backtosettings_btn.png", Vector2(280, 48))
 	if not back_to_set_btn.texture_normal:
@@ -621,6 +639,10 @@ func _build_parental_card():
 	pin_input_conf.add_theme_font_size_override("font_size", 13)
 	pin_inputs_row.add_child(pin_input_conf)
 	pin_box.add_child(pin_inputs_row)
+
+	# Setup keyboard handling for PIN inputs
+	UIHelper.setup_line_edit_keyboard_handling(pin_input_new, self)
+	UIHelper.setup_line_edit_keyboard_handling(pin_input_conf, self)
 	
 	var save_pin_btn = UIHelper.create_image_button("res://assets/images/buttons/savebtn.png", Vector2(160, 46))
 	if not save_pin_btn.texture_normal:

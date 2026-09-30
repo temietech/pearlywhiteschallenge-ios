@@ -212,6 +212,7 @@ var family_competition_winner: String = ""
 var dev_mode: bool = false
 var tooth_fairy_pin: String = ""
 var brush_check_failed_attempts: int = 0
+var privacy_policy_agreed: bool = false
 
 # Firebase & Cloud Sync State
 var family_code: String = ""
@@ -244,7 +245,8 @@ func save_game():
 		"family_mode": family_mode,
 		"family_competition_winner": family_competition_winner,
 		"family_code": family_code,
-		"tooth_fairy_pin": tooth_fairy_pin
+		"tooth_fairy_pin": tooth_fairy_pin,
+		"privacy_policy_agreed": privacy_policy_agreed
 	}
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
@@ -665,6 +667,7 @@ func load_game():
 				family_competition_winner = data.get("family_competition_winner", "")
 				family_code = data.get("family_code", "")
 				tooth_fairy_pin = data.get("tooth_fairy_pin", "")
+				privacy_policy_agreed = data.get("privacy_policy_agreed", false)
 
 func get_profiles() -> Array[Dictionary]:
 	return profiles

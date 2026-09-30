@@ -14,6 +14,7 @@ var current_screen_name: String = ""
 
 const SCRIPTS = {
 	"start": "res://scripts/start_screen.gd",
+	"privacy": "res://scripts/privacy_policy_screen.gd",
 	"profiles": "res://scripts/profiles_screen.gd",
 	"create_profile": "res://scripts/create_profile_screen.gd",
 	"map": "res://scripts/map_screen.gd",
@@ -142,6 +143,40 @@ func _build_framework():
 	notification_manager.set_script(notif_script)
 	add_child(notification_manager)
 
+## Asks for camera access once the player has passed the privacy policy screen, so the
+## iOS/Android permission prompt appears here instead of unexpectedly on the scan page.
+## Safe to call repeatedly: the OS only shows the prompt the first time.
+func _request_camera_permission():
+	var os_name := OS.get_name()
+	if os_name != "iOS" and os_name != "Android":
+		return
+	# 1) Native scanner plugin (also handles the permission on both platforms)
+	if Engine.has_singleton("PearlyToothbrushScanner"):
+		var scanner = Engine.get_singleton("PearlyToothbrushScanner")
+		if scanner.has_method("hasCameraPermission") and scanner.call("hasCameraPermission"):
+			return
+		if scanner.has_method("requestCameraPermission"):
+			scanner.call("requestCameraPermission")
+			return
+	# 2) Plugin missing: fall back to the engine so the prompt still appears
+	if os_name == "Android":
+		OS.request_permission("CAMERA")
+	else:
+		# On iOS, Godot asks for camera access when camera feeds start being monitored
+		CameraServer.monitoring_feeds = true
+
+func _continue_after_start():
+	_request_camera_permission()
+	var count = GameState.profiles.size()
+	if count == 0:
+		navigate_to("create_profile")
+	elif count == 1:
+		var p = GameState.profiles[0]
+		GameState.set_active_profile(p.get("id", ""))
+		navigate_to("map")
+	else:
+		navigate_to("select_player")
+
 func navigate_to(screen_name: String, extra_args: Dictionary = {}):
 	if not SCRIPTS.has(screen_name):
 		return
@@ -173,16 +208,14 @@ func navigate_to(screen_name: String, extra_args: Dictionary = {}):
 	
 	if screen_name == "start":
 		new_screen.start_pressed.connect(func():
-			var count = GameState.profiles.size()
-			if count == 0:
-				navigate_to("create_profile")
-			elif count == 1:
-				var p = GameState.profiles[0]
-				GameState.set_active_profile(p.get("id", ""))
-				navigate_to("map")
+			# First launch only: privacy policy page comes right after "Start Brushing"
+			if not GameState.privacy_policy_agreed:
+				navigate_to("privacy")
 			else:
-				navigate_to("select_player")
+				_continue_after_start()
 		)
+	elif screen_name == "privacy":
+		new_screen.agreed.connect(func(): _continue_after_start())
 	elif screen_name == "profiles":
 		new_screen.profile_picked.connect(func(id):
 			GameState.set_active_profile(id)
@@ -238,7 +271,9 @@ func navigate_to(screen_name: String, extra_args: Dictionary = {}):
 				navigate_to("facts", {"is_review": true})
 			)
 		new_screen.brushing_completed.connect(func():
-			pass
+			# First finished brush = friendly moment to ask iOS for notification permission
+			LocalNotifications.request_permission()
+			LocalNotifications.refresh()
 		)
 		new_screen.quit_requested.connect(func(): navigate_to("map"))
 		if new_screen.has_signal("settings_requested"):

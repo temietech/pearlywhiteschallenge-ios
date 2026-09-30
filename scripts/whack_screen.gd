@@ -298,11 +298,11 @@ func _relayout():
 		combo_banner.position = Vector2((cur_w - 240.0) * 0.5, 134)
 		
 	if holes_container:
-		var top_bound = 165.0
-		var bottom_bound = cur_h - 75.0 # Above foreground candy decorations
+		var top_bound = 165.0 + UIHelper.safe_top  # Account for notch/safe area on iPhone
+		var bottom_bound = cur_h - 75.0 - UIHelper.safe_bottom # Above foreground candy decorations
 		var board_h = max(420.0, bottom_bound - top_bound)
 		var board_w = min(cur_w - 24.0, 680.0)
-		
+
 		holes_container.position = Vector2((cur_w - board_w) * 0.5, top_bound)
 		holes_container.size = Vector2(board_w, board_h)
 		

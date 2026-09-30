@@ -36,6 +36,8 @@ var close_btn: BaseButton
 var on_success_callback: Callable
 var on_cancel_callback: Callable
 var title_text := "GROWN-UPS ONLY"
+# Hard mode: multi-step maths only (no word puzzles) so young children can't guess their way through.
+var hard_mode := false
 
 var _expected := ""
 var _last_type := -1
@@ -46,7 +48,7 @@ var _rng := RandomNumberGenerator.new()
 # ------------------------------------------------------------------
 # Public API
 # ------------------------------------------------------------------
-static func show_gate(parent_node: Node, on_success: Callable, on_cancel: Callable = Callable(), title_override: String = "GROWN-UPS ONLY") -> ParentalGateModal:
+static func show_gate(parent_node: Node, on_success: Callable, on_cancel: Callable = Callable(), title_override: String = "GROWN-UPS ONLY", hard: bool = false) -> ParentalGateModal:
 	if parent_node == null or not parent_node.is_inside_tree():
 		if on_cancel.is_valid():
 			on_cancel.call_deferred()
@@ -68,6 +70,7 @@ static func show_gate(parent_node: Node, on_success: Callable, on_cancel: Callab
 	instance.on_success_callback = on_success
 	instance.on_cancel_callback = on_cancel
 	instance.title_text = title_override if title_override != "" else "GROWN-UPS ONLY"
+	instance.hard_mode = hard
 
 	_find_host(parent_node).add_child(instance)
 	return instance
@@ -229,7 +232,37 @@ func _play_open_anim() -> void:
 # ------------------------------------------------------------------
 # Challenges
 # ------------------------------------------------------------------
+func _new_hard_challenge() -> void:
+	# Multi-step arithmetic that a young child can't solve by guessing or simple times tables.
+	var t: int = _rng.randi_range(0, 2)
+	while t == _last_type:
+		t = _rng.randi_range(0, 2)
+	_last_type = t
+	match t:
+		0:
+			var a := _rng.randi_range(14, 29)
+			var b := _rng.randi_range(11, 19)
+			var c := _rng.randi_range(6, 9)
+			question_lbl.text = "What is (%d + %d) x %d?" % [a, b, c]
+			_expected = str((a + b) * c)
+		1:
+			var a := _rng.randi_range(13, 19)
+			var b := _rng.randi_range(6, 9)
+			var c := _rng.randi_range(15, 49)
+			question_lbl.text = "What is %d x %d + %d?" % [a, b, c]
+			_expected = str(a * b + c)
+		_:
+			var a := _rng.randi_range(12, 19)
+			var b := _rng.randi_range(7, 9)
+			var c := _rng.randi_range(11, 39)
+			question_lbl.text = "What is %d x %d - %d?" % [a, b, c]
+			_expected = str(a * b - c)
+	answer_input.text = ""
+
 func _new_challenge() -> void:
+	if hard_mode:
+		_new_hard_challenge()
+		return
 	var types := [Challenge.MULTIPLY, Challenge.ADD]
 	if USE_WORD_CHALLENGES:
 		types.append_array([Challenge.REVERSE, Challenge.SECOND_WORD])

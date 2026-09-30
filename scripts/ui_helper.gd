@@ -3182,3 +3182,46 @@ static func show_pre_battle_ammo_check_modal(parent_node: Node, on_proceed: Call
 
 
 
+
+# ==============================================================================
+# KEYBOARD HANDLING FOR TEXT INPUT FIELDS
+# ==============================================================================
+# Setup keyboard behavior for a LineEdit:
+# - Dismiss keyboard when pressing Enter/Return
+# - Raise the input above the keyboard if it would be hidden (estimated offset)
+static func setup_line_edit_keyboard_handling(line_edit: LineEdit, parent_node: Node, on_submit: Callable = Callable()) -> void:
+	if line_edit == null or parent_node == null:
+		return
+	
+	line_edit.text_submitted.connect(func(new_text: String):
+		if is_instance_valid(line_edit):
+			line_edit.release_focus()
+		if on_submit.is_valid():
+			on_submit.call(new_text)
+	)
+	
+	line_edit.focus_entered.connect(func():
+		_raise_line_edit_above_keyboard(line_edit, parent_node)
+	)
+
+
+static func _raise_line_edit_above_keyboard(line_edit: LineEdit, parent_node: Node) -> void:
+	if not is_instance_valid(line_edit) or not is_instance_valid(parent_node):
+		return
+	if not parent_node.is_inside_tree():
+		return
+	var viewport_size: Vector2 = line_edit.get_viewport_rect().size
+	var input_rect: Rect2 = line_edit.get_global_rect()
+	var keyboard_height: float = viewport_size.y * 0.40
+	var safe_bottom_y: float = viewport_size.y - keyboard_height - 20.0
+	if input_rect.get_center().y > safe_bottom_y:
+		var scroll_offset: float = input_rect.get_center().y - safe_bottom_y
+		var tween := line_edit.create_tween()
+		tween.set_trans(Tween.TRANS_CUBIC)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property(line_edit, "offset_top", -scroll_offset, 0.3).as_relative()
+
+
+static func dismiss_keyboard_for_control(control: Control) -> void:
+	if is_instance_valid(control):
+		control.release_focus()

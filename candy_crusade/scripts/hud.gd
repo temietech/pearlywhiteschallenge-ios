@@ -245,23 +245,23 @@ func _on_player_shield_updated(active: bool, ratio: float, remaining_shields: in
 
 
 func _build_ui() -> void:
-	# Combat Crosshair Reticle centered on screen
-	var reticle_tex = _get_ui_texture("crosshair_reticle")
-	if reticle_tex != null:
-		var reticle_center = CenterContainer.new()
-		reticle_center.set_anchors_preset(Control.PRESET_FULL_RECT)
-		reticle_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(reticle_center)
-		
-		var reticle = TextureRect.new()
-		reticle.texture = reticle_tex
-		reticle.custom_minimum_size = Vector2(40, 40)
-		reticle.size = Vector2(40, 40)
-		reticle.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		reticle.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		reticle.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		reticle.modulate = Color(1.0, 1.0, 1.0, 0.75)
-		reticle_center.add_child(reticle)
+	# REMOVED: Combat Crosshair Reticle centered on screen (disabled per user request - was distracting)
+	# var reticle_tex = _get_ui_texture("crosshair_reticle")
+	# if reticle_tex != null:
+	# 	var reticle_center = CenterContainer.new()
+	# 	reticle_center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	# 	reticle_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 	add_child(reticle_center)
+	#
+	# 	var reticle = TextureRect.new()
+	# 	reticle.texture = reticle_tex
+	# 	reticle.custom_minimum_size = Vector2(40, 40)
+	# 	reticle.size = Vector2(40, 40)
+	# 	reticle.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	# 	reticle.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	# 	reticle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 	reticle.modulate = Color(1.0, 1.0, 1.0, 0.75)
+	# 	reticle_center.add_child(reticle)
 
 	var top_margin = MarginContainer.new()
 	top_margin.add_theme_constant_override("margin_top", 22)

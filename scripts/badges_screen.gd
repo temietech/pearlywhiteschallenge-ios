@@ -105,6 +105,7 @@ var badges_data = [
 ]
 
 var detail_modal: Control
+var back_btn: TextureButton = null
 static var _cached_grayscale_mat: ShaderMaterial = null
 static var _cached_title_tex: Texture2D = null
 
@@ -265,7 +266,8 @@ func _rebuild_ui():
 		return
 	_last_built_size = size
 	for c in get_children():
-		if c != detail_modal:
+		# Protect back button and detail modal from being freed during rebuilds
+		if c != detail_modal and c != back_btn:
 			c.queue_free()
 	_build_ui()
 
@@ -365,32 +367,34 @@ func _build_ui():
 	bg.texture = UIHelper.load_texture_safe("res://assets/images/badgescreen/badges_background.jpg")
 	add_child(bg)
 	
-	# Top Back Button
-	var back_btn = UIHelper.create_image_button("res://assets/images/badgescreen/blue_back_button.png", Vector2(86, 36))
-	if not back_btn.texture_normal:
-		back_btn = UIHelper.create_image_button("res://assets/images/shop/blue_back_button.png", Vector2(86, 36))
-	if not back_btn.texture_normal:
-		back_btn = UIHelper.create_image_button("res://assets/images/shop/backbtnshop.png", Vector2(86, 36))
-	back_btn.custom_minimum_size = Vector2(96, 44)
-	back_btn.size = Vector2(96, 44)
+	# Top Back Button - Only create once and preserve across rebuilds
+	if not back_btn or not is_instance_valid(back_btn):
+		back_btn = UIHelper.create_image_button("res://assets/images/badgescreen/blue_back_button.png", Vector2(86, 36))
+		if not back_btn.texture_normal:
+			back_btn = UIHelper.create_image_button("res://assets/images/shop/blue_back_button.png", Vector2(86, 36))
+		if not back_btn.texture_normal:
+			back_btn = UIHelper.create_image_button("res://assets/images/shop/backbtnshop.png", Vector2(86, 36))
+		back_btn.custom_minimum_size = Vector2(96, 44)
+		back_btn.size = Vector2(96, 44)
+		# FIX: Raise z_index to 60 and add mouse_filter to make back button tappable above content
+		back_btn.z_index = 60
+		back_btn.mouse_filter = Control.MOUSE_FILTER_STOP
+		var back_fired := [false]
+		var go_back := func():
+			if back_fired[0]:
+				return
+			back_fired[0] = true
+			var main_node = get_tree().root.get_node_or_null("Main")
+			if main_node and main_node.has_method("navigate_to"):
+				main_node.navigate_to("map")
+			else:
+				back_pressed.emit()
+		# Fire on finger-DOWN so the button can never be lost to a layout rebuild mid-tap
+		back_btn.button_down.connect(go_back)
+		back_btn.pressed.connect(go_back)
+		add_child(back_btn)
+	# Update position on each rebuild
 	back_btn.position = Vector2(10, 10)
-	# FIX: Raise z_index to 60 and add mouse_filter to make back button tappable above content
-	back_btn.z_index = 60
-	back_btn.mouse_filter = Control.MOUSE_FILTER_STOP
-	var back_fired := [false]
-	var go_back := func():
-		if back_fired[0]:
-			return
-		back_fired[0] = true
-		var main_node = get_tree().root.get_node_or_null("Main")
-		if main_node and main_node.has_method("navigate_to"):
-			main_node.navigate_to("map")
-		else:
-			back_pressed.emit()
-	# Fire on finger-DOWN so the button can never be lost to a layout rebuild mid-tap
-	back_btn.button_down.connect(go_back)
-	back_btn.pressed.connect(go_back)
-	add_child(back_btn)
 	
 	# Header Title: Graphic Image (Clean transparent PNG) or Styled Bubbly Font
 	var title_tex = _ensure_trophy_title_texture()

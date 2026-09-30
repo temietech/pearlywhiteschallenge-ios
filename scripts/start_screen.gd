@@ -19,6 +19,7 @@ func _ready():
 	_build_ui()
 	_relayout()
 
+
 func _notification(what):
 	if what == NOTIFICATION_RESIZED:
 		if is_node_ready():

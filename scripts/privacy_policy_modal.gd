@@ -2,6 +2,7 @@
 extends Control
 
 signal closed
+signal agreed
 
 var overlay: ColorRect
 var center: CenterContainer
@@ -11,6 +12,8 @@ var scroll: ScrollContainer
 var text_lbl: RichTextLabel
 var close_btn: TextureButton
 var bottom_close_btn: BaseButton
+var agree_checkbox: CheckBox
+var agree_lbl: Label
 
 func _ready():
 	set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -93,17 +96,31 @@ func _build_ui():
 	text_lbl.fit_content = true
 	text_lbl.text = _get_privacy_policy_text()
 	scroll.add_child(text_lbl)
-	
-	var close_img_btn := UIHelper.create_image_button("res://assets/images/buttons/closebtn.png", Vector2(160, 44))
-	if close_img_btn.texture_normal:
-		bottom_close_btn = close_img_btn
-	else:
-		var close_txt_btn := UIHelper.create_bubbly_button("CLOSE", UIHelper.VIBRANT_GREEN)
-		close_txt_btn.custom_minimum_size = Vector2(160, 44)
-		bottom_close_btn = close_txt_btn
-	bottom_close_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	bottom_close_btn.pressed.connect(_on_close_pressed)
-	vbox.add_child(bottom_close_btn)
+
+	# Agree Checkbox & Label
+	var checkbox_hbox = HBoxContainer.new()
+	checkbox_hbox.add_theme_constant_override("separation", 8)
+	vbox.add_child(checkbox_hbox)
+
+	agree_checkbox = CheckBox.new()
+	agree_checkbox.button_pressed = false
+	agree_checkbox.custom_minimum_size = Vector2(28, 28)
+	checkbox_hbox.add_child(agree_checkbox)
+
+	agree_lbl = Label.new()
+	agree_lbl.text = "I have read and agree to this Privacy Policy"
+	agree_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	agree_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	UIHelper.apply_bubbly_label(agree_lbl, 14, UIHelper.DEEP_BLUE, false)
+	agree_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	checkbox_hbox.add_child(agree_lbl)
+
+	var agree_btn := UIHelper.create_bubbly_button("I AGREE & CONTINUE", UIHelper.VIBRANT_GREEN)
+	agree_btn.custom_minimum_size = Vector2(160, 44)
+	agree_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	agree_btn.pressed.connect(_on_agree_pressed)
+	vbox.add_child(agree_btn)
+	bottom_close_btn = agree_btn
 
 func _relayout():
 	var safe_sz = UIHelper.get_viewport_safe_size(self)
@@ -143,6 +160,29 @@ Pearly Whites Challenge deeply values player privacy and safety. This applicatio
 
 For support inquiries or data privacy questions, contact us at:
 [b]game@pearlywhitessaga.com[/b][/color]"""
+
+func _on_agree_pressed():
+	if not agree_checkbox.button_pressed:
+		AudioManager.play_sfx("error")
+		# Brief flash to draw attention to checkbox
+		var tw = create_tween()
+		tw.tween_callback(func(): agree_checkbox.modulate = Color(1.2, 0.8, 0.8))
+		tw.tween_callback(func(): agree_checkbox.modulate = Color.WHITE).set_delay(0.3)
+		return
+
+	# Mark privacy policy as agreed
+	GameState.privacy_policy_agreed = true
+	GameState.save_game()
+
+	AudioManager.play_sfx("pop")
+	var tw = create_tween().set_parallel(true)
+	tw.tween_property(card, "scale", Vector2(0.85, 0.85), 0.15)
+	tw.tween_property(overlay, "modulate:a", 0.0, 0.15)
+	tw.finished.connect(func():
+		agreed.emit()
+		closed.emit()
+		queue_free()
+	)
 
 func _on_close_pressed():
 	AudioManager.play_sfx("click")

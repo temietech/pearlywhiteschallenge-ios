@@ -24,8 +24,6 @@ var auto_narration_enabled: bool = true
 var sfx_cache: Dictionary = {}
 var bgm_cache: Dictionary = {}
 var voice_cache: Dictionary = {}
-# Speech (character voice lines + recorded narration) gain: 1.3 = 30% louder than before.
-const VOICE_GAIN: float = 1.3
 var current_bgm_track_path: String = ""
 
 # Page / Screen to Background Music Mapping
@@ -102,7 +100,6 @@ const CHAR_VOICE_MAP = {
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_load_audio_settings()
 	
 	bgm_player = AudioStreamPlayer.new()
 	bgm_player.bus = "Master"
@@ -311,44 +308,15 @@ func play_character_voice(char_id: String):
 			if not p.playing:
 				p.stream = stream
 				p.pitch_scale = 1.0
-				p.volume_db = linear_to_db(sfx_volume * master_volume * 1.1 * VOICE_GAIN)
+				p.volume_db = linear_to_db(sfx_volume * master_volume * 1.1)
 				p.play()
 				return
 
-const SETTINGS_PATH := "user://audio_settings.cfg"
-
-func _save_audio_settings() -> void:
-	var cfg := ConfigFile.new()
-	cfg.set_value("audio", "sfx_volume", sfx_volume)
-	cfg.set_value("audio", "bgm_volume", bgm_volume)
-	cfg.set_value("audio", "saved_sfx_volume", saved_sfx_volume)
-	cfg.set_value("audio", "saved_bgm_volume", saved_bgm_volume)
-	cfg.set_value("audio", "sound_enabled", sound_enabled)
-	cfg.set_value("audio", "music_enabled", music_enabled)
-	cfg.save(SETTINGS_PATH)
-
-func _load_audio_settings() -> void:
-	var cfg := ConfigFile.new()
-	if cfg.load(SETTINGS_PATH) != OK:
-		return
-	sfx_volume = float(cfg.get_value("audio", "sfx_volume", sfx_volume))
-	bgm_volume = float(cfg.get_value("audio", "bgm_volume", bgm_volume))
-	saved_sfx_volume = float(cfg.get_value("audio", "saved_sfx_volume", saved_sfx_volume))
-	saved_bgm_volume = float(cfg.get_value("audio", "saved_bgm_volume", saved_bgm_volume))
-	sound_enabled = bool(cfg.get_value("audio", "sound_enabled", sound_enabled))
-	music_enabled = bool(cfg.get_value("audio", "music_enabled", music_enabled))
-
 func set_sfx_volume(v: float):
 	sfx_volume = clamp(v, 0.0, 1.0)
-	if sfx_volume > 0.01:
-		saved_sfx_volume = sfx_volume
-	_save_audio_settings()
 
 func set_bgm_volume(v: float):
 	bgm_volume = clamp(v, 0.0, 1.0)
-	if bgm_volume > 0.01:
-		saved_bgm_volume = bgm_volume
-	_save_audio_settings()
 	if bgm_player:
 		bgm_player.volume_db = linear_to_db(bgm_volume * master_volume)
 
@@ -365,7 +333,6 @@ func set_sound_enabled(enabled: bool):
 		if sfx_volume > 0.01:
 			saved_sfx_volume = sfx_volume
 		sfx_volume = 0.0
-	_save_audio_settings()
 
 func set_music_enabled(enabled: bool):
 	music_enabled = enabled
@@ -385,7 +352,6 @@ func set_music_enabled(enabled: bool):
 		if bgm_player:
 			bgm_player.volume_db = linear_to_db(0.0)
 			bgm_player.stop()
-	_save_audio_settings()
 
 func is_sound_enabled() -> bool:
 	return sound_enabled and sfx_volume > 0.01 and not is_muted
@@ -470,6 +436,53 @@ func is_narrating() -> bool:
 		return true
 	return false
 
+func _get_british_english_voice_id() -> String:
+	"""
+	Get a British English voice ID for text-to-speech.
+	Searches through available voices for en-GB or British English voices.
+	Falls back to first available voice if none found.
+	"""
+	if not DisplayServer.has_feature(DisplayServer.FEATURE_TEXT_TO_SPEECH):
+		return ""
+
+	var voices = DisplayServer.tts_get_voices()
+	if voices.size() == 0:
+		return ""
+
+	# First pass: Look for explicit en-GB or British voices
+	for voice in voices:
+		if typeof(voice) == TYPE_DICTIONARY:
+			var voice_id = voice.get("id", "")
+			var lang = voice.get("lang", "").to_lower()
+			var name = voice.get("name", "").to_lower()
+
+			# Check for British English language code or name
+			if "en_gb" in lang or "en-gb" in lang or "british" in name or "gb" in name:
+				return str(voice_id)
+		elif typeof(voice) == TYPE_STRING:
+			var voice_str = voice.to_lower()
+			if "en_gb" in voice_str or "en-gb" in voice_str or "british" in voice_str or "gb" in voice_str:
+				return str(voice)
+
+	# Second pass: Look for any en-US or generic English voices (better than random)
+	for voice in voices:
+		if typeof(voice) == TYPE_DICTIONARY:
+			var lang = voice.get("lang", "").to_lower()
+			if "en_" in lang or "en-" in lang:
+				return str(voice.get("id", ""))
+		elif typeof(voice) == TYPE_STRING:
+			var voice_str = voice.to_lower()
+			if "en_" in voice_str or "en-" in voice_str:
+				return str(voice)
+
+	# Fallback: Return first available voice
+	if typeof(voices[0]) == TYPE_DICTIONARY and voices[0].has("id"):
+		return str(voices[0]["id"])
+	elif typeof(voices[0]) == TYPE_STRING:
+		return str(voices[0])
+
+	return ""
+
 func play_voice_narration(text: String, audio_path: String = "", force: bool = false):
 	if (not tts_enabled and not force and not is_auto_narration_preferred()) or is_muted:
 		return
@@ -488,19 +501,13 @@ func play_voice_narration(text: String, audio_path: String = "", force: bool = f
 		var res = load(audio_path)
 		if res is AudioStream:
 			narration_player.stream = res
-			narration_player.volume_db = linear_to_db(master_volume * VOICE_GAIN)
+			narration_player.volume_db = linear_to_db(master_volume)
 			narration_player.play()
 			played_recorded = true
 			
 	if not played_recorded and text != "":
 		if DisplayServer.has_feature(DisplayServer.FEATURE_TEXT_TO_SPEECH):
-			var voices = DisplayServer.tts_get_voices()
-			var voice_id: String = ""
-			if voices.size() > 0:
-				if typeof(voices[0]) == TYPE_DICTIONARY and voices[0].has("id"):
-					voice_id = str(voices[0]["id"])
-				elif typeof(voices[0]) == TYPE_STRING:
-					voice_id = str(voices[0])
+			var voice_id = _get_british_english_voice_id()
 			DisplayServer.tts_speak(text, voice_id)
 
 func pause_narration():

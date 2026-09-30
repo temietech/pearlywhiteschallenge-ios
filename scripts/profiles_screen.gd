@@ -26,6 +26,7 @@ func _ready():
 	refresh_profiles()
 	_relayout()
 
+
 func _notification(what):
 	if what == NOTIFICATION_RESIZED:
 		if is_node_ready():

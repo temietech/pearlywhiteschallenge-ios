@@ -139,6 +139,10 @@ func _start_scanner_session():
 		_start_desktop_camera_fallback()
 
 func _start_desktop_camera_fallback():
+	# Also makes iOS show the camera permission prompt if the native plugin is missing
+	CameraServer.monitoring_feeds = true
+	if OS.get_name() == "Android":
+		OS.request_permission("CAMERA")
 	var feeds = CameraServer.feeds()
 	var rear_feed: CameraFeed = null
 	for f in feeds:

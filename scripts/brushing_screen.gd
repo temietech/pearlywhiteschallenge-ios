@@ -1480,12 +1480,11 @@ func _set_quadrant(q_idx: int):
 	
 	# Audio chime & Spoken Voice Guide
 	AudioManager.play_sfx("coin")
-	
+
 	var voice_prompt_text = q_info.get("voice_prompt", q_info["dialogue"])
 	if DisplayServer.has_feature(DisplayServer.FEATURE_TEXT_TO_SPEECH):
 		DisplayServer.tts_stop()
-		var voices = DisplayServer.tts_get_voices()
-		var voice_id = voices[0]["id"] if voices.size() > 0 else ""
+		var voice_id = AudioManager._get_british_english_voice_id()
 		DisplayServer.tts_speak(voice_prompt_text, voice_id)
 	else:
 		# Fallback spoken notification

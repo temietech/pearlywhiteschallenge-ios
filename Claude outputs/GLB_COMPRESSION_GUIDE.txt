@@ -1,0 +1,124 @@
+================================================================================
+                    GLB MODEL COMPRESSION GUIDE
+================================================================================
+
+WHAT THIS DOES:
+  Compresses your 25 GLB 3D models using Draco compression
+  Expected savings: 50-70% file size reduction (100+ MB savings)
+  Your iOS app size should reduce by ~100 MB!
+
+FILES INCLUDED:
+  1. compress_glb_models.bat    - Windows batch script (easiest to use)
+  2. compress_glb_models.js     - Node.js script (runs the actual compression)
+  3. GLB_COMPRESSION_GUIDE.txt  - This file
+
+================================================================================
+QUICK START (WINDOWS) - UPDATED VERSION
+================================================================================
+
+STEP 1: Install Node.js (one-time setup)
+  1. Go to https://nodejs.org
+  2. Download and install LTS version
+  3. Restart your computer
+
+STEP 2: Setup compression environment (one-time setup)
+  1. Put ALL THREE files in a folder (e.g., Downloads or Desktop):
+     - setup_compression.bat
+     - compress_glb_models_local.bat
+     - compress_glb_local.js
+  2. Double-click: setup_compression.bat
+  3. A window will open and install dependencies (takes 1-2 minutes)
+  4. Wait for "Setup complete!" message
+  5. Press any key to close the window
+
+STEP 3: Run compression
+  1. Double-click: compress_glb_models_local.bat
+  2. A window will open and show compression progress
+  3. Wait for it to complete (might take 5-15 minutes depending on your computer)
+
+THAT'S IT! Your 25 GLB files will be compressed in-place.
+
+FILES NEEDED (Updated version):
+  1. setup_compression.bat          - Run this FIRST to install dependencies
+  2. compress_glb_models_local.bat  - Run this to compress your models
+  3. compress_glb_local.js          - The actual compression script (called by .bat file)
+  4. GLB_COMPRESSION_GUIDE.txt      - This file
+
+================================================================================
+DETAILS
+================================================================================
+
+What's being compressed:
+  - 21.2 MB  candy_crusade/models/blue_candor.glb
+  - 17.1 MB  candy_crusade/models/BlueCandorHit.glb
+  - 14.4 MB  candy_crusade/regions/EnamelBorder-Region4.glb
+  - 12.4 MB  candy_crusade/models/AmmoChestOpen.glb
+  - 11.0 MB  candy_crusade/models/AmmoChestClosed.glb
+  ... and 20 more files
+
+Expected results:
+  Before: ~212 MB total
+  After:  ~60-80 MB total (60-70% reduction)
+  Savings: ~130-150 MB
+
+This will bring your iOS app from 340 MB → ~200 MB!
+
+What changed in this version:
+  - Simplified to use locally installed packages (more reliable)
+  - Added setup script to install dependencies first
+  - Better error messages and validation
+  - Fixed compatibility issues with global vs local packages
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Q: "node_modules not found" error
+A: You skipped setup_compression.bat! Run it first before running compression.
+
+Q: "gltf-transform packages not found" error
+A: The setup didn't complete properly. Try again:
+   1. Delete the node_modules folder (if it exists)
+   2. Run setup_compression.bat again
+   3. Then run compress_glb_models_local.bat
+
+Q: "Command not found" or "Node.js is not installed"
+A: Make sure Node.js is installed from https://nodejs.org and you restarted
+   your computer after installing it.
+
+Q: Script is slow
+A: This is normal. Compression is CPU-intensive. Each file takes 30 seconds to
+   several minutes. Be patient!
+
+Q: Files aren't smaller
+A: Some models might already be heavily compressed. Draco works best on
+   uncompressed geometry, but will still save space.
+
+Q: I want to undo
+A: This modifies files in-place. If you want to undo:
+   1. Copy your project folder from a backup
+   2. Or use git to restore: git checkout -- assets/candy_crusade/
+
+Q: antMatchers error or other npm errors during setup?
+A: Open Command Prompt, navigate to your script folder, and run:
+   npm install --force @gltf-transform/core @gltf-transform/extensions
+   Then try compression again.
+
+================================================================================
+TECHNICAL DETAILS (for nerds)
+================================================================================
+
+The script uses gltf-transform with Draco compression which:
+  - Quantizes vertex positions to lower precision
+  - Reduces normal/tangent precision
+  - Compresses indices efficiently
+  - Quality loss is imperceptible in games
+
+This is the same compression used by Google, Sketchfab, and AAA game studios.
+
+Command being run:
+  gltf-transform compress <file> <file> --compression draco
+
+For more info: https://gltf-transform.dev/
+
+================================================================================

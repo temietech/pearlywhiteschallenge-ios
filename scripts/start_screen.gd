@@ -58,33 +58,45 @@ func _relayout():
 		var btn_w: float
 		var bottom_pad: float
 		if is_tablet:
-			btn_w = clamp(round(cur_w * 0.46), 280.0, 380.0)
-			bottom_pad = 36.0
+			btn_w = clamp(round(cur_w * 0.345), 210.0, 285.0)
+			bottom_pad = 36.0 + UIHelper.safe_bottom
 		else:
-			btn_w = clamp(round(cur_w * 0.70), 240.0, 310.0)
-			bottom_pad = 24.0
-			
+			btn_w = clamp(round(cur_w * 0.525), 180.0, 232.5)
+			bottom_pad = 24.0 + UIHelper.safe_bottom
+
 		var btn_h = round(btn_w * (228.0 / 493.0))
 		var btn_x = (cur_w - btn_w) * 0.5
 		var btn_y = cur_h - btn_h - bottom_pad
-		
+
 		start_btn.size = Vector2(btn_w, btn_h)
 		start_btn.custom_minimum_size = Vector2(btn_w, btn_h)
 		start_btn.position = Vector2(btn_x, btn_y)
 		start_btn.pivot_offset = Vector2(btn_w * 0.5, btn_h * 0.5)
 
+var _bg_kind: String = ""
+
 func _update_background(cur_w: float = 0.0, cur_h: float = 0.0):
 	if not bg: return
-	# Prefer clean unbaked background artwork
-	var clean_tex = UIHelper.load_texture_safe("res://assets/images/backgrounds/Start-Page-tablet.jpeg")
-	if not clean_tex:
-		clean_tex = UIHelper.load_texture_safe(NEW_TABLET_BG)
-	if not clean_tex:
-		clean_tex = UIHelper.load_texture_safe(NEW_PHONE_BG)
-	if not clean_tex:
-		clean_tex = UIHelper.load_texture_safe("res://assets/images/backgrounds/Start-Page.jpg")
+	if cur_w <= 0.0 or cur_h <= 0.0:
+		var sz = UIHelper.get_viewport_safe_size(self)
+		cur_w = sz.x
+		cur_h = sz.y
+	# iPhones / phones get the tall phone artwork, tablets get the tablet artwork
+	var is_tablet = cur_w >= 600.0 or (cur_w / max(1.0, cur_h)) >= 0.68
+	var kind = "tablet" if is_tablet else "phone"
+	if kind == _bg_kind and bg.texture:
+		return
+	var phone_paths = ["res://assets/images/backgrounds/Start-Page.jpg", NEW_PHONE_BG]
+	var tablet_paths = ["res://assets/images/backgrounds/Start-Page-tablet.jpeg", NEW_TABLET_BG]
+	var ordered = (tablet_paths + phone_paths) if is_tablet else (phone_paths + tablet_paths)
+	var clean_tex: Texture2D = null
+	for path in ordered:
+		clean_tex = UIHelper.load_texture_safe(path)
+		if clean_tex:
+			break
 	if clean_tex:
 		bg.texture = clean_tex
+		_bg_kind = kind
 
 func _build_ui():
 	# Fullscreen Start-Page background art (adaptive phone / tablet)

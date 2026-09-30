@@ -236,13 +236,13 @@ func _relayout():
 		
 	if points_label:
 		# Slot 2: Centered directly over the "Points" text (46.5% to 65.0%) + 5px right offset
-		points_label.position = Vector2(banner_w * 0.465 + 5.0, trough_y)
+		points_label.position = Vector2(banner_w * 0.465 + 10.0, trough_y)
 		points_label.size = Vector2(banner_w * 0.185, trough_h)
 		_style_stat_label(points_label, num_font_sz)
 		
 	if streak_label:
-		# Slot 3: Centered directly over the "Streak" text (77.5% to 94.5%)
-		streak_label.position = Vector2(banner_w * 0.775, trough_y)
+		# Slot 3: Centered directly over the "Streak" text (77.5% to 94.5%) + 5px right offset
+		streak_label.position = Vector2(banner_w * 0.775 + 5.0, trough_y)
 		streak_label.size = Vector2(banner_w * 0.170, trough_h)
 		_style_stat_label(streak_label, num_font_sz)
 

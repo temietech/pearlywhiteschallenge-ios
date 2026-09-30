@@ -15,6 +15,11 @@ const VIBRANT_RED = Color(0.95, 0.26, 0.35)
 const GOLD_YELLOW = Color(1.0, 0.80, 0.15)
 const SHADOW_COLOR = Color(0.0, 0.15, 0.35, 0.3)
 
+# Device safe-area insets (notch / Dynamic Island at the top, home indicator at the bottom),
+# expressed in the game's own viewport units. Set by Main._apply_safe_area().
+static var safe_top: float = 0.0
+static var safe_bottom: float = 0.0
+
 # Character Art Mappings
 const CHAR_IMAGES = {
 	"chip": "res://assets/images/characters/chip-nobg.png",
@@ -492,6 +497,35 @@ static func get_weapon_texture(weapon_id: String, tier: int = 1) -> Texture2D:
 			return tex
 	return null
 
+static var _cached_crown_wallpaper: Texture2D = null
+
+## Sir Crown has no ready-made celebration wallpaper, so build one: royal gradient + his own artwork.
+static func _make_sircrown_wallpaper() -> Texture2D:
+	if _cached_crown_wallpaper != null:
+		return _cached_crown_wallpaper
+	var w: int = 720
+	var h: int = 1280
+	var img = Image.create(w, h, false, Image.FORMAT_RGBA8)
+	var top_c = Color(0.42, 0.30, 0.78)
+	var bot_c = Color(0.90, 0.66, 0.96)
+	for y in range(h):
+		img.fill_rect(Rect2i(0, y, w, 1), top_c.lerp(bot_c, float(y) / float(h - 1)))
+	var crown_tex = load_texture_safe("res://assets/images/characters/SirCrown-nobg.png")
+	if crown_tex != null:
+		var src: Image = crown_tex.get_image()
+		if src != null and not src.is_empty():
+			if src.is_compressed():
+				src.decompress()
+			src.convert(Image.FORMAT_RGBA8)
+			var target_h: int = 760
+			var scale_f: float = min(600.0 / float(src.get_width()), float(target_h) / float(src.get_height()))
+			var nw: int = max(1, int(src.get_width() * scale_f))
+			var nh: int = max(1, int(src.get_height() * scale_f))
+			src.resize(nw, nh, Image.INTERPOLATE_LANCZOS)
+			img.blend_rect(src, Rect2i(0, 0, nw, nh), Vector2i((w - nw) / 2, 330))
+	_cached_crown_wallpaper = ImageTexture.create_from_image(img)
+	return _cached_crown_wallpaper
+
 static func get_finished_brushing_texture(avatar_id: String) -> Texture2D:
 	var char_key = avatar_id.to_lower().strip_edges()
 	var filename = ""
@@ -505,6 +539,7 @@ static func get_finished_brushing_texture(avatar_id: String) -> Texture2D:
 		"nibbles", "chef": filename = "finished_brushing_chef.jpg"
 		"spark": filename = "finished_brushing_spark.jpg"
 		"sparkette": filename = "finished_brushing_sparkette.jpg"
+		"sircrown", "crown": return _make_sircrown_wallpaper()
 		_: filename = "finished_brushing_chip.jpg"
 		
 	var candidate_paths = [
@@ -2060,8 +2095,13 @@ static func show_node0_story_intro_modal(parent_node: Node, on_complete: Callabl
 # ==============================================================================
 # BRUSHING TIME LOCK COUNTDOWN MODAL
 # ==============================================================================
+static var _time_lock_overlay: Control = null
+
 static func show_time_lock_modal(parent_node: Node, is_evening: bool):
 	if not parent_node:
+		return
+	# Only ever one of these popups at a time
+	if _time_lock_overlay != null and is_instance_valid(_time_lock_overlay):
 		return
 		
 	var target_parent: Node = parent_node
@@ -2075,6 +2115,7 @@ static func show_time_lock_modal(parent_node: Node, is_evening: bool):
 	var overlay = dlg["overlay"]
 	var center = dlg["center"]
 	overlay.name = "TimeLockModalOverlay"
+	_time_lock_overlay = overlay
 	
 	var card_w = clampf(safe_sz.x - 40.0, 300.0, 380.0)
 	var card_h = 280.0
@@ -2085,14 +2126,6 @@ static func show_time_lock_modal(parent_node: Node, is_evening: bool):
 	var card_style = create_bubbly_panel(28, Color.WHITE, Color(0.32, 0.68, 0.98), 4)
 	card.add_theme_stylebox_override("panel", card_style)
 	center.add_child(card)
-	
-	var close_btn = create_close_button(Vector2(32, 32))
-	close_btn.position = Vector2(card_w - 40.0, 10.0)
-	close_btn.pressed.connect(func():
-		_play_sfx_safe("click")
-		overlay.queue_free()
-	)
-	card.add_child(close_btn)
 	
 	var vbox = VBoxContainer.new()
 	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -2637,7 +2670,29 @@ static func show_character_unlock_modal(parent_node: Node, char_def: Dictionary,
 			elif gs and gs.has_method("update_active_profile"):
 				gs.update_active_profile({"avatar": c_id})
 	)
-	card_vbox.add_child(close_btn)
+	if not is_unlocked and not (c_id in ["sircrown", "crown"]):
+		# Locked avatar: use the "got it" PNG button
+		var gotit_tex: Texture2D = get_button_texture("gotit")
+		if gotit_tex == null:
+			gotit_tex = load_texture_safe("res://assets/images/buttons/gotitbtn.png")
+		if gotit_tex != null:
+			var gotit_png = TextureButton.new()
+			gotit_png.texture_normal = gotit_tex
+			gotit_png.ignore_texture_size = true
+			gotit_png.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+			gotit_png.custom_minimum_size = Vector2(170, 50)
+			gotit_png.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			gotit_png.focus_mode = Control.FOCUS_NONE
+			gotit_png.pressed.connect(func():
+				_play_sfx_safe("click")
+				overlay.queue_free()
+			)
+			card_vbox.add_child(gotit_png)
+			close_btn.queue_free()
+		else:
+			card_vbox.add_child(close_btn)
+	else:
+		card_vbox.add_child(close_btn)
 	
 	# Pop-in bouncy scale animation
 	modal_card.pivot_offset = Vector2(card_w * 0.5, 180.0)
@@ -2836,6 +2891,119 @@ static func create_reward_badge(icon_path: String, text: String, color: Color, m
 	
 	return badge
 
+static func show_champion_trophy_modal(parent_node: Node, on_close: Callable = Callable()):
+	var dlg = create_modal_dialog(parent_node, 300, Color(0.03, 0.08, 0.22, 0.88))
+	var overlay: Control = dlg["overlay"]
+	var center = dlg["center"]
+
+	var target_parent: Node = parent_node
+	if parent_node and parent_node.is_inside_tree():
+		var main_node = parent_node.get_tree().root.get_node_or_null("Main")
+		if main_node and is_instance_valid(main_node):
+			target_parent = main_node
+	var safe_sz = get_viewport_safe_size(target_parent)
+	var card_w: float = clamp(safe_sz.x - 40.0, 300.0, 380.0)
+
+	var card = PanelContainer.new()
+	card.custom_minimum_size = Vector2(card_w, 0)
+	var card_style = create_bubbly_panel(30, Color.WHITE, Color(1.0, 0.82, 0.25), 4)
+	card_style.content_margin_left = 20
+	card_style.content_margin_right = 20
+	card_style.content_margin_top = 22
+	card_style.content_margin_bottom = 22
+	card.add_theme_stylebox_override("panel", card_style)
+	center.add_child(card)
+
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 12)
+	card.add_child(vbox)
+
+	var title = Label.new()
+	title.text = "CONGRATULATIONS!"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	apply_bubbly_label(title, 24, Color(0.95, 0.60, 0.05), true)
+	vbox.add_child(title)
+
+	var trophy = TextureRect.new()
+	trophy.texture = load_texture_safe("res://assets/images/badgescreen/pearlychampion.png")
+	trophy.custom_minimum_size = Vector2(card_w - 80.0, 220)
+	trophy.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	trophy.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	trophy.pivot_offset = Vector2((card_w - 80.0) * 0.5, 110)
+	vbox.add_child(trophy)
+
+	var sub = Label.new()
+	sub.text = "You are a Pearly Whites Champion!"
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub.custom_minimum_size = Vector2(card_w - 40.0, 0)
+	apply_bubbly_label(sub, 18, Color(0.18, 0.44, 0.78), true)
+	vbox.add_child(sub)
+
+	var sub2 = Label.new()
+	sub2.text = "You brushed your way through all 28 days. Amazing job!"
+	sub2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub2.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub2.custom_minimum_size = Vector2(card_w - 40.0, 0)
+	apply_bubbly_label(sub2, 13, Color(0.35, 0.50, 0.70), false)
+	vbox.add_child(sub2)
+
+	var btn = create_bubbly_button("CONTINUE", VIBRANT_GREEN)
+	btn.custom_minimum_size = Vector2(card_w - 80.0, 50)
+	btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	btn.pressed.connect(func():
+		_play_sfx_safe("click")
+		overlay.queue_free()
+		if on_close.is_valid():
+			on_close.call()
+	)
+	vbox.add_child(btn)
+
+	# Confetti: two bursts of falling coloured paper from the top
+	var colors := [Color(1.0, 0.35, 0.45), Color(1.0, 0.82, 0.25), Color(0.35, 0.85, 0.50), Color(0.35, 0.70, 1.0), Color(0.75, 0.50, 1.0), Color(1.0, 0.60, 0.20)]
+	var grad = Gradient.new()
+	grad.offsets = PackedFloat32Array([0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
+	grad.colors = PackedColorArray(colors)
+	var view_w: float = max(safe_sz.x, 320.0)
+	for i in range(2):
+		var conf = CPUParticles2D.new()
+		conf.position = Vector2(view_w * 0.5, -12)
+		conf.z_index = 5
+		conf.amount = 90
+		conf.lifetime = 4.5
+		conf.preprocess = 0.0
+		conf.explosiveness = 0.0 if i == 0 else 0.85
+		conf.one_shot = (i == 1)
+		conf.emitting = true
+		conf.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+		conf.emission_rect_extents = Vector2(view_w * 0.5, 4)
+		conf.direction = Vector2(0, 1)
+		conf.spread = 25.0
+		conf.gravity = Vector2(0, 260)
+		conf.initial_velocity_min = 60.0
+		conf.initial_velocity_max = 190.0
+		conf.angular_velocity_min = -360.0
+		conf.angular_velocity_max = 360.0
+		conf.angle_min = 0.0
+		conf.angle_max = 360.0
+		conf.scale_amount_min = 5.0
+		conf.scale_amount_max = 11.0
+		conf.color_initial_ramp = grad
+		overlay.add_child(conf)
+
+	# Pop-in and gentle trophy wobble
+	card.pivot_offset = Vector2(card_w * 0.5, 240.0)
+	card.scale = Vector2(0.7, 0.7)
+	card.modulate.a = 0.0
+	var tw = card.create_tween().set_parallel(true)
+	tw.tween_property(card, "scale", Vector2.ONE, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(card, "modulate:a", 1.0, 0.2)
+	var wob = trophy.create_tween().set_loops()
+	wob.tween_property(trophy, "rotation_degrees", 4.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	wob.tween_property(trophy, "rotation_degrees", -4.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_play_sfx_safe("victory")
+
 static func show_pre_battle_ammo_check_modal(parent_node: Node, on_proceed: Callable, on_go_to_shop: Callable):
 	var target_parent: Node = parent_node
 	if parent_node and parent_node.is_inside_tree():
@@ -2877,8 +3045,6 @@ static func show_pre_battle_ammo_check_modal(parent_node: Node, on_proceed: Call
 	close_btn.pressed.connect(func():
 		_play_sfx_safe("click")
 		overlay.queue_free()
-		if on_proceed.is_valid():
-			on_proceed.call()
 	)
 	top_row.add_child(close_btn)
 
@@ -2907,12 +3073,23 @@ static func show_pre_battle_ammo_check_modal(parent_node: Node, on_proceed: Call
 	var brush_icons = ["res://assets/images/shop/brushweapon_1.png", "res://assets/images/shop/brushweapon_2.png", "res://assets/images/shop/BubbleBrush.png"]
 	var battery_icon = "res://assets/images/shop/Bubble_Battery.png" if brush_lvl >= 3 else "res://assets/images/shop/Gold_Battery.png"
 
-	var items = [
-		{"name": "Brushes", "count": int(ammo_dict.get("brushes", 10)), "icon": brush_icons[brush_lvl - 1]},
-		{"name": "Batteries", "count": int(ammo_dict.get("battery", ammo_dict.get("batteries", 0))), "icon": battery_icon},
-		{"name": "Toothpaste", "count": int(ammo_dict.get("tubes", ammo_dict.get("toothpaste", 0))), "icon": "res://assets/images/shop/Lvl%dToothpastePistoleProjectile.png" % paste_lvl},
-		{"name": "Floss Spools", "count": int(ammo_dict.get("spools", ammo_dict.get("string", 0))), "icon": "res://assets/images/shop/flossweapon_%d.png" % floss_lvl}
-	]
+	var wash_lvl: int = clampi(int(w_levels.get("wash", 0)), 0, 3)
+	var paste_owned: bool = int(w_levels.get("paste", 0)) >= 1
+	var floss_owned: bool = int(w_levels.get("floss", 0)) >= 1
+	var wash_owned: bool = wash_lvl >= 1
+
+	# Only show ammo for weapons the player has actually unlocked
+	var items: Array = []
+	if brush_lvl >= 2:
+		items.append({"name": "Batteries", "count": int(ammo_dict.get("battery", ammo_dict.get("batteries", 0))), "icon": battery_icon})
+	else:
+		items.append({"name": "Brushes", "count": int(ammo_dict.get("brushes", 10)), "icon": brush_icons[0]})
+	if paste_owned:
+		items.append({"name": "Toothpaste", "count": int(ammo_dict.get("tubes", ammo_dict.get("toothpaste", 0))), "icon": "res://assets/images/shop/Lvl%dToothpastePistoleProjectile.png" % paste_lvl})
+	if wash_owned:
+		items.append({"name": "Mouthwash", "count": int(ammo_dict.get("vials", ammo_dict.get("bottles", 0))), "icon": ["res://assets/images/shop/MouthwashBlast-1.png", "res://assets/images/shop/WashGold2.png", "res://assets/images/shop/BubbleWash.png"][wash_lvl - 1]})
+	if floss_owned:
+		items.append({"name": "Floss Spools", "count": int(ammo_dict.get("spools", ammo_dict.get("string", 0))), "icon": "res://assets/images/shop/flossweapon_%d.png" % floss_lvl})
 
 	var grid = GridContainer.new()
 	grid.columns = 2
@@ -2966,7 +3143,7 @@ static func show_pre_battle_ammo_check_modal(parent_node: Node, on_proceed: Call
 		grid.add_child(slot)
 
 	var ask_lbl = Label.new()
-	ask_lbl.text = "Do you want to buy more ammo before starting?"
+	ask_lbl.text = "Ready to start the game, or do you want to buy more ammo first?"
 	ask_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ask_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	ask_lbl.custom_minimum_size = Vector2(inner_w, 0)
@@ -2979,25 +3156,26 @@ static func show_pre_battle_ammo_check_modal(parent_node: Node, on_proceed: Call
 	vbox.add_child(btn_hbox)
 	var btn_w: float = floor((inner_w - 10.0) / 2.0)
 
-	var no_btn = create_bubbly_button("NO, ENTER GAME", Color(0.60, 0.65, 0.72))
+	# Left: NO, BUY AMMO (neutral)  |  Right: YES, START GAME (green)
+	var no_btn = create_bubbly_button("NO, BUY AMMO", Color(0.30, 0.62, 0.92))
 	no_btn.custom_minimum_size = Vector2(btn_w, 46)
-	no_btn.add_theme_font_size_override("font_size", 14)
+	no_btn.add_theme_font_size_override("font_size", 13)
 	no_btn.pressed.connect(func():
-		_play_sfx_safe("click")
-		overlay.queue_free()
-		if on_proceed.is_valid():
-			on_proceed.call()
-	)
-	btn_hbox.add_child(no_btn)
-
-	var yes_btn = create_bubbly_button("YES, BUY AMMO", VIBRANT_GREEN)
-	yes_btn.custom_minimum_size = Vector2(btn_w, 46)
-	yes_btn.add_theme_font_size_override("font_size", 14)
-	yes_btn.pressed.connect(func():
 		_play_sfx_safe("click")
 		overlay.queue_free()
 		if on_go_to_shop.is_valid():
 			on_go_to_shop.call()
+	)
+	btn_hbox.add_child(no_btn)
+
+	var yes_btn = create_bubbly_button("YES, START GAME", VIBRANT_GREEN)
+	yes_btn.custom_minimum_size = Vector2(btn_w, 46)
+	yes_btn.add_theme_font_size_override("font_size", 13)
+	yes_btn.pressed.connect(func():
+		_play_sfx_safe("click")
+		overlay.queue_free()
+		if on_proceed.is_valid():
+			on_proceed.call()
 	)
 	btn_hbox.add_child(yes_btn)
 

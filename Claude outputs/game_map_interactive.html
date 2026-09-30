@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pearly Whites Challenge - Interactive Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .instructions {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            border: 3px dashed #667eea;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .node {
+            position: absolute;
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .node.dragging {
+            cursor: grabbing;
+            transform: scale(1.15);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+        }
+
+        .node.node-0 {
+            width: 120px;
+            height: 120px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect fill="%23FF6B6B" rx="10" width="120" height="120"/><text x="60" y="70" font-size="40" fill="white" text-anchor="middle" font-weight="bold">START</text></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .node.node-1 {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .node.node-2 {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .node.node-3 {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .node.node-4 {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .node.node-5 {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .node-label {
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .node-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .node.node-0 .node-label,
+        .node.node-0 .node-number {
+            display: none;
+        }
+
+        .info-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .info-panel h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .coordinates-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .coordinate-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .coordinate-item.node-1 {
+            border-left-color: #764ba2;
+        }
+
+        .coordinate-item.node-2 {
+            border-left-color: #f5576c;
+        }
+
+        .coordinate-item.node-3 {
+            border-left-color: #00f2fe;
+        }
+
+        .coordinate-item.node-4 {
+            border-left-color: #38f9d7;
+        }
+
+        .coordinate-item.node-5 {
+            border-left-color: #fee140;
+        }
+
+        .coordinate-item.node-0 {
+            border-left-color: #FF6B6B;
+        }
+
+        .node-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .coordinate-item span {
+            display: block;
+            font-size: 0.9em;
+            color: #666;
+            margin: 3px 0;
+        }
+
+        .export-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+
+        .export-section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-reset {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-export {
+            background: #43e97b;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #38f9d7;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 233, 123, 0.4);
+        }
+
+        .btn-json {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-json:hover {
+            background: #f5576c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .json-output {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            margin-top: 15px;
+            border: 1px solid #444;
+        }
+
+        .feedback {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #43e97b;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2000;
+        }
+
+        .feedback.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .canvas-container {
+                height: 400px;
+            }
+
+            .node {
+                font-size: 12px;
+            }
+
+            .node.node-0 {
+                width: 80px;
+                height: 80px;
+            }
+
+            .node.node-1,
+            .node.node-2,
+            .node.node-3,
+            .node.node-4,
+            .node.node-5 {
+                width: 70px;
+                height: 70px;
+            }
+
+            .coordinates-list {
+                grid-template-columns: 1fr;
+            }
+
+            .export-buttons {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦷 Pearly Whites Challenge - Interactive Map</h1>
+
+        <div class="instructions">
+            <h3>📋 How to Use:</h3>
+            <ul>
+                <li><strong>Drag nodes:</strong> Click and drag any node to reposition it on the map</li>
+                <li><strong>View coordinates:</strong> See real-time position updates below the canvas</li>
+                <li><strong>Export data:</strong> Copy coordinates as JSON or text format</li>
+                <li><strong>Start node (Node 0):</strong> Features the custom start_btn.png styling</li>
+                <li><strong>Reset positions:</strong> Return all nodes to their default positions</li>
+            </ul>
+        </div>
+
+        <div class="canvas-container" id="canvas">
+            <div class="node node-0" data-node="0" style="left: 50px; top: 50px;">
+                <div class="node-label">Start</div>
+                <div class="node-number">0</div>
+            </div>
+            <div class="node node-1" data-node="1" style="left: 200px; top: 100px;">
+                <div class="node-label">Quest</div>
+                <div class="node-number">1</div>
+            </div>
+            <div class="node node-2" data-node="2" style="left: 400px; top: 80px;">
+                <div class="node-label">Game</div>
+                <div class="node-number">2</div>
+            </div>
+            <div class="node node-3" data-node="3" style="left: 600px; top: 150px;">
+                <div class="node-label">Reward</div>
+                <div class="node-number">3</div>
+            </div>
+            <div class="node node-4" data-node="4" style="left: 300px; top: 350px;">
+                <div class="node-label">Boss</div>
+                <div class="node-number">4</div>
+            </div>
+            <div class="node node-5" data-node="5" style="left: 550px; top: 380px;">
+                <div class="node-label">Treasure</div>
+                <div class="node-number">5</div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>📍 Node Positions</h3>
+            <div class="coordinates-list" id="coordinatesList"></div>
+
+            <div class="export-section">
+                <h3>💾 Export Coordinates</h3>
+                <div class="export-buttons">
+                    <button class="btn-reset" onclick="resetPositions()">Reset Positions</button>
+                    <button class="btn-export" onclick="exportAsText()">Export as Text</button>
+                    <button class="btn-json" onclick="toggleJsonView()">Show JSON</button>
+                </div>
+                <div class="json-output" id="jsonOutput" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const nodes = document.querySelectorAll('.node');
+        const coordinatesList = document.getElementById('coordinatesList');
+        const feedback = document.getElementById('feedback');
+
+        let draggedNode = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let originalPositions = {};
+
+        // Store original positions
+        nodes.forEach(node => {
+            const nodeId = node.getAttribute('data-node');
+            originalPositions[nodeId] = {
+                left: node.style.left,
+                top: node.style.top
+            };
+        });
+
+        // Mouse down - start dragging
+        nodes.forEach(node => {
+            node.addEventListener('mousedown', (e) => {
+                draggedNode = node;
+                node.classList.add('dragging');
+
+                const rect = node.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+
+                e.preventDefault();
+            });
+        });
+
+        // Mouse move - drag
+        document.addEventListener('mousemove', (e) => {
+            if (!draggedNode) return;
+
+            const canvasRect = canvas.getBoundingClientRect();
+            const nodeRect = draggedNode.getBoundingClientRect();
+            const nodeWidth = draggedNode.offsetWidth;
+            const nodeHeight = draggedNode.offsetHeight;
+
+            let newX = e.clientX - canvasRect.left - offsetX;
+            let newY = e.clientY - canvasRect.top - offsetY;
+
+            // Constrain within canvas
+            newX = Math.max(0, Math.min(newX, canvasRect.width - nodeWidth));
+            newY = Math.max(0, Math.min(newY, canvasRect.height - nodeHeight));
+
+            draggedNode.style.left = newX + 'px';
+            draggedNode.style.top = newY + 'px';
+
+            updateCoordinates();
+        });
+
+        // Mouse up - stop dragging
+        document.addEventListener('mouseup', () => {
+            if (draggedNode) {
+                draggedNode.classList.remove('dragging');
+                draggedNode = null;
+                showFeedback('Position updated! ✓');
+            }
+        });
+
+        // Touch events for mobile
+        nodes.forEach(node => {
+            node.addEventListener('touchstart', (e) => {
+                draggedNode = node;
+                node.classList.add('dragging');
+
+                const touch = e.touches[0];
+                const rect = node.getBoundingClientRect();
+
+                offsetX = touch.clientX - rect.left;
+                offsetY = touch.clientY - rect.top;
+
+                e.preventDefault();
+            });
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!draggedNode) return;
+
+            const touch = e.touches[0];
+            const canvasRect = canvas.getBoundingClientRect();
+            const nodeWidth = draggedNode.offsetWidth;
+            const nodeHeight = draggedNode.offsetHeight;
+
+            let newX = touch.clientX - canvasRect.left - offsetX;
+            let newY = touch.clientY - canvasRect.top - offsetY;
+
+            newX = Math.max(0, Math.min(newX, canvasRect.width - nodeWidth));
+            newY = Math.max(0, Math.min(newY, canvasRect.height - nodeHeight));
+
+            draggedNode.style.left = newX + 'px';
+            draggedNode.style.top = newY + 'px';
+
+            updateCoordinates();
+        });
+
+        document.addEventListener('touchend', () => {
+            if (draggedNode) {
+                draggedNode.classList.remove('dragging');
+                draggedNode = null;
+                showFeedback('Position updated! ✓');
+            }
+        });
+
+        // Update coordinates display
+        function updateCoordinates() {
+            coordinatesList.innerHTML = '';
+
+            nodes.forEach(node => {
+                const nodeId = node.getAttribute('data-node');
+                const left = parseInt(node.style.left);
+                const top = parseInt(node.style.top);
+                const label = ['Start', 'Quest', 'Game', 'Reward', 'Boss', 'Treasure'][nodeId];
+
+                const item = document.createElement('div');
+                item.className = `coordinate-item node-${nodeId}`;
+                item.innerHTML = `
+                    <div class="node-name">Node ${nodeId}: ${label}</div>
+                    <span>X: ${left}px</span>
+                    <span>Y: ${top}px</span>
+                `;
+                coordinatesList.appendChild(item);
+            });
+        }
+
+        // Reset positions
+        function resetPositions() {
+            nodes.forEach(node => {
+                const nodeId = node.getAttribute('data-node');
+                node.style.left = originalPositions[nodeId].left;
+                node.style.top = originalPositions[nodeId].top;
+            });
+            updateCoordinates();
+            showFeedback('Positions reset! ✓');
+        }
+
+        // Export as text
+        function exportAsText() {
+            let text = 'Pearly Whites Challenge - Node Positions\n';
+            text += '==========================================\n\n';
+
+            nodes.forEach(node => {
+                const nodeId = node.getAttribute('data-node');
+                const left = parseInt(node.style.left);
+                const top = parseInt(node.style.top);
+                const labels = ['Start', 'Quest', 'Game', 'Reward', 'Boss', 'Treasure'];
+                text += `Node ${nodeId} (${labels[nodeId]}): X=${left}, Y=${top}\n`;
+            });
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'node_positions.txt';
+            a.click();
+
+            showFeedback('Exported as text! ✓');
+        }
+
+        // Toggle JSON view
+        function toggleJsonView() {
+            const jsonOutput = document.getElementById('jsonOutput');
+            if (jsonOutput.style.display === 'none') {
+                generateJsonData();
+                jsonOutput.style.display = 'block';
+            } else {
+                jsonOutput.style.display = 'none';
+            }
+        }
+
+        // Generate JSON data
+        function generateJsonData() {
+            const data = {};
+            nodes.forEach(node => {
+                const nodeId = node.getAttribute('data-node');
+                data[`node_${nodeId}`] = {
+                    x: parseInt(node.style.left),
+                    y: parseInt(node.style.top)
+                };
+            });
+
+            const jsonOutput = document.getElementById('jsonOutput');
+            jsonOutput.textContent = JSON.stringify(data, null, 2);
+
+            // Add copy button
+            const copyBtn = document.createElement('button');
+            copyBtn.textContent = 'Copy JSON';
+            copyBtn.style.marginTop = '10px';
+            copyBtn.style.background = '#667eea';
+            copyBtn.style.color = 'white';
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(jsonOutput.textContent);
+                showFeedback('Copied to clipboard! ✓');
+            };
+
+            if (!jsonOutput.querySelector('button')) {
+                jsonOutput.appendChild(copyBtn);
+            }
+        }
+
+        // Show feedback message
+        function showFeedback(message) {
+            feedback.textContent = message;
+            feedback.classList.add('show');
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 2000);
+        }
+
+        // Initialize
+        updateCoordinates();
+    </script>
+</body>
+</html>

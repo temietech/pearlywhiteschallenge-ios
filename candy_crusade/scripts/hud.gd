@@ -264,16 +264,30 @@ func _build_ui() -> void:
 		reticle_center.add_child(reticle)
 
 	var top_margin = MarginContainer.new()
-	top_margin.add_theme_constant_override("margin_top", 38)
+	top_margin.add_theme_constant_override("margin_top", 22)
 	top_margin.add_theme_constant_override("margin_left", 15)
 	top_margin.add_theme_constant_override("margin_right", 15)
 	top_margin.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	top_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(top_margin)
+
+	# Second row (level banner + boss bar), centred under the player/pause row
+	var banner_margin = MarginContainer.new()
+	banner_margin.add_theme_constant_override("margin_top", 86)
+	banner_margin.add_theme_constant_override("margin_left", 15)
+	banner_margin.add_theme_constant_override("margin_right", 15)
+	banner_margin.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	banner_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(banner_margin)
+	var banner_vbox = VBoxContainer.new()
+	banner_vbox.add_theme_constant_override("separation", 6)
+	banner_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	banner_margin.add_child(banner_vbox)
 
 	# Combo multiplier display
 	var combo_center := CenterContainer.new()
 	combo_center.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	combo_center.offset_top = 80
+	combo_center.offset_top = 190
 	combo_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(combo_center)
 	
@@ -306,6 +320,7 @@ func _build_ui() -> void:
 	_combo_container.visible = false
 	
 	var top_hbox = HBoxContainer.new()
+	top_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top_margin.add_child(top_hbox)
 	
 	var player_hbox = HBoxContainer.new()
@@ -317,8 +332,8 @@ func _build_ui() -> void:
 	p_avatar.custom_minimum_size = Vector2(50, 50)
 	p_avatar.clip_contents = true
 	var sb_circle = StyleBoxFlat.new()
-	sb_circle.bg_color = Color(0.12, 0.16, 0.24, 0.95)
-	sb_circle.border_color = Color(0.3, 0.85, 1.0, 0.9)
+	sb_circle.bg_color = Color(0.55, 0.82, 1.0)
+	sb_circle.border_color = Color.WHITE
 	sb_circle.border_width_left = 2
 	sb_circle.border_width_top = 2
 	sb_circle.border_width_right = 2
@@ -332,8 +347,12 @@ func _build_ui() -> void:
 	
 	_player_avatar_rect = TextureRect.new()
 	_player_avatar_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_player_avatar_rect.offset_left = 4
+	_player_avatar_rect.offset_top = 4
+	_player_avatar_rect.offset_right = -4
+	_player_avatar_rect.offset_bottom = -4
 	_player_avatar_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_player_avatar_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_player_avatar_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_player_avatar_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	p_avatar.add_child(_player_avatar_rect)
 	_update_avatar_display()
@@ -346,27 +365,22 @@ func _build_ui() -> void:
 	_player_name_label = Label.new()
 	_player_name_label.text = "Player"
 	_player_name_label.add_theme_font_size_override("font_size", 14)
-	_player_name_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
-	_player_name_label.add_theme_color_override("font_outline_color", Color(0.08, 0.12, 0.22))
-	_player_name_label.add_theme_constant_override("outline_size", 3)
+	_player_name_label.add_theme_color_override("font_color", Color(0, 0, 0))
+	_player_name_label.add_theme_color_override("font_outline_color", Color(1, 1, 1, 0.9))
+	_player_name_label.add_theme_constant_override("outline_size", 4)
 	_update_player_name()
-	p_vbox.add_child(_player_name_label)
+	_player_name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_player_name_label.custom_minimum_size = Vector2(70, 0)
+	var name_row = HBoxContainer.new()
+	name_row.add_theme_constant_override("separation", 10)
+	p_vbox.add_child(name_row)
+	name_row.add_child(_player_name_label)
 	
 	var hp_hbox = HBoxContainer.new()
 	hp_hbox.alignment = BoxContainer.ALIGNMENT_BEGIN
 	hp_hbox.add_theme_constant_override("separation", 6)
 	p_vbox.add_child(hp_hbox)
 	
-	var heart_tex = _get_ui_texture("heart_candy.jpg")
-	if heart_tex != null:
-		var heart_icon = TextureRect.new()
-		heart_icon.texture = heart_tex
-		heart_icon.custom_minimum_size = Vector2(20, 20)
-		heart_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		heart_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		heart_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		hp_hbox.add_child(heart_icon)
-
 	_player_hp_bar = ProgressBar.new()
 	_player_hp_bar.custom_minimum_size = Vector2(110, 14)
 	_player_hp_bar.show_percentage = false
@@ -386,13 +400,13 @@ func _build_ui() -> void:
 	var coin_box = HBoxContainer.new()
 	coin_box.alignment = BoxContainer.ALIGNMENT_BEGIN
 	coin_box.add_theme_constant_override("separation", 5)
-	p_vbox.add_child(coin_box)
+	name_row.add_child(coin_box)
 	
-	var coin_tex = _get_ui_texture("coin_candy.jpg")
+	var coin_tex = UIHelper.load_texture_safe("res://assets/images/congratulations/gold_tooth_coin.png")
 	if coin_tex != null:
 		var c_icon = TextureRect.new()
 		c_icon.texture = coin_tex
-		c_icon.custom_minimum_size = Vector2(16, 16)
+		c_icon.custom_minimum_size = Vector2(20, 20)
 		c_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		c_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		c_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -453,10 +467,11 @@ func _build_ui() -> void:
 	var center_wrapper = CenterContainer.new()
 	center_wrapper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center_wrapper.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top_hbox.add_child(center_wrapper)
+	banner_vbox.add_child(center_wrapper)
 
 	var level_card = PanelContainer.new()
-	level_card.custom_minimum_size = Vector2(180, 46)
+	level_card.custom_minimum_size = Vector2(200, 44)
+	level_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var lc_sb := StyleBoxFlat.new()
 	lc_sb.bg_color = Color(0.08, 0.15, 0.30, 0.90)
 	lc_sb.border_color = Color(0.40, 0.85, 1.0, 0.95)
@@ -496,9 +511,10 @@ func _build_ui() -> void:
 
 	_boss_avatar_container = HBoxContainer.new()
 	_boss_avatar_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_boss_avatar_container.alignment = BoxContainer.ALIGNMENT_END
+	_boss_avatar_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	_boss_avatar_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_boss_avatar_container.add_theme_constant_override("separation", 8)
-	top_hbox.add_child(_boss_avatar_container)
+	banner_vbox.add_child(_boss_avatar_container)
 	
 	var b_vbox = VBoxContainer.new()
 	b_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -506,7 +522,7 @@ func _build_ui() -> void:
 	_boss_avatar_container.add_child(b_vbox)
 	
 	var b_header = HBoxContainer.new()
-	b_header.alignment = BoxContainer.ALIGNMENT_END
+	b_header.alignment = BoxContainer.ALIGNMENT_CENTER
 	b_header.add_theme_constant_override("separation", 6)
 	b_vbox.add_child(b_header)
 	
@@ -528,7 +544,7 @@ func _build_ui() -> void:
 	b_header.add_child(_boss_hp_label)
 	
 	_boss_hp_bar = ProgressBar.new()
-	_boss_hp_bar.custom_minimum_size = Vector2(110, 14)
+	_boss_hp_bar.custom_minimum_size = Vector2(190, 14)
 	_boss_hp_bar.show_percentage = false
 	var b_sb_fg = StyleBoxFlat.new()
 	b_sb_fg.bg_color = Color(0.95, 0.22, 0.32)
@@ -543,47 +559,38 @@ func _build_ui() -> void:
 	b_avatar.custom_minimum_size = Vector2(52, 52)
 	b_avatar.clip_contents = true
 	var sb_circle2 = StyleBoxFlat.new()
-	sb_circle2.bg_color = Color(0.12, 0.46, 1.0)
+	sb_circle2.bg_color = Color(0.55, 0.82, 1.0)
 	sb_circle2.set_corner_radius_all(26)
+	sb_circle2.border_color = Color.WHITE
+	sb_circle2.set_border_width_all(2)
 	b_avatar.add_theme_stylebox_override("panel", sb_circle2)
-	var boss_tex = _get_ui_texture("boss_candor_avatar.jpg")
+	var boss_tex = UIHelper.load_texture_safe("res://assets/images/candycrusadegame/Blue-Candor.png")
 	if boss_tex != null:
 		var b_tex_rect = TextureRect.new()
 		b_tex_rect.texture = boss_tex
 		b_tex_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 		b_tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		b_tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		b_tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		b_tex_rect.offset_left = 3
+		b_tex_rect.offset_top = 3
+		b_tex_rect.offset_right = -3
+		b_tex_rect.offset_bottom = -3
 		b_avatar.add_child(b_tex_rect)
 	_boss_avatar_container.add_child(b_avatar)
 	_boss_avatar_container.visible = false
 	
 	var pause_btn = TextureButton.new()
-	pause_btn.custom_minimum_size = Vector2(42, 42)
+	pause_btn.custom_minimum_size = Vector2(54, 54)
+	pause_btn.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	pause_btn.ignore_texture_size = true
 	pause_btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	pause_btn.pivot_offset = Vector2(21, 21)
+	pause_btn.focus_mode = Control.FOCUS_NONE
+	pause_btn.pivot_offset = Vector2(27, 27)
 	pause_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	var pause_tex = UIHelper.get_pause_button_texture() if UIHelper else null
-	if not pause_tex:
-		pause_tex = _get_ui_texture("btn_pause")
-	if pause_tex != null:
-		pause_btn.texture_normal = pause_tex
-	else:
-		var fb_lbl = Label.new()
-		fb_lbl.text = "||"
-		fb_lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
-		fb_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		fb_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		fb_lbl.add_theme_font_size_override("font_size", 18)
-		pause_btn.add_child(fb_lbl)
-	pause_btn.mouse_entered.connect(func():
-		var tw = create_tween()
-		tw.tween_property(pause_btn, "scale", Vector2(1.12, 1.12), 0.08).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	)
-	pause_btn.mouse_exited.connect(func():
-		var tw = create_tween()
-		tw.tween_property(pause_btn, "scale", Vector2.ONE, 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	)
+	var pause_tex = UIHelper.load_texture_safe("res://assets/images/buttons/pausebtn.png")
+	if pause_tex == null:
+		pause_tex = UIHelper.get_pause_button_texture()
+	pause_btn.texture_normal = pause_tex
 	pause_btn.pressed.connect(_toggle_pause_menu)
 	top_hbox.add_child(pause_btn)
 	
@@ -1101,15 +1108,11 @@ func _update_avatar_display() -> void:
 	if _player_avatar_rect == null:
 		return
 	var bridge = get_node_or_null("/root/GameBridge")
-	var path := ""
+	var c_id := "chip"
 	if bridge != null:
-		path = bridge.get_character_portrait_path(bridge.character_id)
-	else:
-		path = "res://assets/candy_crusade/characters/Chip.jpeg"
-	if ResourceLoader.exists(path) or FileAccess.file_exists(path):
-		var tex = load(path)
-		if tex != null:
-			_player_avatar_rect.texture = tex
+		c_id = str(bridge.character_id).to_lower().strip_edges()
+	# The character's -nobg artwork, shown inside the circle (same as the map page avatar)
+	_player_avatar_rect.texture = UIHelper.get_char_texture(c_id, false)
 
 
 func _update_player_name() -> void:
@@ -1593,12 +1596,6 @@ func _build_dev_and_clear_panels() -> void:
 	p_card.mouse_filter = Control.MOUSE_FILTER_STOP
 	p_center.add_child(p_card)
 
-	# Top-Right Close Cross Button on card root Control (not inside a PanelContainer)
-	var p_close_btn = UIHelper.create_close_button(Vector2(28, 28))
-	p_close_btn.position = Vector2(p_modal_info["width"] - 38.0, 10.0)
-	p_close_btn.pressed.connect(_unpause_game)
-	p_card.add_child(p_close_btn)
-
 	var p_vbox = VBoxContainer.new()
 	p_vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
 	p_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1858,50 +1855,101 @@ func _build_dev_and_clear_panels() -> void:
 	_clear_panel.visible = false
 
 func show_level1_instructions_modal(on_start: Callable) -> void:
+	# Only the very first Candy Crusade explains how to play
+	var gs = get_node_or_null("/root/GameState")
+	var prof: Dictionary = gs.get_active_profile() if (gs != null and gs.has_method("get_active_profile")) else {}
+	if not prof.is_empty() and bool(prof.get("cc_instructions_seen", false)):
+		if on_start.is_valid():
+			on_start.call()
+		return
+
 	get_tree().paused = true
 	var dlg = UIHelper.create_modal_dialog(self, 300, Color(0.04, 0.08, 0.20, 0.85))
 	var overlay = dlg["overlay"]
 	var center = dlg["center"]
-	
-	var card_w := 320.0
-	var modal_info = UIHelper.create_modal_card(card_w, "portrait")
-	var card = modal_info["root"]
+	overlay.process_mode = Node.PROCESS_MODE_ALWAYS
+
+	var card = PanelContainer.new()
+	card.custom_minimum_size = Vector2(500, 0)
+	var card_style = UIHelper.create_bubbly_panel(28, Color.WHITE, Color(0.35, 0.72, 0.96), 4)
+	card_style.content_margin_left = 24
+	card_style.content_margin_right = 24
+	card_style.content_margin_top = 20
+	card_style.content_margin_bottom = 22
+	card.add_theme_stylebox_override("panel", card_style)
 	center.add_child(card)
-	
+
 	var vbox = VBoxContainer.new()
-	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_theme_constant_override("separation", 10)
-	modal_info["content"].add_child(vbox)
-	
+	card.add_child(vbox)
+
 	var title = Label.new()
-	title.text = "LEVEL 1: CANDY CAVE"
+	title.text = "HOW TO PLAY"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	UIHelper.apply_bubbly_label(title, 18, Color(0.18, 0.44, 0.78), true)
+	UIHelper.apply_bubbly_label(title, 28, Color(0.18, 0.44, 0.78), true)
 	vbox.add_child(title)
-	
-	var sub = Label.new()
-	sub.text = "HOW TO PLAY"
-	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	UIHelper.apply_bubbly_label(sub, 12, Color(0.35, 0.50, 0.70), true)
-	vbox.add_child(sub)
-	
+
+	var goal = Label.new()
+	goal.text = "Blue Candor's candy army is attacking! Blast the minions, then beat Blue Candor to save your teeth."
+	goal.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	goal.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	goal.custom_minimum_size = Vector2(450, 0)
+	UIHelper.apply_bubbly_label(goal, 15, Color(0.30, 0.42, 0.60), false)
+	vbox.add_child(goal)
+
 	var instructions = [
-		"1. Tap or Drag to aim your Toothpaste Pistol.",
-		"2. Blast incoming candy minions before they reach your tooth!",
-		"3. Switch weapons at the bottom to use Boomerangs, Washes & Floss.",
-		"4. Defeat Blue Candor's army to protect Mulinia!"
+		["SWIPE UP", "Throw your Brush Boomerang. It flies to where you let go, then comes back."],
+		["TAP / HOLD", "Tap to squirt Toothpaste. Hold your finger down to rapid-fire."],
+		["PULL DOWN", "Drag down and let go to lob a Mouthwash blast. Pull further to throw further."],
+		["DOUBLE TAP", "Cast the Floss Lasso to freeze the closest minions in place."],
+		["COLLECT", "Tap Molar Coins and Ammo Crates when they appear to grab them."],
+		["AMMO", "The number under each weapon is your ammo. At 0 you can't fire, so buy more in the shop."],
+		["LOCKED", "Weapons with a padlock unlock as you play. Buy them in the shop."],
+		["YOUR HEALTH", "Minions that reach you hurt your tooth. Watch the green bar and don't let it run out!"]
 	]
 	for inst in instructions:
+		var row = HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		vbox.add_child(row)
+
+		var tag_panel = PanelContainer.new()
+		tag_panel.custom_minimum_size = Vector2(118, 0)
+		var tag_sb = StyleBoxFlat.new()
+		tag_sb.bg_color = Color(0.93, 0.96, 1.0)
+		tag_sb.set_corner_radius_all(10)
+		tag_sb.border_color = Color(0.78, 0.86, 0.96)
+		tag_sb.set_border_width_all(1)
+		tag_sb.content_margin_left = 6
+		tag_sb.content_margin_right = 6
+		tag_sb.content_margin_top = 4
+		tag_sb.content_margin_bottom = 4
+		tag_panel.add_theme_stylebox_override("panel", tag_sb)
+		row.add_child(tag_panel)
+
+		var tag = Label.new()
+		tag.text = inst[0]
+		tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		UIHelper.apply_bubbly_label(tag, 12, Color(0.18, 0.44, 0.78), true)
+		tag_panel.add_child(tag)
+
 		var lbl = Label.new()
-		lbl.text = inst
-		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
-		UIHelper.apply_bubbly_label(lbl, 11, Color(0.20, 0.32, 0.50), false)
-		vbox.add_child(lbl)
-		
+		lbl.text = inst[1]
+		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		UIHelper.apply_bubbly_label(lbl, 13, Color(0.15, 0.25, 0.42), false)
+		row.add_child(lbl)
+
 	var start_btn = UIHelper.create_bubbly_button("START BATTLE", UIHelper.VIBRANT_GREEN)
-	start_btn.custom_minimum_size = Vector2(220, 44)
+	start_btn.custom_minimum_size = Vector2(260, 52)
+	start_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	start_btn.pressed.connect(func():
+		if gs != null and not prof.is_empty():
+			prof["cc_instructions_seen"] = true
+			if gs.has_method("save_game"):
+				gs.save_game()
 		overlay.queue_free()
 		get_tree().paused = false
 		if on_start.is_valid():

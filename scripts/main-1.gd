@@ -49,7 +49,6 @@ func _ready():
 
 	_build_framework()
 	_apply_safe_area()
-	get_viewport().size_changed.connect(_apply_safe_area)
 
 	# Preload Candy Crusade 3D scene asynchronously in background
 	call_deferred("_preload_background_assets")
@@ -371,13 +370,11 @@ func navigate_to(screen_name: String, extra_args: Dictionary = {}):
 	content_container.add_child(new_screen)
 	current_screen_node = new_screen
 	
-	_apply_content_insets()
 	_update_chrome_visibility(screen_name)
 	if bottom_nav and bottom_nav.has_method("set_active"):
 		bottom_nav.set_active(screen_name)
 		
-	# The brushing song starts only once the player presses START BRUSHING (see brushing_screen.gd)
-	if AudioManager and not (screen_name in ["brushing", "brush_check", "floss"]):
+	if AudioManager:
 		AudioManager.play_screen_bgm(screen_name)
 
 func _update_chrome_visibility(screen_name: String):
@@ -417,12 +414,7 @@ func _start_tutorial():
 	tutorial_overlay = Control.new()
 	tutorial_overlay.set_script(tut_script)
 	tutorial_overlay.z_index = 200
-	tutorial_overlay.tutorial_finished.connect(func():
-		tutorial_overlay = null
-		# Only NOW (tutorial skipped or completed) may the daily stamp card / badge popups appear
-		if current_screen_node and is_instance_valid(current_screen_node) and current_screen_node.has_method("_check_main_screen_popups"):
-			current_screen_node.call_deferred("_check_main_screen_popups")
-	)
+	tutorial_overlay.tutorial_finished.connect(func(): tutorial_overlay = null)
 	add_child(tutorial_overlay)
 
 func _on_map_node_launched(day: int, node_type: String):
@@ -437,7 +429,7 @@ func _on_map_node_launched(day: int, node_type: String):
 			await get_tree().process_frame
 			navigate_to("combat", {"is_boss": (day == 28 or day in [1, 9, 19, 28])})
 		, func():
-			navigate_to("shop", {"tab": "ammo"})
+			navigate_to("shop", {"tab": "powerups"})
 		)
 	elif node_type == "minigame":
 		var p = GameState.get_active_profile()
@@ -458,36 +450,18 @@ func _on_tab_selected(tab_name: String):
 		navigate_to(tab_name)
 
 func _apply_safe_area():
-	# Handle iPhone notch / Dynamic Island / home indicator.
-	# DisplayServer.get_display_safe_area() is in real screen pixels; the game viewport is scaled
-	# (canvas_items stretch), so convert to viewport units before using it.
-	var top_inset := 0.0
-	var bottom_inset := 0.0
-	var os_name := OS.get_name()
-	if os_name == "iOS" or os_name == "Android":
-		var safe: Rect2i = DisplayServer.get_display_safe_area()
-		var win_size: Vector2i = DisplayServer.window_get_size()
-		var vp_size: Vector2 = get_viewport_rect().size
-		if win_size.x > 0 and win_size.y > 0 and safe.size.x > 0 and safe.size.y > 0:
-			var sy: float = vp_size.y / float(win_size.y)
-			top_inset = max(0.0, float(safe.position.y) * sy)
-			bottom_inset = max(0.0, float(win_size.y - (safe.position.y + safe.size.y)) * sy)
-	UIHelper.safe_top = top_inset
-	UIHelper.safe_bottom = bottom_inset
+	# Handle iPhone notch/safe area for notched devices
+	var safe_rect = DisplayServer.screen_get_usable_rect()
+	var screen_rect = get_viewport_rect()
 
-	if top_bar:
-		top_bar.offset_top = top_inset
-		top_bar.offset_bottom = top_inset + 80.0
-	if bottom_nav:
-		bottom_nav.offset_top = -88.0 - bottom_inset
-		bottom_nav.offset_bottom = -bottom_inset
-	_apply_content_insets()
+	# Calculate the safe area margins
+	var safe_top = safe_rect.position.y
+	var safe_bottom = screen_rect.size.y - (safe_rect.position.y + safe_rect.size.y)
 
-func _apply_content_insets():
-	# Every screen except the full-bleed ones (start splash + map, which have their own top bar / nav)
-	# is pushed inside the safe area so nothing hides behind the notch or home indicator.
-	if not content_container:
-		return
-	var full_bleed := (current_screen_name == "start" or current_screen_name == "map")
-	content_container.offset_top = 0.0 if full_bleed else UIHelper.safe_top
-	content_container.offset_bottom = 0.0 if full_bleed else -UIHelper.safe_bottom
+	# Apply top margin to top bar if there's a notch
+	if safe_top > 0:
+		top_bar.offset_top = int(safe_top)
+
+	# Apply bottom margin to bottom navigation if needed
+	if safe_bottom > 0:
+		bottom_nav.offset_bottom = -int(safe_bottom)

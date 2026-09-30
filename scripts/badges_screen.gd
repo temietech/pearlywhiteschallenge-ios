@@ -250,12 +250,20 @@ func _ready():
 	anchor_right = 1.0
 	anchor_bottom = 1.0
 	_build_ui()
+	_last_built_size = size
 
 func _notification(what):
 	if what == NOTIFICATION_RESIZED and is_node_ready():
 		call_deferred("_rebuild_ui")
 
+var _last_built_size: Vector2 = Vector2.ZERO
+
 func _rebuild_ui():
+	# Only rebuild when the size REALLY changed: rebuilding frees the back button, and a rebuild
+	# landing between finger-down and finger-up made the back button feel dead on phones.
+	if _last_built_size != Vector2.ZERO and size.distance_to(_last_built_size) < 2.0:
+		return
+	_last_built_size = size
 	for c in get_children():
 		if c != detail_modal:
 			c.queue_free()
@@ -310,6 +318,20 @@ func _get_badge_status(b: Dictionary, p: Dictionary) -> Dictionary:
 		for d in days_stat:
 			if d == "done" or d == "surprise-done":
 				completed_days += 1
+
+		# Include the current day in progress if player is actively working on it
+		# This gives a more accurate representation of progress (e.g., on day 28 morning,
+		# show "28 Days" not "27 Days" since they're actively working on day 28)
+		var cur_node = int(p.get("currentNode", 1))
+		var cur_day = GameState.day_for_node(cur_node)
+		if cur_day > 0 and cur_day <= 28 and cur_day > completed_days:
+			var cur_node_data = GameState.get_node_data(cur_node)
+			var node_type = str(cur_node_data.get("type", ""))
+			# Count the current day if they've started it (at least morning brush done)
+			# or if the finish node is the current node (day 28 complete)
+			if node_type in ["evening", "minigame", "quiz", "finish"] or GameState.is_day_morning_completed(cur_day, p):
+				completed_days = cur_day
+
 		cur_val = completed_days
 
 	var tiers: Array = b["tiers"]
@@ -349,16 +371,25 @@ func _build_ui():
 		back_btn = UIHelper.create_image_button("res://assets/images/shop/blue_back_button.png", Vector2(86, 36))
 	if not back_btn.texture_normal:
 		back_btn = UIHelper.create_image_button("res://assets/images/shop/backbtnshop.png", Vector2(86, 36))
-	back_btn.position = Vector2(14, 14)
-	back_btn.z_index = 20
-	back_btn.pressed.connect(func():
-		AudioManager.play_sfx("click")
+	back_btn.custom_minimum_size = Vector2(96, 44)
+	back_btn.size = Vector2(96, 44)
+	back_btn.position = Vector2(10, 10)
+	# FIX: Raise z_index to 60 and add mouse_filter to make back button tappable above content
+	back_btn.z_index = 60
+	back_btn.mouse_filter = Control.MOUSE_FILTER_STOP
+	var back_fired := [false]
+	var go_back := func():
+		if back_fired[0]:
+			return
+		back_fired[0] = true
 		var main_node = get_tree().root.get_node_or_null("Main")
 		if main_node and main_node.has_method("navigate_to"):
 			main_node.navigate_to("map")
 		else:
 			back_pressed.emit()
-	)
+	# Fire on finger-DOWN so the button can never be lost to a layout rebuild mid-tap
+	back_btn.button_down.connect(go_back)
+	back_btn.pressed.connect(go_back)
 	add_child(back_btn)
 	
 	# Header Title: Graphic Image (Clean transparent PNG) or Styled Bubbly Font

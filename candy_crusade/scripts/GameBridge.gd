@@ -334,7 +334,9 @@ func get_ammo_key_for_weapon(weapon_id: String) -> String:
 	var b_id := to_bridge_weapon(weapon_id)
 	match b_id:
 		"brush":
-			return "battery"
+			# Level 1 manual brush uses Brush Boomerang packs ("brushes");
+			# electric levels 2/3 use rechargeable batteries.
+			return "battery" if get_weapon_level("brush") >= 2 else "brushes"
 		"paste":
 			return "tubes"
 		"wash":
@@ -542,7 +544,9 @@ func init_from_game_state(override_boss: bool = false) -> void:
 	
 	var cur_node: int = int(p.get("currentNode", 1))
 	var cur_day: int = gs.day_for_node(cur_node)
-	var is_boss_match: bool = override_boss or (cur_day == 28)
+	# Every fight plays its waves first and THEN Blue Candor spawns (RegionController does that),
+	# so the bridge never starts a fight as an instant boss.
+	var is_boss_match: bool = override_boss
 	var ammo_data: Dictionary = p.get("ammo", {})
 	var wep_data: Dictionary = p.get("weaponLevels", {})
 	

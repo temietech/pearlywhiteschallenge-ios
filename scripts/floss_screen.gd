@@ -56,7 +56,14 @@ func _ready():
 	GameState.preload_candy_crusade_in_background()
 
 func _notification(what):
-	if what == NOTIFICATION_RESIZED:
+	# FIX: Pause floss timer when app backgrounds, resume when returns to focus
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		if current_state == State.FLOSSING and flossing_timer:
+			flossing_timer.paused = true
+	elif what == NOTIFICATION_WM_WINDOW_FOCUS_IN:
+		if current_state == State.FLOSSING and flossing_timer:
+			flossing_timer.paused = false
+	elif what == NOTIFICATION_RESIZED:
 		if is_node_ready():
 			_relayout()
 

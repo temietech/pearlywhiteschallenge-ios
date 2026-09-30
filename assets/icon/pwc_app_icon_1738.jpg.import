@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://iootmn2h7hkm"
-path="res://.godot/imported/pwc_app_icon_1024.png-6c9e489f0f40c06c98f60105c3696b95.ctex"
+uid="uid://cdoqtpt46d1xf"
+path="res://.godot/imported/pwc_app_icon_1738.jpg-334acde65b99974a933d3640039087dc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icon/pwc_app_icon_1024.png"
-dest_files=["res://.godot/imported/pwc_app_icon_1024.png-6c9e489f0f40c06c98f60105c3696b95.ctex"]
+source_file="res://assets/icon/pwc_app_icon_1738.jpg"
+dest_files=["res://.godot/imported/pwc_app_icon_1738.jpg-334acde65b99974a933d3640039087dc.ctex"]
 
 [params]
 

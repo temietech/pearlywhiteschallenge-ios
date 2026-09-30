@@ -30,76 +30,76 @@ void fragment() {
 const BOSS_DAYS = [1, 9, 19, 28]
 
 const PATH_COORDINATES = [
-	Vector2(63.2, 98.0), # Node 0 (Intro Node)
-	Vector2(46.5, 96.9), # Day 1 AM
-	Vector2(20.4, 94.9), # Day 1 PM
-	Vector2(42.1, 93.8), # Day 2 AM
-	Vector2(78.8, 94.1), # Day 2 PM
-	Vector2(81.0, 92.9), # minigame
-	Vector2(39.9, 91.5), # Day 3 AM
-	Vector2(43.8, 89.9), # Day 3 PM
-	Vector2(76.6, 88.5), # Day 4 AM
-	Vector2(44.5, 86.7), # Day 4 PM
-	Vector2(51.1, 85.2), # Day 5 AM
-	Vector2(78.8, 83.8), # Day 5 PM
-	Vector2(75.0, 82.1), # minigame
-	Vector2(28.9, 81.2), # Day 6 AM
-	Vector2(64.9, 78.2), # Day 6 PM
-	Vector2(43.0, 75.5), # Day 7 AM
-	Vector2(59.9, 72.7), # Day 7 PM
-	Vector2(22.8, 70.7), # quiz
-	Vector2(71.1, 70.0), # Day 8 AM
-	Vector2(50.8, 67.2), # Day 8 PM
-	Vector2(76.9, 63.5), # minigame
-	Vector2(51.0, 60.8), # Day 9 AM
-	Vector2(45.8, 56.7), # Day 9 PM
-	Vector2(77.4, 54.7), # Day 10 AM
-	Vector2(54.0, 52.3), # Day 10 PM
-	Vector2(46.6, 50.1), # Day 11 AM
-	Vector2(61.1, 48.3), # Day 11 PM
-	Vector2(52.6, 47.2), # Day 12 AM
-	Vector2(29.9, 46.4), # Day 12 PM
-	Vector2(21.0, 45.3), # Day 13 AM
-	Vector2(31.6, 44.0), # Day 13 PM
-	Vector2(52.9, 44.8), # minigame
-	Vector2(80.3, 44.7), # Day 14 AM
-	Vector2(80.6, 43.2), # Day 14 PM
-	Vector2(70.5, 42.6), # quiz
-	Vector2(46.3, 42.2), # Day 15 AM
-	Vector2(42.6, 40.4), # Day 15 PM
-	Vector2(66.0, 39.8), # Day 16 AM
-	Vector2(75.6, 38.5), # Day 16 PM
-	Vector2(54.9, 37.5), # minigame
-	Vector2(45.3, 36.3), # Day 17 AM
-	Vector2(67.3, 35.4), # Day 17 PM
-	Vector2(77.7, 34.2), # Day 18 AM
-	Vector2(72.0, 32.8), # Day 18 PM
-	Vector2(30.5, 31.3), # Day 19 AM
-	Vector2(36.4, 30.1), # Day 19 PM
-	Vector2(58.8, 29.5), # Day 20 AM
-	Vector2(69.3, 28.4), # Day 20 PM
-	Vector2(56.1, 27.4), # minigame
-	Vector2(42.3, 26.5), # Day 21 AM
-	Vector2(52.7, 25.0), # Day 21 PM
-	Vector2(61.2, 23.7), # quiz
-	Vector2(47.6, 22.5), # Day 22 AM
-	Vector2(28.7, 21.7), # Day 22 PM
-	Vector2(25.7, 20.4), # Day 23 AM
-	Vector2(41.2, 19.5), # Day 23 PM
-	Vector2(64.8, 19.4), # Day 24 AM
-	Vector2(43.9, 17.2), # Day 24 PM
-	Vector2(62.5, 15.8), # minigame
-	Vector2(44.9, 13.9), # Day 25 AM
-	Vector2(67.5, 13.3), # Day 25 PM
-	Vector2(75.0, 11.9), # Day 26 AM
-	Vector2(55.4, 11.1), # Day 26 PM
-	Vector2(44.9, 9.8), # Day 27 AM
-	Vector2(62.5, 8.9), # Day 27 PM
-	Vector2(69.3, 7.9), # minigame
-	Vector2(48.3, 6.9), # Day 28 AM
-	Vector2(37.1, 5.9), # Day 28 PM
-	Vector2(46.2, 4.5), # Final quiz (last node before FINISH)
-	Vector2(52.4, 2.8)  # FINISH
+	Vector2(50.0, 98.0), # Node 0 (Intro Node) - Start button area
+	Vector2(55.0, 96.5), # Day 1 AM
+	Vector2(30.0, 95.0), # Day 1 PM
+	Vector2(35.0, 93.5), # Day 2 AM
+	Vector2(70.0, 92.0), # Day 2 PM
+	Vector2(80.0, 90.5), # minigame
+	Vector2(40.0, 89.0), # Day 3 AM
+	Vector2(45.0, 87.5), # Day 3 PM
+	Vector2(75.0, 86.0), # Day 4 AM
+	Vector2(45.0, 84.5), # Day 4 PM
+	Vector2(50.0, 83.0), # Day 5 AM
+	Vector2(78.0, 81.5), # Day 5 PM
+	Vector2(75.0, 80.0), # minigame
+	Vector2(30.0, 78.5), # Day 6 AM
+	Vector2(65.0, 77.0), # Day 6 PM
+	Vector2(40.0, 75.5), # Day 7 AM
+	Vector2(60.0, 74.0), # Day 7 PM
+	Vector2(25.0, 72.5), # quiz
+	Vector2(70.0, 71.0), # Day 8 AM
+	Vector2(50.0, 69.5), # Day 8 PM
+	Vector2(75.0, 68.0), # minigame
+	Vector2(50.0, 66.5), # Day 9 AM
+	Vector2(45.0, 65.0), # Day 9 PM
+	Vector2(75.0, 63.5), # Day 10 AM
+	Vector2(55.0, 62.0), # Day 10 PM
+	Vector2(45.0, 60.5), # Day 11 AM
+	Vector2(60.0, 59.0), # Day 11 PM
+	Vector2(50.0, 57.5), # Day 12 AM
+	Vector2(30.0, 56.0), # Day 12 PM
+	Vector2(20.0, 54.5), # Day 13 AM
+	Vector2(35.0, 53.0), # Day 13 PM
+	Vector2(50.0, 51.5), # minigame
+	Vector2(80.0, 50.0), # Day 14 AM
+	Vector2(80.0, 48.5), # Day 14 PM
+	Vector2(70.0, 47.0), # quiz
+	Vector2(45.0, 45.5), # Day 15 AM
+	Vector2(40.0, 44.0), # Day 15 PM
+	Vector2(65.0, 42.5), # Day 16 AM
+	Vector2(75.0, 41.0), # Day 16 PM
+	Vector2(55.0, 39.5), # minigame
+	Vector2(45.0, 38.0), # Day 17 AM
+	Vector2(65.0, 36.5), # Day 17 PM
+	Vector2(75.0, 35.0), # Day 18 AM
+	Vector2(70.0, 33.5), # Day 18 PM
+	Vector2(30.0, 32.0), # Day 19 AM
+	Vector2(35.0, 30.5), # Day 19 PM
+	Vector2(60.0, 29.0), # Day 20 AM
+	Vector2(70.0, 27.5), # Day 20 PM
+	Vector2(55.0, 26.0), # minigame
+	Vector2(40.0, 24.5), # Day 21 AM
+	Vector2(55.0, 23.0), # Day 21 PM
+	Vector2(60.0, 21.5), # quiz
+	Vector2(45.0, 20.0), # Day 22 AM
+	Vector2(30.0, 18.5), # Day 22 PM
+	Vector2(25.0, 17.0), # Day 23 AM
+	Vector2(40.0, 15.5), # Day 23 PM
+	Vector2(65.0, 14.0), # Day 24 AM
+	Vector2(45.0, 12.5), # Day 24 PM
+	Vector2(60.0, 11.0), # minigame
+	Vector2(45.0, 9.5), # Day 25 AM
+	Vector2(70.0, 8.0), # Day 25 PM
+	Vector2(75.0, 6.5), # Day 26 AM
+	Vector2(55.0, 5.0), # Day 26 PM
+	Vector2(45.0, 3.5), # Day 27 AM
+	Vector2(60.0, 2.0), # Day 27 PM
+	Vector2(70.0, 1.5), # minigame
+	Vector2(50.0, 0.5), # Day 28 AM
+	Vector2(35.0, 0.2), # Day 28 PM - near finish
+	Vector2(45.0, 0.1), # quiz - near finish
+	Vector2(50.0, 0.0)  # FINISH - top of map
 ]
 
 var map_nodes_data: Array[Dictionary] = []
@@ -114,9 +114,10 @@ func _ready():
 
 	_init_node_data()
 	_build_ui()
+	_apply_safe_area()
 	GameState.stats_updated.connect(_on_stats_updated)
 	call_deferred("_check_main_screen_popups")
-	
+
 	# 2. Quietly upload any progress made while offline
 	FirebaseManager.check_and_sync_pending_data()
 
@@ -135,9 +136,15 @@ func _load_local_challenge_state():
 func _check_main_screen_popups():
 	var p = GameState.get_active_profile()
 	if not p.is_empty() and not p.get("tutorial_done", false):
-		# First-run tutorial is (about to be) showing. Nothing may pop up behind it.
-		# Main calls this function again the moment the tutorial is skipped or finished.
-		return
+		# Tutorial is active on cold start/first run, defer popups until tutorial completes
+		var main_node = get_tree().root.get_node_or_null("Main")
+		if main_node and "tutorial_overlay" in main_node and is_instance_valid(main_node.tutorial_overlay):
+			var tut = main_node.tutorial_overlay
+			if tut.has_signal("tutorial_finished"):
+				tut.tutorial_finished.connect(func():
+					_check_main_screen_popups()
+				, CONNECT_ONE_SHOT)
+				return
 
 	var shown_stamp = _check_and_show_daily_stamp_calendar(func():
 		_check_badge_unlocks()
@@ -150,16 +157,82 @@ func _check_badge_unlocks():
 	if p.is_empty():
 		return
 
-	# Check for any new badge unlocks and display popups
-	GameState.check_badge_unlocks(p, true)
-	GameState.save_game()
-	# Make sure anything queued (even from other screens) pops up now that we're on the map
-	var main_node = get_tree().root.get_node_or_null("Main") if is_inside_tree() else null
-	if main_node and main_node.get("achievement_overlay") and is_instance_valid(main_node.achievement_overlay):
-		main_node.achievement_overlay.call_deferred("check_and_show_pending")
+	# FIX: Track badge unlocks BEFORE checking so we can show them as popups
+	var seen_before = {}
+	if p.has("seen_badge_unlocks") and typeof(p["seen_badge_unlocks"]) == TYPE_DICTIONARY:
+		seen_before = p["seen_badge_unlocks"].duplicate()
 
-	# Then check weapon unlocks
-	_check_weapon_unlocks()
+	# Check for any new badge unlocks
+	GameState.check_badge_unlocks(p, false)  # Don't notify yet - we'll show modals instead
+	GameState.save_game()
+
+	# FIX: Show badge unlock modals for any newly unlocked badges
+	var seen_after = p.get("seen_badge_unlocks", {})
+	var newly_unlocked = []
+
+	for badge_id in seen_after:
+		var new_lvl = int(seen_after.get(badge_id, 0))
+		var old_lvl = int(seen_before.get(badge_id, 0))
+		if new_lvl > old_lvl:
+			newly_unlocked.append({"id": badge_id, "level": new_lvl})
+
+	# Show popups for newly unlocked badges
+	if not newly_unlocked.is_empty():
+		_show_badge_unlock_popups(newly_unlocked, 0)
+	else:
+		# Then check weapon unlocks
+		_check_weapon_unlocks()
+
+func _show_badge_unlock_popups(badge_queue: Array, index: int):
+	if index >= badge_queue.size():
+		# All badge popups shown, check weapon unlocks
+		_check_weapon_unlocks()
+		return
+
+	var badge_info = badge_queue[index]
+	var badge_id = badge_info["id"]
+	var level = badge_info["level"]
+
+	# Find badge definition
+	for b in GameState.BADGE_FAMILIES:
+		if b["family"] == badge_id:
+			for tier in b["tiers"]:
+				if tier["level"] == level:
+					var badge_name = b["name"]
+					var tier_label = tier["label"]
+					# Show toast and queue achievement
+					GameState.push_toast("Badge Unlocked!", "%s - %s" % [badge_name, tier_label], "", "purple")
+					# Show popup modal
+					var panel = UIHelper.create_bubbly_panel(16, Color.WHITE, Color(1.0, 0.92, 0.5), 2)
+					var modal = Control.new()
+					modal.custom_minimum_size = Vector2(300, 200)
+					modal.set_anchors_preset(Control.PRESET_CENTER)
+					var vbox = VBoxContainer.new()
+					vbox.add_theme_constant_override("separation", 12)
+					modal.add_child(vbox)
+
+					var title = Label.new()
+					title.text = "Badge Unlocked!"
+					title.add_theme_font_size_override("font_size", 18)
+					title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+					vbox.add_child(title)
+
+					var desc = Label.new()
+					desc.text = "%s\n%s" % [badge_name, tier_label]
+					desc.add_theme_font_size_override("font_size", 14)
+					desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+					vbox.add_child(desc)
+
+					var btn = Button.new()
+					btn.text = "Continue"
+					btn.pressed.connect(func():
+						modal.queue_free()
+						_show_badge_unlock_popups(badge_queue, index + 1)
+					)
+					vbox.add_child(btn)
+
+					get_tree().root.add_child(modal)
+					break
 
 func _check_weapon_unlocks():
 	var p = GameState.get_active_profile()
@@ -254,14 +327,10 @@ func _init_node_data():
 		node_id += 1
 		map_nodes_data.append({"id": node_id, "day": day, "type": "evening"})
 		node_id += 1
-		# Day 28: the Final Quiz comes right after the evening brush, before FINISH (mirrors GameState.NODE_DATA)
-		if day == 28:
-			map_nodes_data.append({"id": node_id, "day": day, "type": "quiz"})
-			node_id += 1
 		if minigame_days.has(day):
 			map_nodes_data.append({"id": node_id, "day": day, "type": "minigame"})
 			node_id += 1
-		if quiz_days.has(day) and day != 28:
+		if quiz_days.has(day):
 			map_nodes_data.append({"id": node_id, "day": day, "type": "quiz"})
 			node_id += 1
 	map_nodes_data.append({"id": node_id, "day": 28, "type": "finish"})
@@ -297,8 +366,7 @@ func _build_ui():
 	
 	map_bg_tex = TextureRect.new()
 	map_bg_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	map_bg_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
-	map_bg_tex.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	map_bg_tex.stretch_mode = TextureRect.STRETCH_SCALE
 	map_bg_tex.custom_minimum_size = Vector2(cur_w, map_height)
 	map_bg_tex.size = Vector2(cur_w, map_height)
 	map_bg_tex.position = Vector2.ZERO
@@ -352,7 +420,7 @@ func _build_map_nodes():
 	for c in nodes_container.get_children():
 		if c != map_bg_tex:
 			c.queue_free()
-
+		
 	var p = GameState.get_active_profile()
 	var current_node = int(p.get("currentNode", 0))
 	var active_avatar = p.get("avatar", "chip")
@@ -379,17 +447,14 @@ func _build_map_nodes():
 		nodes_container.add_child(node_widget)
 
 func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, is_active: bool, is_locked: bool, pos: Vector2, avatar_id: String, is_missed: bool = false) -> Control:
-	# Start (intro) and finish nodes are 20% bigger than the rest
-	var node_size: Vector2 = Vector2(46, 32) * (1.2 if (n_type == "intro" or n_type == "finish") else 1.0)
 	var container = Control.new()
-	container.position = pos - node_size * 0.5
-	container.custom_minimum_size = node_size
+	container.position = pos - Vector2(23, 16)
+	container.custom_minimum_size = Vector2(46, 32)
 	container.z_index = 2 if not is_active else 5
 	# FIX: Ensure container allows clicks to reach child nodes
 	container.mouse_filter = Control.MOUSE_FILTER_PASS
 	if is_active:
 		container.add_to_group("active_map_node")
-
 	
 	var node_stage = GameState.get_node_stage(id)
 	var is_boss_day = BOSS_DAYS.has(day)
@@ -423,16 +488,16 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 	var btn = TextureButton.new()
 	btn.ignore_texture_size = true
 	btn.stretch_mode = TextureButton.STRETCH_SCALE
-	btn.custom_minimum_size = node_size
-	btn.size = node_size
-	btn.pivot_offset = node_size * 0.5
+	btn.custom_minimum_size = Vector2(46, 32)
+	btn.size = Vector2(46, 32)
+	btn.pivot_offset = Vector2(23, 16)
 	# FIX: Ensure button captures input properly
 	btn.focus_mode = Control.FOCUS_NONE
 	btn.mouse_filter = Control.MOUSE_FILTER_STOP
 	
 	var normal_tex: Texture2D
 	var pressed_tex: Texture2D
-
+	
 	if is_completed:
 		normal_tex = UIHelper.load_texture_safe("res://assets/images/mainmap/mapbuttonsup_green.png")
 		pressed_tex = UIHelper.load_texture_safe("res://assets/images/mainmap/mapbuttonsdown_green.png")
@@ -451,8 +516,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 		normal_tex = UIHelper.load_texture_safe("res://assets/images/mainmap/mapbuttonsup_blue.png")
 		pressed_tex = normal_tex
 	if n_type == "intro":
-		# DRAG-DROP: Use start_btn.png for node 0 (START node)
-		var start_t = UIHelper.load_texture_safe("res://assets/images/buttons/start_btn.png")
+		var start_t = UIHelper.load_texture_safe("res://assets/images/buttons/startgamebtn.png")
 		if start_t:
 			normal_tex = start_t
 			pressed_tex = start_t
@@ -465,7 +529,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 	btn.texture_normal = normal_tex
 	btn.texture_pressed = pressed_tex
 	btn.modulate = Color.WHITE
-
+	
 	if is_locked:
 		btn.material = _get_grayscale_material()
 		# FIX: Add subtle visual indicator that node is locked
@@ -475,7 +539,6 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 		btn.modulate = Color.WHITE
 
 	btn.scale = Vector2.ONE
-
 		
 	var finish_lbl: Label = null
 	var day_lbl: Label = null
@@ -485,7 +548,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 			day_lbl = Label.new()
 			day_lbl.text = "START"
 			day_lbl.position = Vector2(0, -4)
-			day_lbl.size = node_size
+			day_lbl.size = Vector2(46, 32)
 			day_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			day_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			day_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -501,7 +564,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 			finish_lbl = Label.new()
 			finish_lbl.text = "FINISH"
 			finish_lbl.position = Vector2(0, -4)
-			finish_lbl.size = node_size
+			finish_lbl.size = Vector2(46, 32)
 			finish_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			finish_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			finish_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -514,7 +577,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 		day_lbl = Label.new()
 		day_lbl.text = str(day)
 		day_lbl.position = Vector2(0, -4)
-		day_lbl.size = node_size
+		day_lbl.size = Vector2(46, 32)
 		day_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		day_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		day_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -536,7 +599,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 		var mascot_root = Control.new()
 		mascot_root.custom_minimum_size = Vector2(160, 140)
 		mascot_root.size = Vector2(160, 140)
-		mascot_root.position = Vector2((node_size.x - 160.0) * 0.5, 0.0)
+		mascot_root.position = Vector2((46.0 - 160.0) * 0.5, 0.0)
 		mascot_root.z_index = 6
 		mascot_root.mouse_filter = Control.MOUSE_FILTER_PASS
 		mascot_root.gui_input.connect(func(ev):
@@ -635,7 +698,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 			if day > 0 and GameState.is_day_story_unlocked(day, p):
 				UIHelper.show_story_panel_modal(self, day)
 			elif day == 0:
-				pass # Prologue was already seen once: never pop it up again
+				UIHelper.show_node0_story_intro_modal(self)
 			else:
 				GameState.push_toast("Completed!", "Day %d is completed!" % day, "", "green")
 		)
@@ -648,18 +711,11 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 				AudioManager.play_sfx("click")
 				if n_type == "intro":
 					if node_stage == 0:
-						var start_combat = func():
-							var pp = GameState.get_active_profile()
-							if not pp.is_empty():
-								pp["prologue_seen"] = true
-								GameState.save_game()
+						UIHelper.show_node0_story_intro_modal(self, func():
 							GameState.preload_candy_crusade_in_background()
-							# Node 0 = prologue + quiz only. The first Candy Crusade is on Day 1.
-							launch_node.emit(0, "quiz")
-						if bool(GameState.get_active_profile().get("prologue_seen", false)):
-							start_combat.call()
-						else:
-							UIHelper.show_node0_story_intro_modal(self, start_combat)
+							UIHelper.create_candy_crusade_loading_overlay(self)
+							launch_node.emit(0, "combat")
+						)
 					else:
 						launch_node.emit(0, "quiz")
 				elif n_type == "morning":
@@ -689,6 +745,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 					if node_stage == 0:
 						if is_boss_day:
 							GameState.preload_candy_crusade_in_background()
+							UIHelper.create_candy_crusade_loading_overlay(self)
 							launch_node.emit(day, "combat")
 						else:
 							launch_node.emit(day, "minigame")
@@ -704,22 +761,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 				elif n_type == "quiz":
 					launch_node.emit(day, "quiz")
 				elif n_type == "finish":
-					var fp = GameState.get_active_profile()
-					var seen_fin = fp.get("seen_story_unlocks", [])
-					if typeof(seen_fin) != TYPE_ARRAY: seen_fin = []
-					seen_fin = seen_fin.duplicate()
-					if not seen_fin.has(28):
-						seen_fin.append(28)
-					fp["seen_story_unlocks"] = seen_fin
-					GameState.finish_node(false)  # completes the finish node -> unlocks the Day 28 picture
-					GameState.save_game()
-					# Champion trophy + confetti first, then the Day 28 picture
-					UIHelper.show_champion_trophy_modal(self, func():
-						UIHelper.show_story_panel_modal(self, 28, func():
-							GameState.check_character_unlocks(GameState.get_active_profile(), true)
-							GameState.save_game()
-						)
-					)
+					GameState.push_toast("Champion!", "You completed the challenge!", "", "green")
 		)
 	
 	return container
@@ -890,3 +932,21 @@ func _show_daily_stamp_modal(current_day: int, on_close: Callable = Callable()):
 			on_close.call()
 	)
 	vbox.add_child(claim_btn)
+
+func _apply_safe_area():
+	# Handle iPhone notch/safe area for notched devices
+	var safe_rect = DisplayServer.screen_get_usable_rect()
+	var screen_rect = get_viewport_rect()
+
+	# Calculate the safe area margins
+	var safe_top = safe_rect.position.y
+	var safe_bottom = screen_rect.size.y - (safe_rect.position.y + safe_rect.size.y)
+
+	# Apply top padding to scroll container if there's a notch
+	if safe_top > 0 and scroll_container:
+		scroll_container.custom_minimum_size.y -= int(safe_top)
+		scroll_container.offset_top = int(safe_top)
+
+	# Apply bottom padding if needed
+	if safe_bottom > 0 and scroll_container:
+		scroll_container.custom_minimum_size.y -= int(safe_bottom)

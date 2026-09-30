@@ -780,9 +780,11 @@ func _on_answer_submitted(user_choice):
 			"answer": ans_str,
 			"timestamp": Time.get_unix_time_from_system()
 		})
-			
-		if current_question_idx < results.size():
-			results[current_question_idx] = true
+
+		# FIX: Ensure results array is properly sized before accessing
+		while results.size() <= current_question_idx:
+			results.append(null)
+		results[current_question_idx] = true
 		_update_dots()
 		
 		# Award coins and points for writing reflection
@@ -815,9 +817,11 @@ func _on_answer_submitted(user_choice):
 		return
 		
 	# True / False recap question
+	# FIX: Ensure results array is properly sized before accessing
 	var is_correct = (user_choice == q.get("a", false))
-	if current_question_idx < results.size():
-		results[current_question_idx] = is_correct
+	while results.size() <= current_question_idx:
+		results.append(null)
+	results[current_question_idx] = is_correct
 	_update_dots()
 	
 	var why_text = q.get("why", q.get("explanation", ""))
@@ -958,7 +962,9 @@ func _show_results():
 			total_graded += 1
 	if total_graded == 0:
 		total_graded = questions.size()
-		
+
+	# FIX: Baseline quizzes now grant participation rewards (100 points, 50 coins)
+	# regardless of True/False score, eliminating farming exploit
 	var pts_earned = 100 if is_baseline else (correct_answers * 20 + 60)
 	var coins_earned = 50 if is_baseline else (correct_answers * 3 + 10)
 	

@@ -179,22 +179,15 @@ const QUIZ_BANKS = [
 		{"day": 27, "section": "PREVIEW", "q": "How often should you floss between teeth that touch?", "concept": "Daily Flossing", "tip": "Floss once every day between touching teeth!"},
 		{"day": 28, "section": "PREVIEW", "q": "How do you become a Pearly Whites Champion?", "concept": "Champion Habit", "tip": "Keep up your daily 2-minute brushing habit every day!"}
 	],
-	# Week 4 (Day 28 Node - Championship Finale) - 7 Recap + 7 Finale
+	# Week 4 (Day 28 Node - Final Quiz) - exactly 7 questions
 	[
-		{"day": 22, "section": "RECAP", "q": "Brush softly in small circles to protect your gums.", "a": true, "why": "Gentle circles clean all tooth surfaces without hurting gums!", "tip": "Brush softly in small, gentle circles!"},
-		{"day": 23, "section": "RECAP", "q": "It is safe and clean to share toothbrushes with friends.", "a": false, "why": "Toothbrushes hold germs, so sharing swaps bacteria between mouths!", "tip": "Always keep your toothbrush to yourself!"},
-		{"day": 24, "section": "RECAP", "q": "A dry mouth allows cavity bacteria to multiply.", "a": true, "why": "Without saliva, acids stay trapped against teeth!", "tip": "Drink water during play and bedtime to prevent dry mouth!"},
-		{"day": 25, "section": "RECAP", "q": "First dentist visits should happen by age 1.", "a": true, "why": "Early checkups build a healthy dental home before problems start!", "tip": "Visit your dentist every 6 months!"},
-		{"day": 26, "section": "RECAP", "q": "Brushing for 2 minutes twice a day stops cavities.", "a": true, "why": "Two minutes morning and night removes plaque bacteria thoroughly!", "tip": "Brush for 2 full minutes every morning and night!"},
-		{"day": 27, "section": "RECAP", "q": "Flossing once a day keeps hidden tooth spaces clean.", "a": true, "why": "Flossing cleans between tight teeth where bristles can't fit!", "tip": "Floss every single day between touching teeth!"},
-		{"day": 28, "section": "RECAP", "q": "Daily brushing and flossing makes you a Pearly Champion!", "a": true, "why": "Taking care of your teeth every day gives you a healthy smile forever!", "tip": "Stick to your 2-minute morning and night routine!"},
-		{"day": 28, "section": "CHAMPION", "q": "What is the golden daily rule for healthy teeth?", "a": true, "why": "Two minutes morning and night plus daily flossing protects teeth for life!", "tip": "Brush for 2 minutes twice every day and floss daily!"},
-		{"day": 28, "section": "CHAMPION", "q": "Tooth enamel is the hardest substance in your entire body.", "a": true, "why": "Tooth enamel is the hardest substance your body produces!", "tip": "Protect your precious enamel every day!"},
-		{"day": 28, "section": "CHAMPION", "q": "Flossing cleans the tight spaces that brushing misses.", "a": true, "why": "Floss reaches between tight teeth where bristles can't fit!", "tip": "Floss once every day between tight teeth!"},
-		{"day": 28, "section": "CHAMPION", "q": "You should replace your toothbrush every 3 months.", "a": true, "why": "Worn, splayed bristles cannot clean properly!", "tip": "Swap to a fresh new toothbrush every 3 months!"},
-		{"day": 28, "section": "CHAMPION", "q": "Bad bacteria eat sugar to make cavity acid.", "a": true, "why": "Bacteria eat leftover sugar and produce acid that erodes enamel!", "tip": "Drink water right after sugary snacks!"},
-		{"day": 28, "section": "CHAMPION", "q": "Drinking water flushes away acids and keeps saliva flowing.", "a": true, "why": "Water keeps your mouth hydrated and washes acids away!", "tip": "Stay hydrated for strong, healthy teeth!"},
-		{"day": 28, "section": "CHAMPION", "q": "You defended Mulinia and are an official Pearly Whites Champion!", "a": true, "why": "You conquered all 28 days and built healthy brushing habits for life!", "tip": "Congratulations, Pearly Whites Champion!"}
+		{"day": 28, "section": "CHAMPION", "q": "You should brush your teeth for 2 minutes, twice a day.", "a": true, "why": "Two minutes morning and night removes plaque and stops cavities!", "tip": "Brush for 2 full minutes every morning and night!"},
+		{"day": 28, "section": "CHAMPION", "q": "Flossing once a day cleans the spaces your brush cannot reach.", "a": true, "why": "Floss gets between tight teeth where bristles can't fit!", "tip": "Floss every single day between touching teeth!"},
+		{"day": 28, "section": "CHAMPION", "q": "It is fine to share your toothbrush with a friend.", "a": false, "why": "Toothbrushes hold germs, so sharing swaps bacteria between mouths!", "tip": "Always keep your toothbrush to yourself!"},
+		{"day": 28, "section": "CHAMPION", "q": "You should brush right away after drinking a sour, fizzy soda.", "a": false, "why": "Sour drinks soften enamel, so wait 30 minutes and swish water first!", "tip": "Swish water after acidic drinks, then wait to brush!"},
+		{"day": 28, "section": "CHAMPION", "q": "Crunchy fruit and veggies help keep your teeth clean.", "a": true, "why": "Crunchy fibers scrub teeth and boost cleansing saliva!", "tip": "Snack on crisp carrots, celery, or apples!"},
+		{"day": 28, "section": "CHAMPION", "q": "Visiting your dentist regularly helps keep your smile healthy.", "a": true, "why": "Early and regular checkups catch small problems before they grow!", "tip": "Visit your dentist every 6 months!"},
+		{"day": 28, "section": "CHAMPION", "q": "You are a Pearly Whites Champion!", "a": true, "why": "You brushed, flossed and learned for 28 whole days. Congratulations, Champion!", "tip": "Keep up your daily 2-minute brushing habit for a lifetime of smiles!"}
 	]
 ]
 
@@ -601,12 +594,12 @@ func _init_nodes():
 	for day in range(1, 29):
 		NODE_DATA.append({"id": node_id, "day": day, "type": "morning"})
 		node_id += 1
-		# Day 28: the Final Quiz sits between the morning and the evening brush
+		NODE_DATA.append({"id": node_id, "day": day, "type": "evening"})
+		node_id += 1
+		# Day 28: the Final Quiz comes right after the evening brush, just before the finish node
 		if day == FINAL_QUIZ_DAY:
 			NODE_DATA.append({"id": node_id, "day": day, "type": "quiz"})
 			node_id += 1
-		NODE_DATA.append({"id": node_id, "day": day, "type": "evening"})
-		node_id += 1
 		if BONUS_MINIGAME_DAYS.has(day):
 			NODE_DATA.append({"id": node_id, "day": day, "type": "minigame"})
 			node_id += 1
@@ -614,6 +607,22 @@ func _init_nodes():
 			NODE_DATA.append({"id": node_id, "day": day, "type": "quiz"})
 			node_id += 1
 	NODE_DATA.append({"id": node_id, "day": 28, "type": "finish"})
+
+# Candy Crusade fights happen at the evening node of days 1, 9, 19, 28 (node 0 is only prologue + quiz).
+# The Nth fight the player reaches plays Level N (capped at the last level, 4).
+const CANDY_CRUSADE_DAYS: Array = [1, 9, 19, 28]
+
+func get_candy_crusade_number(node_id: int) -> int:
+	if NODE_DATA.is_empty():
+		_init_nodes()
+	var count: int = 0
+	var last: int = mini(node_id, NODE_DATA.size() - 1)
+	for i in range(0, last + 1):
+		var d: Dictionary = NODE_DATA[i]
+		var t: String = str(d.get("type", ""))
+		if (t == "evening" and CANDY_CRUSADE_DAYS.has(int(d.get("day", 0)))):
+			count += 1
+	return maxi(count, 1)
 
 func get_node_data(node_id: int) -> Dictionary:
 	if NODE_DATA.is_empty():
@@ -984,7 +993,7 @@ func check_badge_unlocks(p: Dictionary = {}, notify: bool = true):
 		{"id": "fact", "name": "FACT FINDER", "val": facts_cnt, "tiers": [{"lvl": 1, "th": 5, "label": "5 Facts Learned", "img": "res://assets/images/badgescreen/factfinder_bronze.png"}, {"lvl": 2, "th": 10, "label": "10 Facts Learned", "img": "res://assets/images/badgescreen/factfinder_silver.png"}, {"lvl": 3, "th": 20, "label": "20 Facts Learned", "img": "res://assets/images/badgescreen/factfinder_gold.png"}]},
 		{"id": "minion", "name": "MINION MASHER", "val": minions, "tiers": [{"lvl": 1, "th": 25, "label": "25 Minions Defeated", "img": "res://assets/images/badgescreen/minionmasher_bronze.png"}, {"lvl": 2, "th": 75, "label": "75 Minions Defeated", "img": "res://assets/images/badgescreen/minionmasher_silver.png"}, {"lvl": 3, "th": 200, "label": "200 Minions Defeated", "img": "res://assets/images/badgescreen/minionmasher_gold.png"}]},
 		{"id": "quiz", "name": "QUIZ WHIZ", "val": quizzes, "tiers": [{"lvl": 1, "th": 1, "label": "1 Quiz Completed", "img": "res://assets/images/badgescreen/quizwhiz-bronze.png"}, {"lvl": 2, "th": 2, "label": "2 Quizzes Completed", "img": "res://assets/images/badgescreen/quizwhiz-silver.png"}, {"lvl": 3, "th": 3, "label": "3 Quizzes Completed", "img": "res://assets/images/badgescreen/quizwhiz.png"}]},
-		{"id": "boss", "name": "SWEET DEFEAT", "val": bosses, "tiers": [{"lvl": 1, "th": 1, "label": "Defeated Blue Candor", "img": "res://assets/images/badgescreen/sweetdefeat_bronze.png"}, {"lvl": 2, "th": 2, "label": "Defeated Blue Candor 2x", "img": "res://assets/images/badgescreen/sweetdefeat_silver.png"}, {"lvl": 3, "th": 3, "label": "Defeated Blue Candor 3x", "img": "res://assets/images/badgescreen/sweetdefeat_gold.png"}]},
+		{"id": "boss", "name": "SWEET DEFEAT", "val": bosses, "tiers": [{"lvl": 1, "th": 1, "label": "Defeated Blue Candor", "img": "res://assets/images/badgescreen/sweetdefeat_bronze.png"}, {"lvl": 2, "th": 2, "label": "Defeated Blue Candor 2x", "img": "res://assets/images/badgescreen/sweetdefeat_silver.png"}, {"lvl": 3, "th": 4, "label": "Defeated Blue Candor 4x", "img": "res://assets/images/badgescreen/sweetdefeat_gold.png"}]},
 		{"id": "coin", "name": "COIN COLLECTOR", "val": coins, "tiers": [{"lvl": 1, "th": 250, "label": "Saved 250 Coins", "img": "res://assets/images/badgescreen/coincollector_bronze.png"}, {"lvl": 2, "th": 750, "label": "Saved 750 Coins", "img": "res://assets/images/badgescreen/coincollector_silver.png"}, {"lvl": 3, "th": 2000, "label": "Saved 2000 Coins", "img": "res://assets/images/badgescreen/coincollector_gold.png"}]},
 		{"id": "point", "name": "POINT MASTER", "val": pts, "tiers": [{"lvl": 1, "th": 500, "label": "Earned 500 Points", "img": "res://assets/images/badgescreen/Pointsmaster_bronze.png"}, {"lvl": 2, "th": 2000, "label": "Earned 2000 Points", "img": "res://assets/images/badgescreen/pointmaster_silver.png"}, {"lvl": 3, "th": 5000, "label": "Earned 5000 Points", "img": "res://assets/images/badgescreen/Pointsmaster_gold.png"}]},
 		{"id": "sparkle", "name": "FIRST SPARKLE", "val": sparkle_cnt, "tiers": [{"lvl": 1, "th": 1, "label": "Completed First Brush", "img": "res://assets/images/badgescreen/firstsparkle.png"}]},
@@ -1102,7 +1111,7 @@ func complete_brushing(full_two_minutes: bool, evening: bool = false):
 		# Unlock story page upon completing morning brushing session
 		if not p.has("unlockedStory") or typeof(p["unlockedStory"]) != TYPE_ARRAY:
 			p["unlockedStory"] = []
-		if not p["unlockedStory"].has(day):
+		if day != 28 and not p["unlockedStory"].has(day):
 			p["unlockedStory"].append(day)
 
 	p["factsRead"] = p["factsCollected"].size()
@@ -1136,7 +1145,7 @@ func finish_node(evening: bool = false):
 		p["nodeStage"] = {}
 	p["nodeStage"][str(node)] = 99
 	p["currentNode"] = node + 1
-	
+
 	var n_info = get_node_data(node)
 	var is_ev = evening or (n_info.get("type", "") == "evening")
 	var day = n_info.get("day", 1)
@@ -1144,8 +1153,12 @@ func finish_node(evening: bool = false):
 	p["lastBrushDate"] = today_str
 	if is_ev:
 		var day_idx = clamp(day - 1, 0, 27)
-		if p.has("daysStatus") and day_idx < p["daysStatus"].size():
-			p["daysStatus"][day_idx] = "done"
+		if p.has("daysStatus"):
+			# FIX: Mark skipped morning/evening as missed if applicable
+			if day_idx < p["daysStatus"].size() and p["daysStatus"][day_idx] == "todo":
+				p["daysStatus"][day_idx] = "missed"
+			elif day_idx < p["daysStatus"].size():
+				p["daysStatus"][day_idx] = "done"
 		p["lastEveningBrushDate"] = today_str
 		p["streak"] = int(p.get("streak", 0)) + 1
 	check_character_unlocks(p, true)
@@ -1412,11 +1425,30 @@ func _collect_candy_preload(pending: Array) -> void:
 	_warm_up_candy_crusade()
 
 ## Returns the preloaded Candy Crusade scene, waiting for the background load if it's still running.
+# FIX: Proper loading with validation and fallback
 func get_candy_crusade_scene() -> PackedScene:
 	if candy_crusade_scene == null:
 		preload_candy_crusade_in_background()
 		if is_candy_crusade_preloading:
-			await candy_crusade_ready
+			var start_time = Time.get_ticks_msec()
+			var timeout_ms = 25000  # 25 seconds - increased from 20s
+			while is_candy_crusade_preloading and (Time.get_ticks_msec() - start_time) < timeout_ms:
+				await get_tree().process_frame
+
+			# If timeout occurred and scene still null, fallback to blocking load
+			if candy_crusade_scene == null:
+				push_warning("Candy Crusade preload timeout - falling back to blocking load")
+				candy_crusade_scene = load(CANDY_MAIN_SCENE) as PackedScene
+
+	# Wait for warm-up to complete if it's running
+	if candy_crusade_scene != null and _candy_warmed_up == false and _candy_in_use == false:
+		# Give warm-up a chance to start and complete
+		var warm_timeout = Time.get_ticks_msec()
+		while _candy_warmed_up == false and (Time.get_ticks_msec() - warm_timeout) < 10000:
+			if _candy_in_use:
+				break
+			await get_tree().process_frame
+
 	return candy_crusade_scene
 
 # Renders the Candy Crusade world once in an invisible viewport (scripts removed, so
@@ -1425,7 +1457,16 @@ func get_candy_crusade_scene() -> PackedScene:
 func _warm_up_candy_crusade() -> void:
 	if _candy_warmed_up or candy_crusade_scene == null or _candy_in_use:
 		return
-	_candy_warmed_up = true
+
+	# FIX: Validate scene can be instantiated before warming up
+	var world = candy_crusade_scene.instantiate()
+	if world == null:
+		push_error("Candy Crusade instantiation failed - scene is null")
+		_candy_warmed_up = true
+		return
+
+	_strip_for_warmup(world)
+
 	var vp := SubViewport.new()
 	vp.name = "CandyCrusadeWarmup"
 	vp.size = Vector2i(180, 320)
@@ -1433,8 +1474,6 @@ func _warm_up_candy_crusade() -> void:
 	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	vp.process_mode = Node.PROCESS_MODE_DISABLED
 
-	var world := candy_crusade_scene.instantiate()
-	_strip_for_warmup(world)
 	vp.add_child(world)
 	get_tree().root.add_child(vp)
 
@@ -1444,6 +1483,9 @@ func _warm_up_candy_crusade() -> void:
 	for res in _candy_preload_cache:
 		if res is PackedScene:
 			var inst := (res as PackedScene).instantiate()
+			if inst == null:
+				push_warning("Failed to instantiate cached Candy Crusade resource")
+				continue
 			_strip_for_warmup(inst)
 			world.add_child(inst)
 			if inst is Node3D:
@@ -1451,9 +1493,13 @@ func _warm_up_candy_crusade() -> void:
 				(inst as Node3D).global_position = cam_xf * local
 			i += 1
 
-	for _f in range(4):
+	# FIX: Give more frames for shaders to compile
+	for _f in range(8):
 		await get_tree().process_frame
+
 	vp.queue_free()
+	_candy_warmed_up = true
+	print("Candy Crusade warm-up completed successfully")
 
 func _strip_for_warmup(n: Node) -> void:
 	n.set_script(null)
@@ -1548,8 +1594,7 @@ func is_day_morning_completed(day_num: int, p: Dictionary = {}) -> bool:
 	return false
 
 static func get_evening_node_for_day(target_day: int) -> int:
-	# On the final day the Final Quiz node sits between morning and evening
-	return get_morning_node_for_day(target_day) + (2 if target_day == FINAL_QUIZ_DAY else 1)
+	return get_morning_node_for_day(target_day) + 1
 
 func is_day_evening_completed(day_num: int, p: Dictionary = {}) -> bool:
 	if day_num < 1 or day_num > 28:
@@ -1581,6 +1626,12 @@ func is_day_story_unlocked(day_num: int, p: Dictionary = {}) -> bool:
 		profile = get_active_profile()
 	if profile.is_empty():
 		return false
+	# Day 28's finale picture belongs to the FINISH node only: it unlocks once that node is completed
+	if day_num == 28:
+		if NODE_DATA.is_empty():
+			_init_nodes()
+		var finish_id: int = NODE_DATA.size() - 1
+		return int(profile.get("currentNode", 1)) > finish_id
 	var unlocked_story = profile.get("unlockedStory", [])
 	if typeof(unlocked_story) == TYPE_ARRAY and unlocked_story.has(day_num):
 		return true

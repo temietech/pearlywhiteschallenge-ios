@@ -459,7 +459,18 @@ func _spawn_open_burst_fx() -> void:
 # =========================================================================
 
 func _spawn_loot_item() -> void:
-	var item_types := ["toothpaste", "boomerang", "mouthwash", "floss"]
+	# Only drop ammo for weapons the player has actually unlocked
+	var all_types := {"toothpaste": "paste", "boomerang": "brush", "mouthwash": "wash", "floss": "floss"}
+	var item_types: Array = []
+	var loot_bridge = get_node_or_null("/root/GameBridge")
+	for t in all_types:
+		var unlocked := true
+		if loot_bridge != null and loot_bridge.has_method("get_weapon_level"):
+			unlocked = int(loot_bridge.get_weapon_level(all_types[t])) >= 1
+		if unlocked:
+			item_types.append(t)
+	if item_types.is_empty():
+		item_types = ["boomerang"]
 	var chosen_type: String = item_types.pick_random()
 	
 	_loot_item_root = Node3D.new()

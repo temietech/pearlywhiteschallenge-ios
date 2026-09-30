@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ddvwlmcd05t08"
-path="res://.godot/imported/Map.jpg-3b2944f189768def3f33b1b7330139bf.ctex"
+uid="uid://bkcoroayg88kk"
+path="res://.godot/imported/pwc_app_icon_store.jpg-363376021dad01b4ca3e7e21965337a0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/mainmap/Map.jpg"
-dest_files=["res://.godot/imported/Map.jpg-3b2944f189768def3f33b1b7330139bf.ctex"]
+source_file="res://assets/icon/pwc_app_icon_store.jpg"
+dest_files=["res://.godot/imported/pwc_app_icon_store.jpg-363376021dad01b4ca3e7e21965337a0.ctex"]
 
 [params]
 

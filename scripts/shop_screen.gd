@@ -1628,7 +1628,7 @@ func _show_ammo_purchase_popup(item: Dictionary):
 	var center = dlg["center"]
 	
 	var win_w = min(safe_sz.x - 32.0, 330.0)
-	var win_h = 425.0
+	var win_h = 455.0
 	var win = _create_nine_patch("res://assets/images/shop/game_blue_window_tall.png", 32)
 	win.custom_minimum_size = Vector2(win_w, win_h)
 	win.size = Vector2(win_w, win_h)
@@ -1778,8 +1778,22 @@ func _show_ammo_purchase_popup(item: Dictionary):
 
 	update_ui.call()
 	
+	# Status line shown INSIDE the popup (global toasts are disabled, so feedback must live here)
+	var status_lbl = Label.new()
+	status_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	status_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	status_lbl.custom_minimum_size = Vector2(win_w - 48.0, 18)
+	status_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	UIHelper.apply_bubbly_label(status_lbl, 12, Color(1.0, 0.88, 0.30), true)
+	status_lbl.add_theme_color_override("font_outline_color", Color(0.04, 0.14, 0.32, 0.95))
+	status_lbl.add_theme_constant_override("outline_size", 2)
+	var pts_now = int(round(float(p_cur.get("points", 0))))
+	status_lbl.text = "You have %d points" % pts_now
+	vbox.add_child(status_lbl)
+
 	# Yellow PURCHASE button
 	var buy_btn = _create_aspect_button("res://assets/images/shop/purchasebtn.png", Vector2(130, 38))
+	buy_btn.mouse_filter = Control.MOUSE_FILTER_STOP
 	
 	buy_btn.pressed.connect(func():
 		var p = GameState.get_active_profile()
@@ -1791,19 +1805,30 @@ func _show_ammo_purchase_popup(item: Dictionary):
 		if item["ammo_key"] == "brushes" and cur_qty <= 0:
 			cur_qty = 40
 		if points >= total_cost:
-			p["points"] = points - total_cost
 			if not p.has("ammo") or typeof(p["ammo"]) != TYPE_DICTIONARY:
 				p["ammo"] = {"brushes": 40, "battery": 0, "tubes": 0, "spools": 0, "vials": 0}
+			p["points"] = points - total_cost
 			p["ammo"][item["ammo_key"]] = cur_qty + total_pcs
 			GameState.save_game()
 			GameState.stats_updated.emit(p)
 			AudioManager.play_sfx("pop")
-			GameState.push_toast("Restocked!", "+%d %s acquired! (%d Packs)" % [total_pcs, item["desc"], q], "", "green")
-			backdrop.queue_free()
+			status_lbl.add_theme_color_override("font_color", Color(0.45, 1.0, 0.55))
+			status_lbl.text = "Purchased! +%d %s" % [total_pcs, item["desc"]]
+			buy_btn.disabled = true
 			_refresh_data()
+			# Let the player SEE the confirmation before the popup closes
+			get_tree().create_timer(0.8).timeout.connect(func():
+				if is_instance_valid(backdrop):
+					backdrop.queue_free()
+			)
 		else:
 			AudioManager.play_sfx("hit")
-			GameState.push_toast("Need More Points!", "Complete challenges and brush daily to earn points!", "", "orange")
+			status_lbl.add_theme_color_override("font_color", Color(1.0, 0.55, 0.45))
+			status_lbl.text = "Not enough points! You need %d more." % (total_cost - points)
+			var shake = status_lbl.create_tween()
+			shake.tween_property(status_lbl, "position:x", status_lbl.position.x + 6.0, 0.05)
+			shake.tween_property(status_lbl, "position:x", status_lbl.position.x - 6.0, 0.05)
+			shake.tween_property(status_lbl, "position:x", status_lbl.position.x, 0.05)
 	)
 	
 	var bc = CenterContainer.new()

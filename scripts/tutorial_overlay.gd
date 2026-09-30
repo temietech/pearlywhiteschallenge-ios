@@ -73,6 +73,26 @@ var body_lbl: Label
 var back_btn: TextureButton
 var next_btn: TextureButton
 
+# Dim layer with a real "hole" so the highlighted control stays bright and clearly visible
+const SPOTLIGHT_SHADER := """
+shader_type canvas_item;
+uniform vec4 hole_rect = vec4(0.0, 0.0, 0.0, 0.0); // x, y, w, h in pixels
+uniform vec2 view_size = vec2(450.0, 800.0);
+uniform float radius = 22.0;
+uniform float enabled = 0.0;
+void fragment() {
+	vec2 p = UV * view_size;
+	vec2 c = hole_rect.xy + hole_rect.zw * 0.5;
+	vec2 hs = hole_rect.zw * 0.5;
+	float r = min(radius, min(hs.x, hs.y));
+	vec2 d = abs(p - c) - (hs - vec2(r));
+	float dist = length(max(d, vec2(0.0))) + min(max(d.x, d.y), 0.0) - r;
+	float a = mix(1.0, smoothstep(-1.0, 1.5, dist), enabled);
+	COLOR = vec4(COLOR.rgb, COLOR.a * a);
+}
+"""
+var spot_mat: ShaderMaterial
+
 var pulse_tween: Tween
 var bob_tween: Tween
 var _ui_built: bool = false
@@ -115,6 +135,11 @@ func _build_ui():
 	dim_bg.anchor_bottom = 1.0
 	dim_bg.color = Color(0.04, 0.12, 0.25, 0.72)
 	dim_bg.mouse_filter = Control.MOUSE_FILTER_STOP
+	var spot_shader := Shader.new()
+	spot_shader.code = SPOTLIGHT_SHADER
+	spot_mat = ShaderMaterial.new()
+	spot_mat.shader = spot_shader
+	dim_bg.material = spot_mat
 	add_child(dim_bg)
 	
 	# 2. Glowing Spotlight Ring (Highlights target)
@@ -337,7 +362,7 @@ func _update_step():
 	
 	back_btn.visible = (current_step > 0)
 	if current_step == STEPS.size() - 1:
-		next_btn.texture_normal = UIHelper.get_button_texture("letsbrush")
+		next_btn.texture_normal = UIHelper.get_button_texture("startgame")
 		next_btn.custom_minimum_size = Vector2(160, 46)
 		next_btn.size = Vector2(160, 46)
 		next_btn.pivot_offset = Vector2(80, 23)
@@ -357,16 +382,24 @@ func _update_step():
 			spotlight_ring.position = target_rect.position - Vector2(5, 5)
 			spotlight_ring.size = target_rect.size + Vector2(10, 10)
 			
+			var hole_radius := 24.0
 			var ring_style = spotlight_ring.get_theme_stylebox("panel") as StyleBoxFlat
 			if ring_style:
 				if target == "stats":
-					ring_style.set_corner_radius_all(18)
+					hole_radius = 18.0
 				elif target == "settings" or target == "profile":
-					ring_style.set_corner_radius_all(22)
+					hole_radius = 22.0
 				elif target.begins_with("nav-"):
-					ring_style.set_corner_radius_all(16)
-				else:
-					ring_style.set_corner_radius_all(24)
+					hole_radius = 16.0
+				ring_style.set_corner_radius_all(int(hole_radius))
+			# Cut the spotlight hole out of the dim layer so the target is fully lit
+			if spot_mat:
+				var vs: Vector2 = size if (size.x > 50.0 and size.y > 50.0) else get_viewport_rect().size
+				var hr := Rect2(target_rect.position - Vector2(5, 5), target_rect.size + Vector2(10, 10))
+				spot_mat.set_shader_parameter("view_size", vs)
+				spot_mat.set_shader_parameter("hole_rect", Vector4(hr.position.x, hr.position.y, hr.size.x, hr.size.y))
+				spot_mat.set_shader_parameter("radius", hole_radius + 4.0)
+				spot_mat.set_shader_parameter("enabled", 1.0)
 			
 			# Pulse spotlight ring
 			if pulse_tween and pulse_tween.is_valid():
@@ -406,6 +439,8 @@ func _update_step():
 				
 			_start_bobbing()
 	else:
+		if spot_mat:
+			spot_mat.set_shader_parameter("enabled", 0.0)
 		if is_instance_valid(spotlight_ring):
 			spotlight_ring.visible = false
 		if is_instance_valid(pointing_hand):

@@ -4,3 +4,4 @@
 
 # Summer Engine local-only state (SummerGit, caches, locks)
 .summer/local/
+githubtokencode.txt

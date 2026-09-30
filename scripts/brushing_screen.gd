@@ -1138,6 +1138,25 @@ func _relayout():
 					b_img.custom_minimum_size = Vector2(sz, sz)
 					b_img.pivot_offset = Vector2(sz * 0.5, sz * 0.5)
 		
+	# Sir Crown / mouth-card geometry (shared by the button row and the avatar+bubble block)
+	# SirCrown-nobg.png is a 424x424 square; its visible art spans x 48..362 (after flip_h) and y 31..416.
+	const CROWN_VIS_LEFT := 0.113
+	const CROWN_VIS_RIGHT := 0.854
+	const CROWN_VIS_TOP := 0.073
+	const CROWN_VIS_BOTTOM := 0.981
+	var is_sircrown = (GameState.get_avatar().to_lower().strip_edges() in ["sircrown", "crown"])
+	var mc_bottom: float = (mouth_card.position.y + mouth_card.size.y) if mouth_card else cur_h - 396.0
+	var crown_box: float = 0.0
+	var crown_x: float = 0.0
+	var crown_vis_right: float = 0.0
+	if is_sircrown:
+		# Much bigger Sir Crown: as tall as fits between the mouth card and the bottom of the screen
+		var want_box: float = 300.0 if not is_tablet else 380.0
+		var fit_box: float = (cur_h - 6.0 - (mc_bottom + 6.0)) / (CROWN_VIS_BOTTOM - CROWN_VIS_TOP)
+		crown_box = maxf(150.0, minf(want_box, fit_box))
+		crown_x = 8.0 - CROWN_VIS_LEFT * crown_box
+		crown_vis_right = crown_x + CROWN_VIS_RIGHT * crown_box
+	
 	# 5. Bottom Pre-brush Controls (Grouped closely side-by-side, lifted up by 20px)
 	var btn_y = cur_h - 98.0 if not is_tablet else cur_h - 110.0
 	if pre_brush_controls:
@@ -1150,6 +1169,9 @@ func _relayout():
 	var btn_gap = 12.0
 	var total_btns_w = back_w + btn_gap + start_w
 	var start_x = (cur_w - total_btns_w) * 0.5
+	if is_sircrown:
+		# Keep the buttons clear of the bigger Sir Crown
+		start_x = minf(maxf(start_x, crown_vis_right + 8.0), cur_w - total_btns_w - 4.0)
 	
 	if back_btn:
 		back_btn.position = Vector2(start_x, btn_y + (start_h - back_h) * 0.5)
@@ -1161,24 +1183,27 @@ func _relayout():
 		start_btn.custom_minimum_size = Vector2(start_w, start_h)
 		start_btn.pivot_offset = Vector2(start_w * 0.5, start_h * 0.5)
 		
-	# 6. User Avatar & Speech Bubble (Grounded on floor baseline, lowered)
+	# 6. User Avatar & Speech Bubble
 	var floor_y = cur_h - 76.0 if not is_tablet else cur_h - 90.0
 	
 	if mascot_rect:
 		mascot_rect.visible = false
 		
-	var is_sircrown = (GameState.get_avatar().to_lower().strip_edges() in ["sircrown", "crown"])
-	# Space between the bottom of the mouth card and the floor line
-	var mc_bottom: float = (mouth_card.position.y + mouth_card.size.y) if mouth_card else floor_y - 320.0
-	var free_h: float = floor_y - mc_bottom - 4.0
 	var avatar_h: float
+	var avatar_w: float
+	var avatar_x: float
+	var avatar_y: float
 	if is_sircrown:
-		# Sir Crown: noticeably bigger, using the free space above the floor
-		avatar_h = clampf(free_h, 230.0, 300.0) if not is_tablet else 340.0
+		# Sir Crown: big square sprite standing on the bottom of the screen
+		avatar_w = crown_box
+		avatar_h = crown_box
+		avatar_x = crown_x
+		avatar_y = cur_h - 6.0 - CROWN_VIS_BOTTOM * crown_box
 	else:
 		avatar_h = 165.0 if not is_tablet else 210.0
-	var avatar_w = avatar_h * (120.0 / 134.0)
-	var avatar_x = 4.0 if not is_tablet else cx - avatar_w - 70.0
+		avatar_w = avatar_h * (120.0 / 134.0)
+		avatar_x = 4.0 if not is_tablet else cx - avatar_w - 70.0
+		avatar_y = floor_y - avatar_h
 	
 	if char_rect:
 		char_rect.visible = true
@@ -1186,37 +1211,38 @@ func _relayout():
 		if custom_char_pos != Vector2.ZERO:
 			char_rect.position = custom_char_pos
 		else:
-			char_rect.position = Vector2(avatar_x, floor_y - avatar_h)
+			char_rect.position = Vector2(avatar_x, avatar_y)
 		char_rect.scale = Vector2.ONE
 		char_rect.pivot_offset = Vector2(avatar_w * 0.5, avatar_h)
 		char_rect.z_index = 80
 		
-	# Speech bubble: twice the old size, artwork's own aspect ratio (tail bottom-left points at the avatar)
+	# Speech bubble: fills all the free room between the mouth card and the button row,
+	# keeps the artwork's own aspect ratio (tail bottom-left points at the avatar)
 	if speech_bubble:
 		var tex_aspect := 1.40
 		if speech_bubble.texture and speech_bubble.texture.get_height() > 0:
 			tex_aspect = float(speech_bubble.texture.get_width()) / float(speech_bubble.texture.get_height())
-		var bubble_left: float = avatar_x + avatar_w * 0.70
-		var bubble_w: float = clampf(cur_w - bubble_left - 6.0, 200.0, 340.0) if not is_tablet else 360.0
-		var bubble_h: float = bubble_w / tex_aspect
-		# Tail tip sits beside the avatar's head; keep the bubble clear of the mouth card
-		var tail_y: float = floor_y - avatar_h * 0.62
-		var max_h: float = tail_y - (mc_bottom + 4.0)
-		if bubble_h > max_h and max_h > 90.0:
-			bubble_h = max_h
-			bubble_w = bubble_h * tex_aspect
+		var bubble_left: float = (crown_vis_right - 55.0) if is_sircrown else (avatar_x + avatar_w * 0.70)
+		var bubble_top: float = mc_bottom + 2.0
+		var bubble_bottom: float = btn_y - 2.0
+		var bubble_h: float = maxf(110.0, bubble_bottom - bubble_top)
+		var bubble_w: float = bubble_h * tex_aspect
+		var bubble_max_w: float = cur_w - bubble_left - 6.0
+		if bubble_w > bubble_max_w:
+			bubble_w = bubble_max_w
+			bubble_h = bubble_w / tex_aspect
 		speech_bubble.size = Vector2(bubble_w, bubble_h)
 		speech_bubble.flip_h = false
 		if custom_bubble_pos != Vector2.ZERO:
 			speech_bubble.position = custom_bubble_pos
 		else:
 			var bubble_x = clampf(bubble_left, 4.0, cur_w - bubble_w - 4.0)
-			speech_bubble.position = Vector2(bubble_x, tail_y - bubble_h)
+			speech_bubble.position = Vector2(bubble_x, bubble_bottom - bubble_h)
 		speech_bubble.z_index = 85
 		if bubble_label:
 			# Text area = the rounded body of the bubble artwork (excludes border and tail)
-			bubble_label.position = Vector2(bubble_w * 0.08, bubble_h * 0.07)
-			bubble_label.size = Vector2(bubble_w * 0.84, bubble_h * 0.60)
+			bubble_label.position = Vector2(bubble_w * 0.07, bubble_h * 0.06)
+			bubble_label.size = Vector2(bubble_w * 0.86, bubble_h * 0.64)
 			bubble_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			UIHelper.apply_bubbly_label(bubble_label, 22 if not is_tablet else 26, Color(0.10, 0.30, 0.55), true)
 			_bubble_fit_key = ""
@@ -1564,8 +1590,8 @@ func _fit_bubble_text() -> void:
 	var font := bubble_label.get_theme_font("font")
 	if not font:
 		return
-	var box := bubble_label.size - Vector2(6, 6)
-	var max_fs: int = clampi(int(box.y / 3.2), 12, 28)
+	var box := bubble_label.size - Vector2(16, 10)
+	var max_fs: int = clampi(int(box.y / 2.6), 12, 44)
 	var fs := max_fs
 	while fs > 10:
 		var sz := font.get_multiline_string_size(bubble_label.text, HORIZONTAL_ALIGNMENT_CENTER, box.x, fs)
@@ -2181,9 +2207,9 @@ func _relayout_cheer_modal(cur_w: float, cur_h: float):
 		var bg_h = th * scale_factor
 		var bg_x = (cur_w - bg_w) * 0.5
 		
-		# Place character at the vertical middle height (cur_h * 0.50).
+		# Place character at the vertical middle height (cur_h * 0.58).
 		# In finished_brushing artworks the character sits around y = th * 0.62.
-		var bg_y = (cur_h * 0.50) - (th * 0.62 * scale_factor)
+		var bg_y = (cur_h * 0.58) - (th * 0.62 * scale_factor)
 		
 		# Clamping to ensure zero empty borders
 		if bg_y > 0.0:

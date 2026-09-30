@@ -59,6 +59,8 @@ func _resolve_active_character():
 func _get_trapped_char_texture(id: String) -> Texture2D:
 	var tex_path = "res://assets/images/candytrap/candytrap_%s.png" % id
 	var tex = UIHelper.load_texture_safe(tex_path)
+	if not tex and id.to_lower() in ["sircrown", "crown"]:
+		tex = UIHelper.load_texture_safe("res://assets/images/characters/SirCrown-nobg.png")
 	if not tex:
 		tex = UIHelper.load_texture_safe("res://assets/images/candytrap/sad_tooth_character.png")
 	if not tex:
@@ -444,7 +446,7 @@ func _on_freed():
 	tooth_char.modulate = Color.WHITE
 	
 	# Happy character texture
-	var happy_tex = UIHelper.load_texture_safe("res://assets/images/characters/%s-nobg.png" % avatar_id)
+	var happy_tex = UIHelper.get_char_texture(str(avatar_id).to_lower().strip_edges(), false)
 	if not happy_tex:
 		happy_tex = UIHelper.load_texture_safe("res://assets/images/characters/chip-nobg.png")
 	if happy_tex:

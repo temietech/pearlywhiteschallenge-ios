@@ -91,31 +91,20 @@ func setup_fight(is_boss: bool = false) -> void:
 	var cur_node: int = int(p.get("currentNode", 1)) if not p.is_empty() else 1
 	var cur_day: int = GameState.day_for_node(cur_node) if not p.is_empty() else 1
 	
-	var region_idx: int = 0
-	if is_boss or cur_day >= 28:
-		region_idx = 3 # Enamel Border (Boss level / Level 4)
-	elif cur_day < 9:
-		region_idx = 0 # Level 1 (Days 1-8)
-	elif cur_day < 19:
-		region_idx = 1 # Level 2 (Days 9-18)
-	else:
-		region_idx = 2 # Level 3 (Days 19-27)
+	# Level rule: 1st Candy Crusade = Level 1, 2nd = Level 2, ... (capped at Level 4)
+	var region_idx: int = clampi(GameState.get_candy_crusade_number(cur_node) - 1, 0, 3)
+	print("[CandyCrusade] node ", cur_node, " day ", cur_day, " -> fight #", GameState.get_candy_crusade_number(cur_node), " -> level ", region_idx + 1)
 
 	# Initialize GameBridge with active profile
 	var bridge = get_node_or_null("/root/GameBridge")
 	if bridge != null and bridge.has_method("init_from_game_state"):
-		bridge.init_from_game_state(is_boss)
+		bridge.init_from_game_state(false)
 	
 	var game = get_node_or_null("/root/Game")
 	if game != null:
 		game.test_level_index = region_idx
 	
 	# Instantiate Candy Crusade 3D main world
-	if is_boss:
-		var main_node = get_tree().root.get_node_or_null("Main")
-		if main_node and main_node.get("notification_manager"):
-			main_node.notification_manager.trigger_boss_encounter_alert("Blue Candor")
-			
 	_load_3d_world(region_idx)
 
 func _build_game_container() -> void:

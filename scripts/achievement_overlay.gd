@@ -279,7 +279,14 @@ func _check_show_next():
 	var p = GameState.get_active_profile()
 	if p.is_empty():
 		return
-		
+	if not bool(p.get("tutorial_done", false)):
+		return # nothing pops up over the first-run tutorial; map re-triggers us afterwards
+
+	# Queue any badge that has been earned but not yet announced, so nothing unlocks silently
+	GameState.check_badge_unlocks(p, true)
+	if is_showing:
+		return
+
 	var queued = p.get("queued_achievements", [])
 	if typeof(queued) != TYPE_ARRAY or queued.is_empty():
 		return

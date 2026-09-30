@@ -556,8 +556,8 @@ func _spawn_loot_item() -> void:
 	if cam != null and is_instance_valid(cam):
 		var fwd := -cam.global_transform.basis.z.normalized()
 		var up := cam.global_transform.basis.y.normalized()
-		# Position ~1.30m in front of camera at comfortable size (never too big or blocking view)
-		target_pos = cam.global_position + fwd * 1.30 + up * (-0.06)
+		# Position ~0.90m in front of camera (closer than before) at comfortable size
+		target_pos = cam.global_position + fwd * 0.90 + up * (-0.06)
 		_loot_item_root.look_at(cam.global_position, Vector3.UP)
 		_loot_item_root.rotate_y(PI) # face camera
 		

@@ -51,6 +51,7 @@ func _ready():
 	_build_framework()
 	_apply_safe_area()
 	get_viewport().size_changed.connect(_apply_safe_area)
+	_setup_keyboard_handling()
 
 	# Preload Candy Crusade 3D scene asynchronously in background
 	call_deferred("_preload_background_assets")
@@ -414,6 +415,9 @@ func navigate_to(screen_name: String, extra_args: Dictionary = {}):
 	# The brushing song starts only once the player presses START BRUSHING (see brushing_screen.gd)
 	if AudioManager and not (screen_name in ["brushing", "brush_check", "floss"]):
 		AudioManager.play_screen_bgm(screen_name)
+	elif AudioManager and screen_name == "brushing":
+		# Silence the map music; the brushing song starts on START BRUSHING
+		AudioManager.stop_bgm()
 
 func _update_chrome_visibility(screen_name: String):
 	# Global top bar is ONLY visible on map
@@ -511,8 +515,12 @@ func _apply_safe_area():
 	UIHelper.safe_bottom = bottom_inset
 
 	if top_bar:
-		top_bar.offset_top = top_inset
+		# Avatar / back / settings buttons stay in the top corners; the stats banner is pushed
+		# down below the notch by TopBar._relayout (bar grows by the inset, nothing is shrunk)
+		top_bar.offset_top = 0.0
 		top_bar.offset_bottom = top_inset + 80.0
+		if top_bar.has_method("_relayout"):
+			top_bar.call("_relayout")
 	if bottom_nav:
 		bottom_nav.offset_top = -88.0 - bottom_inset
 		bottom_nav.offset_bottom = -bottom_inset
@@ -526,3 +534,40 @@ func _apply_content_insets():
 	var full_bleed := (current_screen_name == "start" or current_screen_name == "map")
 	content_container.offset_top = 0.0 if full_bleed else UIHelper.safe_top
 	content_container.offset_bottom = 0.0 if full_bleed else -UIHelper.safe_bottom
+
+
+# ------------------------------------------------------------------
+# Keyboard handling: dismiss on Enter or tap outside the focused box
+# Popups like parental gate handle their own lift above the keyboard
+# ------------------------------------------------------------------
+func _setup_keyboard_handling():
+	get_tree().node_added.connect(_on_kb_node_added)
+	set_process_input(true)
+
+func _on_kb_node_added(node: Node):
+	if node is LineEdit:
+		var le := node as LineEdit
+		le.text_submitted.connect(func(_t: String):
+			le.release_focus()
+			DisplayServer.virtual_keyboard_hide()
+		)
+
+func _input(event: InputEvent) -> void:
+	var pressed := false
+	var pos := Vector2.ZERO
+	if event is InputEventScreenTouch and event.pressed:
+		pressed = true
+		pos = event.position
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		pressed = true
+		pos = event.position
+	if not pressed:
+		return
+	var f := get_viewport().gui_get_focus_owner()
+	if f == null or not (f is LineEdit or f is TextEdit):
+		return
+	var xf := f.get_global_transform_with_canvas()
+	var rect := Rect2(xf.origin, f.size * xf.get_scale())
+	if not rect.has_point(pos):
+		f.release_focus()
+		DisplayServer.virtual_keyboard_hide()

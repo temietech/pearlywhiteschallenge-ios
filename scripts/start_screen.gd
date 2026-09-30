@@ -3,9 +3,6 @@ extends Control
 
 signal start_pressed
 
-const NEW_PHONE_BG = "C:/Users/temie/.gemini/antigravity/brain/40c9ebe0-1383-4428-afa5-a28113911371/.user_uploaded/media_1789681557847.jpg"
-const NEW_TABLET_BG = "C:/Users/temie/.gemini/antigravity/brain/40c9ebe0-1383-4428-afa5-a28113911371/.user_uploaded/media_1789681571746.jpg"
-
 var bg: TextureRect
 var start_btn: TextureButton
 
@@ -15,7 +12,6 @@ func _ready():
 	anchor_bottom = 1.0
 	offset_right = 0
 	offset_bottom = 0
-	_sync_uploaded_assets()
 	_build_ui()
 	_relayout()
 
@@ -25,26 +21,6 @@ func _notification(what):
 		if is_node_ready():
 			_relayout()
 
-func _sync_uploaded_assets():
-	var phone_dest = ProjectSettings.globalize_path("res://assets/images/backgrounds/Start-Page.jpg")
-	var tab_dest = ProjectSettings.globalize_path("res://assets/images/backgrounds/Start-Page-tablet.jpeg")
-	
-	if FileAccess.file_exists(NEW_PHONE_BG):
-		var bytes = FileAccess.get_file_as_bytes(NEW_PHONE_BG)
-		if bytes.size() > 0:
-			var f = FileAccess.open(phone_dest, FileAccess.WRITE)
-			if f:
-				f.store_buffer(bytes)
-				f.close()
-				
-	if FileAccess.file_exists(NEW_TABLET_BG):
-		var bytes = FileAccess.get_file_as_bytes(NEW_TABLET_BG)
-		if bytes.size() > 0:
-			var f = FileAccess.open(tab_dest, FileAccess.WRITE)
-			if f:
-				f.store_buffer(bytes)
-				f.close()
-
 func _relayout():
 	var safe_sz = UIHelper.get_viewport_safe_size(self)
 	var cur_w = safe_sz.x
@@ -52,7 +28,10 @@ func _relayout():
 	var is_tablet = cur_w >= 600.0 or (cur_w / max(1.0, cur_h)) >= 0.68
 	
 	if bg:
-		bg.size = safe_sz
+		# Fill the whole screen (iPhone notch / iPad edges included), not just the safe size
+		var full_sz = get_viewport_rect().size if is_inside_tree() else safe_sz
+		bg.position = Vector2.ZERO
+		bg.size = Vector2(max(safe_sz.x, full_sz.x), max(safe_sz.y, full_sz.y))
 		_update_background(cur_w, cur_h)
 		
 	if start_btn:
@@ -87,8 +66,8 @@ func _update_background(cur_w: float = 0.0, cur_h: float = 0.0):
 	var kind = "tablet" if is_tablet else "phone"
 	if kind == _bg_kind and bg.texture:
 		return
-	var phone_paths = ["res://assets/images/backgrounds/Start-Page.jpg", NEW_PHONE_BG]
-	var tablet_paths = ["res://assets/images/backgrounds/Start-Page-tablet.jpeg", NEW_TABLET_BG]
+	var phone_paths = ["res://assets/images/backgrounds/Start-Page.jpg"]
+	var tablet_paths = ["res://assets/images/backgrounds/Start-Page-tablet.jpeg"]
 	var ordered = (tablet_paths + phone_paths) if is_tablet else (phone_paths + tablet_paths)
 	var clean_tex: Texture2D = null
 	for path in ordered:

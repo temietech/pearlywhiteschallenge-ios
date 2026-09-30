@@ -89,7 +89,7 @@ const FACTS = [
 	"A dry mouth lets cavity bacteria multiply, so drink plenty of water.",
 	"Pediatric dentists recommend your first checkup by your 1st birthday!",
 	"Brush for 2 full minutes, twice a day, to stop cavities 100%!",
-	"Floss every single day between any teeth that touch each other.",
+	"Floss every time you brush, between any teeth that touch each other.",
 	"Brushing 2 minutes twice a day makes you a Pearly Whites Champion!"
 ]
 
@@ -132,7 +132,7 @@ const QUIZ_BANKS = [
 	[
 		{"day": 1, "section": "RECAP", "q": "Brushing right before bed is the most important clean of the day.", "a": true, "why": "At night there is no saliva to fight bacteria, so teeth need extra protection!", "tip": "Brush right before bed, and remember: spit, don't rinse!"},
 		{"day": 2, "section": "RECAP", "q": "Your tooth enamel is the hardest substance in your whole body.", "a": true, "why": "Enamel cannot regrow once it's gone!", "tip": "Brush gently twice a day with fluoride toothpaste to strengthen your enamel."},
-		{"day": 3, "section": "RECAP", "q": "A toothbrush alone cleans 100% of every tooth surface.", "a": false, "why": "A toothbrush misses up to 40% of surfaces between teeth!", "tip": "Floss once a day between any teeth that touch."},
+		{"day": 3, "section": "RECAP", "q": "A toothbrush alone cleans 100% of every tooth surface.", "a": false, "why": "A toothbrush misses up to 40% of surfaces between teeth!", "tip": "Floss every time you brush, between any teeth that touch."},
 		{"day": 4, "section": "RECAP", "q": "Flossing before brushing helps toothpaste reach everywhere.", "a": true, "why": "Flossing clears out tight spaces so fluoride toothpaste can reach between teeth!", "tip": "Floss first to clear spaces, then brush with fluoride toothpaste!"},
 		{"day": 5, "section": "RECAP", "q": "Bad bacteria eat sugar to make cavity acid.", "a": true, "why": "Bad bacteria feed on sugar and produce acid that hurts enamel!", "tip": "Drink water after sweet treats to wash away sugar!"},
 		{"day": 6, "section": "RECAP", "q": "You should change your toothbrush every 3 months.", "a": true, "why": "Bent bristles clean poorly, so swap your brush every 3 months!", "tip": "Replace your toothbrush every 3 months or when bristles bend!"},
@@ -176,13 +176,13 @@ const QUIZ_BANKS = [
 		{"day": 24, "section": "PREVIEW", "q": "Why does a dry mouth make it easier for cavities to grow?", "concept": "Dry Mouth Risk", "tip": "Drink water during play and bedtime to prevent dry mouth!"},
 		{"day": 25, "section": "PREVIEW", "q": "When should a child have their first dentist checkup?", "concept": "First Visit", "tip": "Visit your dentist by your 1st birthday or 1st tooth!"},
 		{"day": 26, "section": "PREVIEW", "q": "How many minutes should you brush your teeth each day?", "concept": "2 Minute Rule", "tip": "Brush for 2 full minutes morning and night!"},
-		{"day": 27, "section": "PREVIEW", "q": "How often should you floss between teeth that touch?", "concept": "Daily Flossing", "tip": "Floss once every day between touching teeth!"},
+		{"day": 27, "section": "PREVIEW", "q": "How often should you floss between teeth that touch?", "concept": "Flossing Habit", "tip": "Floss every time you brush, between touching teeth!"},
 		{"day": 28, "section": "PREVIEW", "q": "How do you become a Pearly Whites Champion?", "concept": "Champion Habit", "tip": "Keep up your daily 2-minute brushing habit every day!"}
 	],
 	# Week 4 (Day 28 Node - Final Quiz) - exactly 7 questions
 	[
 		{"day": 28, "section": "CHAMPION", "q": "You should brush your teeth for 2 minutes, twice a day.", "a": true, "why": "Two minutes morning and night removes plaque and stops cavities!", "tip": "Brush for 2 full minutes every morning and night!"},
-		{"day": 28, "section": "CHAMPION", "q": "Flossing once a day cleans the spaces your brush cannot reach.", "a": true, "why": "Floss gets between tight teeth where bristles can't fit!", "tip": "Floss every single day between touching teeth!"},
+		{"day": 28, "section": "CHAMPION", "q": "Flossing every time you brush cleans the spaces your brush cannot reach.", "a": true, "why": "Floss gets between tight teeth where bristles can't fit!", "tip": "Floss every time you brush, between touching teeth!"},
 		{"day": 28, "section": "CHAMPION", "q": "It is fine to share your toothbrush with a friend.", "a": false, "why": "Toothbrushes hold germs, so sharing swaps bacteria between mouths!", "tip": "Always keep your toothbrush to yourself!"},
 		{"day": 28, "section": "CHAMPION", "q": "You should brush right away after drinking a sour, fizzy soda.", "a": false, "why": "Sour drinks soften enamel, so wait 30 minutes and swish water first!", "tip": "Swish water after acidic drinks, then wait to brush!"},
 		{"day": 28, "section": "CHAMPION", "q": "Crunchy fruit and veggies help keep your teeth clean.", "a": true, "why": "Crunchy fibers scrub teeth and boost cleansing saliva!", "tip": "Snack on crisp carrots, celery, or apples!"},
@@ -596,12 +596,12 @@ func _init_nodes():
 	for day in range(1, 29):
 		NODE_DATA.append({"id": node_id, "day": day, "type": "morning"})
 		node_id += 1
-		NODE_DATA.append({"id": node_id, "day": day, "type": "evening"})
-		node_id += 1
-		# Day 28: the Final Quiz comes right after the evening brush, just before the finish node
+		# Day 28 order: AM brush > Final Quiz > PM brush (Candy Crusade is its last step) > story panel > FINISH
 		if day == FINAL_QUIZ_DAY:
 			NODE_DATA.append({"id": node_id, "day": day, "type": "quiz"})
 			node_id += 1
+		NODE_DATA.append({"id": node_id, "day": day, "type": "evening"})
+		node_id += 1
 		if BONUS_MINIGAME_DAYS.has(day):
 			NODE_DATA.append({"id": node_id, "day": day, "type": "minigame"})
 			node_id += 1
@@ -1597,7 +1597,9 @@ func is_day_morning_completed(day_num: int, p: Dictionary = {}) -> bool:
 	return false
 
 static func get_evening_node_for_day(target_day: int) -> int:
-	return get_morning_node_for_day(target_day) + 1
+	# Day 28 has the Final Quiz between the morning and evening brushes
+	var extra: int = 1 if target_day == FINAL_QUIZ_DAY else 0
+	return get_morning_node_for_day(target_day) + 1 + extra
 
 func is_day_evening_completed(day_num: int, p: Dictionary = {}) -> bool:
 	if day_num < 1 or day_num > 28:
@@ -1629,12 +1631,10 @@ func is_day_story_unlocked(day_num: int, p: Dictionary = {}) -> bool:
 		profile = get_active_profile()
 	if profile.is_empty():
 		return false
-	# Day 28's finale picture belongs to the FINISH node only: it unlocks once that node is completed
+	# Day 28's story panel opens right after the evening brush + Candy Crusade are completed
+	# (the FINISH node then only shows the Pearly Champion trophy and confetti)
 	if day_num == 28:
-		if NODE_DATA.is_empty():
-			_init_nodes()
-		var finish_id: int = NODE_DATA.size() - 1
-		return int(profile.get("currentNode", 1)) > finish_id
+		return is_day_evening_completed(28, profile)
 	var unlocked_story = profile.get("unlockedStory", [])
 	if typeof(unlocked_story) == TYPE_ARRAY and unlocked_story.has(day_num):
 		return true

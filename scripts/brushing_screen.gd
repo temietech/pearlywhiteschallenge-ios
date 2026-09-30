@@ -959,19 +959,19 @@ func _build_ui():
 		bubble_tex = UIHelper.load_texture_safe("res://assets/images/brushing/speech_bubble_right_tail.png")
 	speech_bubble.texture = bubble_tex
 	speech_bubble.flip_h = false
-	speech_bubble.size = Vector2(230, 96)
+	speech_bubble.size = Vector2(161, 67)
 	add_child(speech_bubble)
 	_setup_draggable(speech_bubble, "bubble")
-	
+
 	bubble_label = Label.new()
-	bubble_label.position = Vector2(18, 10)
-	bubble_label.size = Vector2(194, 76)
-	bubble_label.text = "Ready to scrub\nthat plaque?\nHit START!"
+	bubble_label.position = Vector2(13, 7)
+	bubble_label.size = Vector2(136, 53)
+	bubble_label.text = "Ready to scrub\nthat plaque away?\nHit START!"
 	bubble_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	bubble_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	bubble_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	bubble_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	UIHelper.apply_bubbly_label(bubble_label, 17, Color(0.10, 0.30, 0.55), true)
+	UIHelper.apply_bubbly_label(bubble_label, 12, Color(0.10, 0.30, 0.55), true)
 	speech_bubble.add_child(bubble_label)
 
 	
@@ -1052,8 +1052,9 @@ func _relayout():
 	# 1. Bathroom Background (anchored cleanly across full viewport)
 	if bg:
 		var bg_y_offset = -round(cur_h * 0.04)
-		bg.position = Vector2(0, bg_y_offset)
-		bg.size = Vector2(cur_w, cur_h * 1.06)
+		# The page content sits inside the notch / home-bar insets; the background stays full-bleed
+		bg.position = Vector2(0, bg_y_offset - UIHelper.safe_top)
+		bg.size = Vector2(cur_w, cur_h * 1.06 + UIHelper.safe_top + UIHelper.safe_bottom)
 		
 	# 2. Top Status Bar (Centered across top width)
 	var bar_w = min(cur_w - 24.0, 400.0) if not is_tablet else 440.0
@@ -1371,7 +1372,7 @@ func _set_pre_brush_state():
 		
 	_reset_plaque_germs()
 		
-	bubble_label.text = "Ready to scrub\nthat plaque?\nHit START!"
+	bubble_label.text = "Ready to scrub\nthat plaque away?\nHit START!"
 	total_seconds = 20 if GameState.dev_mode else 120
 	time_left = total_seconds
 	time_label.text = "2:00"
@@ -1394,6 +1395,8 @@ func _on_start_pressed():
 	start_btn.scale = Vector2.ONE
 	
 	AudioManager.play_sfx("pop")
+	# The brushing song starts only now that the player pressed START
+	AudioManager.play_screen_bgm("brushing")
 	is_brushing_active = true
 	is_paused = false
 	brush_anim_time = 0.0
@@ -1872,7 +1875,8 @@ func _show_early_quit_modal():
 	var card_w = clampf(safe_sz.x - 48.0, 300.0, 400.0)
 	
 	var card = Panel.new()
-	card.custom_minimum_size = Vector2(card_w, 0)
+	# A Panel does not grow with its children, so give the white card a real height
+	card.custom_minimum_size = Vector2(card_w, 260)
 	card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	card.add_theme_stylebox_override("panel", UIHelper.create_bubbly_panel(28, Color.WHITE, UIHelper.SOFT_BLUE, 3))

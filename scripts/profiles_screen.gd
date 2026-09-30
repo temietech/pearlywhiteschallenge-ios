@@ -168,7 +168,7 @@ func _build_ui():
 	)
 	btn_hbox.add_child(add_btn)
 	
-	submit_btn = UIHelper.create_themed_button("submit", btn_sz)
+	submit_btn = UIHelper.create_themed_button("confirm", btn_sz)  # was "submit" (SUBMIT ANSWER image); CONFIRM fits Player Setup
 	if not submit_btn.texture_normal:
 		submit_btn = UIHelper.create_image_button(
 			"res://assets/images/addprofilescreen/submit_button.png",

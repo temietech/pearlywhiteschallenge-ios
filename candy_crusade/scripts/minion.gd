@@ -29,7 +29,7 @@ const DEFAULT_DEATH_LAUNCH_STRENGTH := 22.0
 const DEATH_HORIZONTAL_DECAY := 2.0
 const MINION_SEPARATION_RADIUS := 0.55
 const MINION_SEPARATION_SPEED := 1.5
-const CAVE_RUSH_SPEED := 2.6
+const CAVE_RUSH_SPEED := 3.6
 const CAVE_EXIT_Z := -9.5
 const CAVE_DECEL_END_Z := -7.6
 
@@ -310,7 +310,7 @@ func _physics_process(delta: float) -> void:
 			if blocked:
 				PurpleStars.spawn_burst(global_position + Vector3(0, 0.25, 0), get_tree(), 12, 0.7)
 				take_damage(1.0, false) # Minion takes damage from barrier contact
-				knockback(Vector3(0, 0, -1), 6.0) # Knock minion back down the lane
+				knockback(Vector3(0, 0, -1), 3.0) # Knock minion back down the lane (halved)
 			else:
 				var game = get_node_or_null("/root/Game")
 				if game != null and game.has_method("reset_combo"):

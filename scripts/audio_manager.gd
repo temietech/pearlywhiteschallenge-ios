@@ -325,9 +325,16 @@ func set_master_volume(v: float):
 	if bgm_player:
 		bgm_player.volume_db = linear_to_db(bgm_volume * master_volume)
 
+## Sets the master mute state (keeps music / narration in sync). Used by Settings and the brushing page.
+func set_muted(muted: bool) -> void:
+	if is_muted != muted:
+		toggle_mute()
+
 func set_sound_enabled(enabled: bool):
 	sound_enabled = enabled
 	if enabled:
+		# Turning sounds ON must also clear a master mute set from the brushing page
+		set_muted(false)
 		sfx_volume = saved_sfx_volume if saved_sfx_volume > 0.01 else 0.85
 	else:
 		if sfx_volume > 0.01:
@@ -337,6 +344,8 @@ func set_sound_enabled(enabled: bool):
 func set_music_enabled(enabled: bool):
 	music_enabled = enabled
 	if enabled:
+		# Turning music ON must also clear a master mute set from the brushing page
+		set_muted(false)
 		bgm_volume = saved_bgm_volume if saved_bgm_volume > 0.01 else 0.40
 		if bgm_player:
 			bgm_player.volume_db = linear_to_db(bgm_volume * master_volume)

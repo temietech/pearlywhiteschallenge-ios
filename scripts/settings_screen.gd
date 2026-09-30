@@ -418,7 +418,7 @@ func _build_audio_card():
 
 	# 3. Master Mute/Unmute Toggle Row
 	var mute_toggle = _create_toggle_row("Master Mute", func(val):
-		AudioManager.is_muted = val
+		AudioManager.set_muted(val)
 	, AudioManager.is_muted)
 	vbox.add_child(mute_toggle)
 

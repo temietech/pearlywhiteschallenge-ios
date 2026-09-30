@@ -346,7 +346,7 @@ func _damage_enemy(body: Node, from_behind: bool = false) -> bool:
 			if will_kill:
 				dir.y = 0.5
 				dir = dir.normalized()
-				body.knockback(dir, 16.0)
-			else:
 				body.knockback(dir, 8.0)
+			else:
+				body.knockback(dir, 4.0)
 	return true

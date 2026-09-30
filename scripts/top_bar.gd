@@ -190,9 +190,12 @@ func _relayout():
 	var banner_h = banner_w / 4.89
 	
 	var bar_h = max(80.0, banner_h + 16.0)
-	size.y = bar_h
-	custom_minimum_size.y = bar_h
-	offset_bottom = bar_h
+	# Notch / Dynamic Island: the bar grows by the top inset. Corner buttons stay at the very top,
+	# only the stats banner (coins / points / streak) is brought down below the notch.
+	var inset = UIHelper.safe_top
+	size.y = bar_h + inset
+	custom_minimum_size.y = bar_h + inset
+	offset_bottom = bar_h + inset
 	
 	# Left element: Avatar on map, or Back button on subpages
 	if avatar_btn:
@@ -209,7 +212,7 @@ func _relayout():
 	var right_limit = (cur_w - 52.0) - 8.0
 	var mid_x = (left_limit + right_limit) * 0.5
 	var banner_x = mid_x - (banner_w * 0.5)
-	var banner_y = (bar_h - banner_h) * 0.5
+	var banner_y = inset + (bar_h - banner_h) * 0.5
 	
 	if stats_banner:
 		stats_banner.size = Vector2(banner_w, banner_h)

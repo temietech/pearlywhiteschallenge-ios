@@ -1191,7 +1191,9 @@ func record_brushing_completed(total_secs: int = 120):
 	var is_evening: bool = (n_data.get("type", "") == "evening")
 	var required_secs = 20 if dev_mode else 120
 	complete_brushing(total_secs >= required_secs, is_evening)
-	if is_evening:
+	if is_evening and int(n_data.get("day", 0)) == 28:
+		set_node_stage(cur_node, 1) # Day 28: Candy Crusade still to play after the night brush
+	elif is_evening:
 		finish_node(true)
 	else:
 		set_node_stage(cur_node, 1)

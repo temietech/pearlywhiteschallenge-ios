@@ -218,8 +218,7 @@ func _ready():
 	_build_ui()
 	_relayout()
 	_show_question()
-	if is_baseline:
-		call_deferred("_show_story_intro")
+	# The prologue is shown ONCE, from the map (before the first Candy Crusade). Do not show it again here.
 
 func _show_story_intro():
 	UIHelper.show_node0_story_intro_modal(self)

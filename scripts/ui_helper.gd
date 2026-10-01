@@ -1812,6 +1812,10 @@ static func show_node0_story_intro_modal(parent_node: Node, on_complete: Callabl
 		if main_node and is_instance_valid(main_node):
 			target_parent = main_node
 
+	# Never open a second prologue on top of one that is already showing (double taps)
+	if target_parent.get_node_or_null("Node0StoryIntroOverlay") != null:
+		return
+
 	AudioManager.play_sfx("pop")
 	var safe_sz = get_viewport_safe_size(target_parent)
 	var cur_w = safe_sz.x

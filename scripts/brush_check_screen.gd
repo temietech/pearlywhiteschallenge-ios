@@ -157,7 +157,48 @@ func _start_desktop_camera_fallback():
 		active_camera_feed.feed_is_active = true
 		camera_feed_texture = CameraTexture.new()
 		camera_feed_texture.camera_feed_id = active_camera_feed.get_id()
-		camera_feed_texture.which_feed = CameraServer.FEED_RGBA_IMAGE
+		if active_camera_feed.get_datatype() == CameraFeed.FEED_YCBCR_SEP:
+			# iOS delivers camera frames as separate Y and CbCr planes. Reading them as RGBA
+			# gives a red/pink picture, so convert YCbCr -> RGB in a shader instead.
+			camera_feed_texture.which_feed = CameraServer.FEED_Y_IMAGE
+			var cbcr_tex := CameraTexture.new()
+			cbcr_tex.camera_feed_id = active_camera_feed.get_id()
+			cbcr_tex.which_feed = CameraServer.FEED_CBCR_IMAGE
+			var sh := Shader.new()
+			sh.code = """shader_type canvas_item;
+uniform sampler2D cbcr_tex : filter_linear;
+uniform vec2 box_size = vec2(1.0, 1.0);
+uniform float rotate_quarter = 1.0; // 1.0 = rotate the landscape sensor image 90 degrees clockwise (portrait phone)
+void fragment() {
+	vec2 ts = vec2(textureSize(TEXTURE, 0));
+	if (ts.x < 2.0 || ts.y < 2.0) { ts = vec2(4.0, 3.0); }
+	vec2 img = rotate_quarter > 0.5 ? vec2(ts.y, ts.x) : ts;
+	float a_img = img.x / img.y;
+	float a_box = box_size.x / max(box_size.y, 1.0);
+	vec2 uv = UV - vec2(0.5);
+	// "cover" the box: crop the longer side instead of stretching
+	if (a_box > a_img) { uv.y *= a_img / a_box; } else { uv.x *= a_box / a_img; }
+	uv += vec2(0.5);
+	vec2 src = rotate_quarter > 0.5 ? vec2(uv.y, 1.0 - uv.x) : uv;
+	float y = texture(TEXTURE, src).r;
+	vec2 c = texture(cbcr_tex, src).rg - vec2(0.5);
+	vec3 rgb = vec3(y + 1.402 * c.y, y - 0.344136 * c.x - 0.714136 * c.y, y + 1.772 * c.x);
+	COLOR = vec4(rgb, 1.0);
+}
+"""
+			var mat := ShaderMaterial.new()
+			mat.shader = sh
+			mat.set_shader_parameter("cbcr_tex", cbcr_tex)
+			if camera_feed:
+				# The shader does its own rotation + cover-crop, so the rect must simply fill the box
+				camera_feed.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+				camera_feed.stretch_mode = TextureRect.STRETCH_SCALE
+				camera_feed.material = mat
+				mat.set_shader_parameter("box_size", camera_feed.size)
+		else:
+			camera_feed_texture.which_feed = CameraServer.FEED_RGBA_IMAGE
+			if camera_feed:
+				camera_feed.material = null
 		if camera_feed:
 			camera_feed.texture = camera_feed_texture
 			camera_feed.modulate = Color.WHITE
@@ -345,6 +386,8 @@ func _relayout():
 			if camera_feed:
 				camera_feed.size = inner_box.size
 				camera_feed.position = Vector2.ZERO
+				if camera_feed.material is ShaderMaterial:
+					(camera_feed.material as ShaderMaterial).set_shader_parameter("box_size", inner_box.size)
 			if scanline_laser:
 				scanline_laser.size = Vector2(inner_box.size.x, 3)
 			if reticle_box:

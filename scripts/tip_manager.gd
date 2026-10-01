@@ -65,34 +65,36 @@ func _ready():
 	tip_completed.connect(_on_tip_completed)
 	_setup_native_plugin_listeners()
 
+const RC_SINGLETON := "GodotxRevenueCat"
+var _rc: Object = null
+var _rc_initialized: bool = false
+var _pending_comment: String = ""
+var _pending_package_id: String = ""
+
 func _setup_native_plugin_listeners():
-	# Wire native RevenueCat plugin signals if loaded on Android / iOS
-	var rc_singleton: Object = null
-	if Engine.has_singleton("RevenueCat"):
-		rc_singleton = Engine.get_singleton("RevenueCat")
-	elif Engine.has_singleton("Purchases"):
-		rc_singleton = Engine.get_singleton("Purchases")
-		
-	if rc_singleton:
-		if rc_singleton.has_signal("purchase_completed") and not rc_singleton.is_connected("purchase_completed", _on_native_purchase_success):
-			rc_singleton.connect("purchase_completed", _on_native_purchase_success)
-		elif rc_singleton.has_signal("purchaseCompleted") and not rc_singleton.is_connected("purchaseCompleted", _on_native_purchase_success):
-			rc_singleton.connect("purchaseCompleted", _on_native_purchase_success)
-			
-		if rc_singleton.has_signal("purchase_failed") and not rc_singleton.is_connected("purchase_failed", _on_native_purchase_fail):
-			rc_singleton.connect("purchase_failed", _on_native_purchase_fail)
-		elif rc_singleton.has_signal("purchaseFailed") and not rc_singleton.is_connected("purchaseFailed", _on_native_purchase_fail):
-			rc_singleton.connect("purchaseFailed", _on_native_purchase_fail)
+	# Real RevenueCat (GodotX plugin) - only exists in iOS/Android exports
+	if not Engine.has_singleton(RC_SINGLETON):
+		return
+	_rc = Engine.get_singleton(RC_SINGLETON)
+	if _rc.has_signal("purchase_result") and not _rc.is_connected("purchase_result", _on_rc_purchase_result):
+		_rc.connect("purchase_result", _on_rc_purchase_result)
+	if revenuecat_public_api_key.is_empty():
+		return
+	_rc.initialize(revenuecat_public_api_key, "", OS.is_debug_build())
+	_rc_initialized = true
 
-func _on_native_purchase_success(product_or_details):
-	var pkg_id = default_package_id
-	if typeof(product_or_details) == TYPE_DICTIONARY:
-		pkg_id = str(product_or_details.get("product_id", product_or_details.get("package_id", default_package_id)))
-	_finalize_successful_tip(pkg_id, "native_store")
-
-func _on_native_purchase_fail(err_msg):
-	is_processing = false
-	tip_failed.emit(str(err_msg))
+func _on_rc_purchase_result(data: Dictionary):
+	var err := str(data.get("error", ""))
+	if bool(data.get("cancelled", false)):
+		is_processing = false
+		tip_failed.emit("Purchase cancelled.")
+		return
+	if not err.is_empty():
+		is_processing = false
+		tip_failed.emit(err)
+		return
+	var pid := str(data.get("product_id", _pending_package_id))
+	_finalize_successful_tip(pid, "revenuecat", _pending_comment)
 
 func _setup_http_node():
 	if not _http_request or not is_instance_valid(_http_request):
@@ -108,6 +110,13 @@ func set_paywall_url(url: String):
 ## Sets the RevenueCat public API key dynamically
 func set_api_key(key: String):
 	revenuecat_public_api_key = key
+
+## Direct purchase method for testing (used by debug tester)
+func purchase_tip(package_id: String):
+	if is_processing:
+		return
+	is_processing = true
+	_execute_tip_purchase(package_id, "")
 
 ## Primary public method to initiate the tip / developer support action
 func support_developers(_package_id: String = ""):
@@ -319,75 +328,38 @@ func _select_and_purchase_tier(tier: Dictionary, user_comment: String = ""):
 	
 	_execute_tip_purchase(package_id, user_comment)
 
-## Executes the RevenueCat purchase or simulated sandbox test transaction
+## Executes a real RevenueCat / App Store purchase. Never grants rewards without a confirmed purchase.
 func _execute_tip_purchase(package_id: String, user_comment: String = ""):
-	var os_name = OS.get_name()
-	
-	# 1. Native Mobile Plugin check (iOS StoreKit / Google Play Billing through RevenueCat)
-	if os_name in ["Android", "iOS"] or Engine.has_singleton("RevenueCat") or Engine.has_singleton("Purchases"):
-		if Engine.has_singleton("RevenueCat"):
-			var rc = Engine.get_singleton("RevenueCat")
-			if rc.has_method("purchase_package"):
-				rc.purchase_package(package_id)
-				return
-			elif rc.has_method("purchasePackage"):
-				rc.purchasePackage(package_id)
-				return
-		elif Engine.has_singleton("Purchases"):
-			var rc = Engine.get_singleton("Purchases")
-			if rc.has_method("purchasePackage"):
-				rc.purchasePackage(package_id)
-				return
-				
-		# On mobile builds without a compiled native plugin binary (e.g. editor debugging),
-		# handle via sandbox verification. NEVER open web links on mobile to ensure 100% store compliance.
-		_simulate_revenuecat_verification(package_id, user_comment)
+	if _rc == null or not _rc_initialized:
+		is_processing = false
+		tip_failed.emit("Store not available right now. Please try again later.")
+		_show_notice("Store not available", "Tips can only be sent from the App Store version of the game.")
 		return
+	_pending_comment = user_comment
+	_pending_package_id = package_id
+	_rc.purchase(package_id)
 
-	# 2. Web export / JavaScriptBridge support (for Web builds & Shipaton competition)
-	if OS.has_feature("web"):
-		if JavaScriptBridge.eval("typeof window.supportDevelopers === 'function'"):
-			JavaScriptBridge.eval("window.supportDevelopers('%s')" % package_id)
-			_finalize_successful_tip(package_id, "web_sdk", user_comment)
-			return
-
-	# 3. Direct Web Paywall / Stripe Checkout URL (Web/Desktop ONLY - disabled on Android/iOS)
-	if not paywall_url.is_empty():
-		OS.shell_open(paywall_url)
-		_finalize_successful_tip(package_id, "web_paywall", user_comment)
+func _show_notice(_title_text: String, body_text: String):
+	var tree = get_tree()
+	var host: Node = tree.current_scene if tree else null
+	if host == null or not is_instance_valid(host):
 		return
-
-	# 4. Sandbox Simulated Flow (Fallback for Shipaton testing)
-	_simulate_revenuecat_verification(package_id, user_comment)
-
-func _simulate_revenuecat_verification(package_id: String, user_comment: String = ""):
-	# Optional verification ping using HTTPRequest with RevenueCat Authorization Header
-	if _http_request and not revenuecat_public_api_key.is_empty():
-		var app_user_id = "test_user_godot"
-		var p = GameState.get_active_profile()
-		if not p.is_empty() and p.has("name"):
-			app_user_id = str(p.get("name", "hero")).to_lower().replace(" ", "_")
-			
-		var url = "https://api.revenuecat.com/v1/subscribers/" + app_user_id
-		var headers = [
-			"Authorization: Bearer " + revenuecat_public_api_key,
-			"Content-Type: application/json",
-			"X-Platform: stripe"
-		]
-		
-		# Non-blocking query to RevenueCat subscriber endpoint
-		var on_req_done = func(_res, response_code, _hdrs, _body):
-			_finalize_successful_tip(package_id, "revenuecat_api_code_%d" % response_code, user_comment)
-		_http_request.request_completed.connect(on_req_done, CONNECT_ONE_SHOT)
-		
-		var err = _http_request.request(url, headers, HTTPClient.METHOD_GET)
-		if err == OK:
-			return
-			
-	# Immediate fallback if offline or editor sandbox testing
-	get_tree().create_timer(0.4).timeout.connect(func():
-		_finalize_successful_tip(package_id, "sandbox_direct", user_comment)
-	)
+	var lbl := Label.new()
+	lbl.text = body_text
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.add_theme_font_size_override("font_size", 16)
+	lbl.add_theme_color_override("font_color", Color.WHITE)
+	lbl.add_theme_color_override("font_outline_color", Color(0.1, 0.1, 0.2))
+	lbl.add_theme_constant_override("outline_size", 6)
+	var layer := CanvasLayer.new()
+	layer.layer = 300
+	host.add_child(layer)
+	layer.add_child(lbl)
+	lbl.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	lbl.custom_minimum_size = Vector2(300, 0)
+	lbl.position = Vector2(40, 600)
+	get_tree().create_timer(3.0).timeout.connect(func(): if is_instance_valid(layer): layer.queue_free())
 
 func _finalize_successful_tip(package_id: String, provider: String = "test", user_comment: String = ""):
 	is_processing = false

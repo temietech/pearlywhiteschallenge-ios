@@ -1965,11 +1965,14 @@ func _on_brushing_complete():
 	var completed_day = node_info.get("day", 1)
 	
 	GameState.complete_brushing(true, is_evening)
-	if is_evening:
+	if is_evening and int(completed_day) == 28:
+		# Day 28: Candy Crusade comes AFTER the night brush, so the node stays open
+		GameState.set_node_stage(cur_node, 1)
+	elif is_evening:
 		GameState.finish_node(true)
 	else:
 		GameState.set_node_stage(cur_node, 1)
-	
+
 	# 1. Log brushing session habit metric (duration & morning/evening) to FirebaseManager
 	FirebaseManager.record_brushing_session(120, not is_evening)
 	

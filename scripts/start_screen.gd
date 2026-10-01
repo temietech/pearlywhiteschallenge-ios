@@ -4,6 +4,7 @@ extends Control
 signal start_pressed
 
 var bg: TextureRect
+var bg_fill: TextureRect
 var start_btn: TextureButton
 
 func _ready():
@@ -32,6 +33,14 @@ func _relayout():
 		var full_sz = get_viewport_rect().size if is_inside_tree() else safe_sz
 		bg.position = Vector2.ZERO
 		bg.size = Vector2(max(safe_sz.x, full_sz.x), max(safe_sz.y, full_sz.y))
+		# Phones: show the WHOLE artwork width (nothing cut off at the sides); the small leftover
+		# strips at top/bottom are filled with the artwork's own sky-blue / pink edge colours.
+		# Tablets: keep filling the whole screen (cover).
+		bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED if is_tablet else TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		if bg_fill:
+			bg_fill.position = Vector2.ZERO
+			bg_fill.size = bg.size
+			bg_fill.visible = not is_tablet
 		_update_background(cur_w, cur_h)
 		
 	if start_btn:
@@ -80,6 +89,25 @@ func _update_background(cur_w: float = 0.0, cur_h: float = 0.0):
 
 func _build_ui():
 	# Fullscreen Start-Page background art (adaptive phone / tablet)
+	var grad = Gradient.new()
+	grad.offsets = PackedFloat32Array([0.0, 0.45, 0.55, 1.0])
+	grad.colors = PackedColorArray([
+		Color8(90, 185, 233), Color8(90, 185, 233),
+		Color8(229, 133, 175), Color8(229, 133, 175)
+	])
+	var grad_tex = GradientTexture2D.new()
+	grad_tex.gradient = grad
+	grad_tex.fill_from = Vector2(0.5, 0.0)
+	grad_tex.fill_to = Vector2(0.5, 1.0)
+	grad_tex.width = 8
+	grad_tex.height = 256
+	bg_fill = TextureRect.new()
+	bg_fill.texture = grad_tex
+	bg_fill.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	bg_fill.stretch_mode = TextureRect.STRETCH_SCALE
+	bg_fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg_fill)
+	
 	bg = TextureRect.new()
 	UIHelper.setup_fullscreen_bg(bg)
 	add_child(bg)

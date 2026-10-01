@@ -27,6 +27,9 @@ var voice_cache: Dictionary = {}
 var current_bgm_track_path: String = ""
 
 # Page / Screen to Background Music Mapping
+# Character voices and narration are 30% louder than music / effects
+const VOICE_GAIN := 1.3
+
 const HOME_PAGE_BGM = "res://assets/audio/music/PW Intro Audio.mp3"
 const MAP_AND_APP_BGM = "res://assets/audio/music/Candyland Dreams.mp3"
 
@@ -308,7 +311,7 @@ func play_character_voice(char_id: String):
 			if not p.playing:
 				p.stream = stream
 				p.pitch_scale = 1.0
-				p.volume_db = linear_to_db(sfx_volume * master_volume * 1.1)
+				p.volume_db = linear_to_db(sfx_volume * master_volume * 1.1 * VOICE_GAIN)
 				p.play()
 				return
 
@@ -510,7 +513,7 @@ func play_voice_narration(text: String, audio_path: String = "", force: bool = f
 		var res = load(audio_path)
 		if res is AudioStream:
 			narration_player.stream = res
-			narration_player.volume_db = linear_to_db(master_volume)
+			narration_player.volume_db = linear_to_db(master_volume * VOICE_GAIN)
 			narration_player.play()
 			played_recorded = true
 			

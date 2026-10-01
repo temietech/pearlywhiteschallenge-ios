@@ -136,6 +136,12 @@ static func _ensure_trophy_title_texture() -> Texture2D:
 		return _cached_title_tex
 		
 	var path = "res://assets/images/badgescreen/trophy_collection_title.png"
+	# Exported builds (iPhone/iPad) only contain the imported texture, not the raw PNG file,
+	# so load it through the resource system first. Raw-file cleanup below is editor-only.
+	var imported_tex = UIHelper.load_texture_safe(path)
+	if imported_tex:
+		_cached_title_tex = imported_tex
+		return _cached_title_tex
 	var global_path = ProjectSettings.globalize_path(path)
 	
 	# If image exists on disk, load and clean any black background artifacts
@@ -384,17 +390,17 @@ func _build_ui():
 			if back_fired[0]:
 				return
 			back_fired[0] = true
-			var main_node = get_tree().root.get_node_or_null("Main")
-			if main_node and main_node.has_method("navigate_to"):
-				main_node.navigate_to("map")
-			else:
-				back_pressed.emit()
+			# Re-arm shortly so the button can never stay dead if navigation was blocked
+			get_tree().create_timer(0.6).timeout.connect(func(): back_fired[0] = false)
+			# main.gd connects back_pressed -> navigate_to("map")
+			back_pressed.emit()
 		# Fire on finger-DOWN so the button can never be lost to a layout rebuild mid-tap
 		back_btn.button_down.connect(go_back)
 		back_btn.pressed.connect(go_back)
 		add_child(back_btn)
 	# Update position on each rebuild
-	back_btn.position = Vector2(10, 10)
+	# Keep the button below the notch / status bar so iPhone and iPad taps reach it
+	back_btn.position = Vector2(10, 10 + UIHelper.safe_top)
 	
 	# Header Title: Graphic Image (Clean transparent PNG) or Styled Bubbly Font
 	var title_tex = _ensure_trophy_title_texture()

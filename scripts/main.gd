@@ -338,7 +338,11 @@ func navigate_to(screen_name: String, extra_args: Dictionary = {}):
 					navigate_to("quiz")
 					return
 				elif n_type == "evening":
-					GameState.set_node_stage(cur_node, 1)
+					if int(node_info.get("day", 0)) == 28:
+						# Day 28: Candy Crusade is the last step after the night brush
+						GameState.finish_node(true)
+					else:
+						GameState.set_node_stage(cur_node, 1)
 				elif n_type == "morning":
 					GameState.finish_node(false)
 				elif n_type == "minigame":

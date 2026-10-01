@@ -46,7 +46,7 @@ project/assembly_name="Pearly Whites Challenge"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/NotificationSchedulerPlugin/plugin.cfg")
+enabled=PackedStringArray("res://addons/NotificationSchedulerPlugin/plugin.cfg", "res://addons/godotx_revenue_cat/plugin.cfg")
 
 [gui]
 

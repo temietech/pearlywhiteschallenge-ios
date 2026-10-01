@@ -35,6 +35,26 @@ jobs:
           mv templates/* "$HOME/Library/Application Support/Godot/export_templates/4.7.stable/"
           ls "$HOME/Library/Application Support/Godot/export_templates/4.7.stable/" | grep -i ios
 
+      - name: Build PearlyToothbrushScanner iOS plugin (TensorFlow Lite toothbrush detection)
+        id: scanner_build
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          mkdir -p build
+          bash ios/plugins/PearlyToothbrushScanner/build_ios_plugin.sh 4.7-stable 2>&1 | tee build/scanner_plugin_build.log | tail -n 80
+          ls -la ios/plugins
+
+      - name: Enable scanner plugin in export preset (only if it built)
+        run: |
+          if [ -f ios/plugins/PearlyToothbrushScanner.release.a ] && [ -f ios/plugins/PearlyToothbrushScanner.debug.a ] && [ -d ios/plugins/TensorFlowLiteC.xcframework ]; then
+            sed -i '' 's|^plugins/PearlyToothbrushScanner=.*|plugins/PearlyToothbrushScanner=true|' export_presets.cfg
+            echo "SCANNER PLUGIN: built and ENABLED"
+          else
+            echo "::warning::SCANNER PLUGIN did NOT build, so the app will use the plain camera without toothbrush detection. See the build step log above."
+            tail -n 60 build/scanner_plugin_build.log 2>/dev/null || true
+          fi
+          grep -m1 'plugins/PearlyToothbrushScanner' export_presets.cfg
+
       - name: Install Certificates and Provisioning Profile
         env:
           P12_BASE64: ${{ secrets.P12_BASE64 }}

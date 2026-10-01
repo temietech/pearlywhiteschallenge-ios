@@ -370,7 +370,12 @@ func _build_ui():
 	nodes_container = Control.new()
 	nodes_container.custom_minimum_size = Vector2(cur_w, total_h)
 	nodes_container.size = Vector2(cur_w, total_h)
+	# PASS (not the default STOP) so wheel/drag events reach the ScrollContainer
+	nodes_container.mouse_filter = Control.MOUSE_FILTER_PASS
 	scroll_container.add_child(nodes_container)
+	# Our own drag-scroll (below) handles touch + mouse, so switch off the built-in
+	# touch drag to avoid the two fighting each other on iPhone/iPad.
+	scroll_container.scroll_deadzone = 100000
 	
 	map_bg_tex = TextureRect.new()
 	map_bg_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -623,7 +628,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 					child.modulate = Color.WHITE
 		)
 		mascot_root.gui_input.connect(func(ev):
-			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and ev.pressed:
+			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and not _suppress_tap:
 				btn.pressed.emit()
 		)
 		container.add_child(mascot_root)
@@ -634,7 +639,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 		bubble_center.position = Vector2(0, -98)
 		bubble_center.mouse_filter = Control.MOUSE_FILTER_PASS
 		bubble_center.gui_input.connect(func(ev):
-			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and ev.pressed:
+			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and not _suppress_tap:
 				btn.pressed.emit()
 		)
 		mascot_root.add_child(bubble_center)
@@ -648,7 +653,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 		bubble.add_theme_stylebox_override("panel", b_style)
 		bubble.mouse_filter = Control.MOUSE_FILTER_PASS
 		bubble.gui_input.connect(func(ev):
-			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and ev.pressed:
+			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and not _suppress_tap:
 				btn.pressed.emit()
 		)
 		bubble_center.add_child(bubble)
@@ -686,7 +691,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 		b_lbl.add_theme_font_size_override("font_size", 11)
 		b_lbl.mouse_filter = Control.MOUSE_FILTER_PASS
 		b_lbl.gui_input.connect(func(ev):
-			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and ev.pressed:
+			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and not _suppress_tap:
 				btn.pressed.emit()
 		)
 		bubble.add_child(b_lbl)
@@ -703,7 +708,7 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 		char_rect.pivot_offset = Vector2(av_w * 0.5, av_h)
 		char_rect.mouse_filter = Control.MOUSE_FILTER_PASS
 		char_rect.gui_input.connect(func(ev):
-			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and ev.pressed:
+			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and not ev.pressed and not _suppress_tap:
 				btn.pressed.emit()
 		)
 		char_rect.texture = UIHelper.get_char_texture(avatar_id, false)
@@ -720,6 +725,8 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 		
 	if is_completed:
 		btn.pressed.connect(func():
+			if _suppress_tap:
+				return
 			_save_scroll_position()
 			AudioManager.play_sfx("click")
 			var p = GameState.get_active_profile()
@@ -732,6 +739,8 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 		)
 	else:
 		btn.pressed.connect(func():
+			if _suppress_tap:
+				return
 			if is_locked:
 				AudioManager.play_sfx("click")
 				GameState.push_toast("Locked!", "Finish earlier steps first!", "", "orange")
@@ -810,6 +819,130 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 func _save_scroll_position():
 	# The map always opens on the active node, so nothing is saved any more.
 	pass
+
+# ---------------------------------------------------------------------------
+# Drag-to-scroll (finger on iPhone/iPad, click-drag with a mouse) + momentum.
+# A tap still opens a node; once the finger moves more than DRAG_THRESHOLD it
+# becomes a scroll and the node under the finger is NOT triggered.
+# ---------------------------------------------------------------------------
+const DRAG_THRESHOLD := 10.0
+const WHEEL_STEP := 90.0
+const MOMENTUM_FRICTION := 5.0
+
+var _drag_pressed := false
+var _drag_active := false
+var _drag_start_pos := Vector2.ZERO
+var _drag_start_scroll := 0.0
+var _drag_last_y := 0.0
+var _drag_last_time := 0
+var _drag_velocity := 0.0
+var _momentum := 0.0
+var _scroll_f := 0.0
+var _pushing_synthetic := false
+# True from the moment a drag turns into a scroll until the NEXT press, so the
+# release at the end of a scroll can never count as a tap on a node.
+var _suppress_tap := false
+
+func _pointer_over_map(_pos: Vector2 = Vector2.ZERO) -> bool:
+	# False while a popup is showing on top of the map (daily stamp, story, tutorial...):
+	# the popup owns every touch, so the map must not scroll underneath it.
+	# NOTE: we deliberately do not rely on the engine's "hovered control" for this - on a
+	# touch screen it can be stale (e.g. still the bottom-bar button that opened this page).
+	for o in get_tree().root.find_children("ModalOverlay*", "Control", true, false):
+		if (o as Control).is_visible_in_tree():
+			return false
+	var main = get_tree().root.get_node_or_null("Main")
+	if main != null:
+		var tut = main.get("tutorial_overlay")
+		if tut is Control and is_instance_valid(tut) and (tut as Control).is_visible_in_tree():
+			return false
+	return true
+
+func _input(event: InputEvent) -> void:
+	if _pushing_synthetic or scroll_container == null or not is_visible_in_tree():
+		return
+
+	if event is InputEventMouseButton:
+		var mb := event as InputEventMouseButton
+		# Mouse wheel / trackpad
+		if mb.pressed and (mb.button_index == MOUSE_BUTTON_WHEEL_UP or mb.button_index == MOUSE_BUTTON_WHEEL_DOWN):
+			if scroll_container.get_global_rect().has_point(mb.position) and _pointer_over_map(mb.position):
+				var dir := -1.0 if mb.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0
+				_momentum = 0.0
+				_set_scroll(scroll_container.scroll_vertical + dir * WHEEL_STEP * maxf(mb.factor, 1.0))
+				get_viewport().set_input_as_handled()
+			return
+		if mb.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if mb.pressed:
+			_suppress_tap = false
+			_drag_pressed = false
+			# Decide ONCE, at the moment of touch, whether this gesture belongs to the map
+			# (not a popup, the top bar or the bottom bar sitting on top of it).
+			if scroll_container.get_global_rect().has_point(mb.position) and _pointer_over_map(mb.position):
+				_drag_pressed = true
+				_drag_active = false
+				_momentum = 0.0
+				_drag_start_pos = mb.position
+				_drag_start_scroll = float(scroll_container.scroll_vertical)
+				_drag_last_y = mb.position.y
+				_drag_last_time = Time.get_ticks_msec()
+				_drag_velocity = 0.0
+		else:
+			if _drag_active:
+				# Finger lifted after a scroll: keep gliding a little
+				_momentum = clampf(_drag_velocity, -4000.0, 4000.0)
+				_scroll_f = float(scroll_container.scroll_vertical)
+			_drag_pressed = false
+			_drag_active = false
+		return
+
+	if event is InputEventMouseMotion and _drag_pressed:
+		var mm := event as InputEventMouseMotion
+		if not _drag_active:
+			if mm.position.distance_to(_drag_start_pos) < DRAG_THRESHOLD:
+				return
+			_drag_active = true
+			_suppress_tap = true
+			_cancel_pending_tap()
+		# Content follows the finger
+		_set_scroll(_drag_start_scroll - (mm.position.y - _drag_start_pos.y))
+		var now := Time.get_ticks_msec()
+		var dt := maxf(float(now - _drag_last_time) / 1000.0, 0.001)
+		var inst_v := -(mm.position.y - _drag_last_y) / dt
+		_drag_velocity = lerpf(_drag_velocity, inst_v, 0.35)
+		_drag_last_y = mm.position.y
+		_drag_last_time = now
+		get_viewport().set_input_as_handled()
+
+func _cancel_pending_tap() -> void:
+	# Move the "held" pointer far off-screen for whichever node button was
+	# pressed, so releasing the finger after a scroll does not open that node.
+	var ev := InputEventMouseMotion.new()
+	ev.position = Vector2(-100000, -100000)
+	ev.global_position = ev.position
+	ev.button_mask = MOUSE_BUTTON_MASK_LEFT
+	_pushing_synthetic = true
+	get_viewport().push_input(ev, true)
+	_pushing_synthetic = false
+
+func _set_scroll(value: float) -> void:
+	var vbar = scroll_container.get_v_scroll_bar()
+	var max_scroll = maxf(0.0, vbar.max_value - vbar.page)
+	_scroll_f = clampf(value, 0.0, max_scroll)
+	scroll_container.scroll_vertical = int(round(_scroll_f))
+
+func _process(delta: float) -> void:
+	if _drag_pressed or scroll_container == null:
+		return
+	if absf(_momentum) < 5.0:
+		_momentum = 0.0
+		return
+	_set_scroll(_scroll_f + _momentum * delta)
+	_momentum = lerpf(_momentum, 0.0, clampf(MOMENTUM_FRICTION * delta, 0.0, 1.0))
+	var vbar = scroll_container.get_v_scroll_bar()
+	if _scroll_f <= 0.0 or _scroll_f >= maxf(0.0, vbar.max_value - vbar.page):
+		_momentum = 0.0
 
 func _restore_scroll_position():
 	# Always go back to the active node (players can still scroll freely afterwards)

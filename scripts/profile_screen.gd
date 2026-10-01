@@ -355,7 +355,8 @@ func _relayout():
 	# Central Card — organically fills and centers with ample breathing room
 	if central_card:
 		var card_w = clamp(w - 32.0, 340.0, 420.0) if not is_tablet else clamp(w - 80.0, 400.0, 520.0)
-		var card_top = 58.0
+		# Card starts below the notch on iPhone; back / settings stay up in the corners
+		var card_top = max(58.0, UIHelper.safe_top + 6.0)
 		var card_bottom = btn_y - 12.0
 		var card_h = card_bottom - card_top
 		central_card.position = Vector2((w - card_w) * 0.5, card_top)

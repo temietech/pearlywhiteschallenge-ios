@@ -83,7 +83,19 @@ func _build_ui():
 	_add_menu_btn(card_vbox, "BRUSHING PAGE", Color(0.18, 0.78, 0.36), Color(0.10, 0.58, 0.24), func():
 		navigate_requested.emit("brushing")
 	)
-	
+	_add_menu_btn(card_vbox, "BRUSH CHECK PAGE", Color(0.18, 0.78, 0.36), Color(0.10, 0.58, 0.24), func():
+		navigate_requested.emit("brush_check")
+	)
+	_add_menu_btn(card_vbox, "FLOSS PAGE", Color(0.18, 0.78, 0.36), Color(0.10, 0.58, 0.24), func():
+		navigate_requested.emit("floss")
+	)
+	_add_menu_btn(card_vbox, "STORY PAGE", Color(0.18, 0.78, 0.36), Color(0.10, 0.58, 0.24), func():
+		navigate_requested.emit("story")
+	)
+	_add_menu_btn(card_vbox, "FACTS PAGE", Color(0.18, 0.78, 0.36), Color(0.10, 0.58, 0.24), func():
+		navigate_requested.emit("facts")
+	)
+
 	_add_menu_btn(card_vbox, "CANDY TRAP", Color(0.18, 0.78, 0.36), Color(0.10, 0.58, 0.24), func():
 		navigate_requested.emit("candy_trap")
 	)
@@ -168,14 +180,14 @@ func _relayout():
 	var is_tablet = w >= 600
 	
 	if title_lbl:
-		var title_y = 36.0 if not is_tablet else 46.0
+		var title_y = max(36.0 if not is_tablet else 46.0, UIHelper.safe_top + 6.0)
 		title_lbl.position = Vector2(0, title_y)
 		title_lbl.size = Vector2(w, 40)
 		title_lbl.add_theme_font_size_override("font_size", 28 if not is_tablet else 38)
 		
 	if card_panel:
 		var card_w = min(w - 32.0, 396.0) if not is_tablet else min(w - 80.0, 480.0)
-		var card_top = 88.0 if not is_tablet else 110.0
+		var card_top = max(88.0 if not is_tablet else 110.0, UIHelper.safe_top + 58.0)
 		var card_h = min(h - card_top - 20.0, 660.0)
 		card_panel.position = Vector2((w - card_w) * 0.5, card_top)
 		card_panel.size = Vector2(card_w, card_h)

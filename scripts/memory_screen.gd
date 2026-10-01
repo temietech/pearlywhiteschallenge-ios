@@ -415,7 +415,9 @@ func _relayout():
 	
 	# 4. Vertical Distribution & Centering with ample padding between segments
 	var total_group_h = title_h + stat_h + tray_size + 24.0 + 28.0
-	var free_h = max(0.0, cur_h - total_group_h)
+	# Content group starts below the notch on iPhone; the pause button stays in the corner
+	var notch_t: float = UIHelper.safe_top
+	var free_h = max(0.0, cur_h - total_group_h - notch_t)
 	
 	# Balance vertical position across the screen:
 	# Keep a comfortable top margin for header buttons (back, pause, memorise pill)
@@ -423,16 +425,16 @@ func _relayout():
 	var gap_title_stats = clamp(free_h * 0.10, 20.0, 30.0)
 	var gap_stats_tray = clamp(free_h * 0.12, 24.0, 36.0)
 	
-	var title_y = top_pad
+	var title_y = top_pad + notch_t
 	var stats_y = title_y + title_h + gap_title_stats
 	var tray_y = stats_y + stat_h + gap_stats_tray
 	
 	# Header buttons vertically centered in the space above the title
-	var top_btn_y = clamp((title_y - 46.0) * 0.5, 14.0, 24.0)
+	var top_btn_y = clamp((top_pad - 46.0) * 0.5, 14.0, 24.0)
 	if pause_btn:
 		pause_btn.position = Vector2(cur_w - 58, top_btn_y)
 	if memorise_pill:
-		memorise_pill.position = Vector2((cur_w - 160.0) * 0.5, max(8.0, top_btn_y - 4.0))
+		memorise_pill.position = Vector2((cur_w - 160.0) * 0.5, max(8.0, top_btn_y - 4.0) + notch_t)
 		
 	if title_vbox:
 		title_vbox.position = Vector2((cur_w - title_w) * 0.5, title_y)

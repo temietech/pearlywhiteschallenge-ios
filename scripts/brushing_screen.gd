@@ -1052,9 +1052,9 @@ func _relayout():
 	# 1. Bathroom Background (anchored cleanly across full viewport)
 	if bg:
 		var bg_y_offset = -round(cur_h * 0.04)
-		# The page content sits inside the notch / home-bar insets; the background stays full-bleed
-		bg.position = Vector2(0, bg_y_offset - UIHelper.safe_top)
-		bg.size = Vector2(cur_w, cur_h * 1.06 + UIHelper.safe_top + UIHelper.safe_bottom)
+		# The page fills the whole screen (behind the notch and home indicator)
+		bg.position = Vector2(0, bg_y_offset)
+		bg.size = Vector2(cur_w, cur_h * 1.06)
 		
 	# 2. Top Status Bar (Centered across top width)
 	var bar_w = min(cur_w - 24.0, 400.0) if not is_tablet else 440.0
@@ -1065,7 +1065,8 @@ func _relayout():
 			var th = float(top_bar_rect.texture.get_height())
 			if tw > 0.0:
 				bar_h = bar_w * (th / tw)
-		top_bar_rect.position = Vector2((cur_w - bar_w) * 0.5, 8.0 if not is_tablet else 12.0)
+		# Stats bar spans the top centre, so it drops below the notch on iPhone
+		top_bar_rect.position = Vector2((cur_w - bar_w) * 0.5, max(8.0 if not is_tablet else 12.0, UIHelper.safe_top + 2.0))
 		top_bar_rect.size = Vector2(bar_w, bar_h)
 		
 		# Percentage-based alignments matching React / Godot mockup
@@ -1487,8 +1488,8 @@ func _set_quadrant(q_idx: int):
 	var voice_prompt_text = q_info.get("voice_prompt", q_info["dialogue"])
 	if DisplayServer.has_feature(DisplayServer.FEATURE_TEXT_TO_SPEECH):
 		DisplayServer.tts_stop()
-		var voice_id = AudioManager._get_british_english_voice_id()
-		DisplayServer.tts_speak(voice_prompt_text, voice_id)
+		# speak_tts dips the brushing song first so the spoken tip is easy to hear
+		AudioManager.speak_tts(voice_prompt_text)
 	else:
 		# Fallback spoken notification
 		AudioManager.play_sfx("brush_tick")

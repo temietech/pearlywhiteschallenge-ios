@@ -236,7 +236,8 @@ func _relayout():
 		back_btn.size = Vector2(96, 40) if not is_tablet else Vector2(115, 48)
 		
 	# Position Title
-	var title_y = 52.0 if not is_tablet else 65.0
+	# Title drops below the notch on iPhone; the back button stays in the corner
+	var title_y = max(52.0 if not is_tablet else 65.0, UIHelper.safe_top + 6.0)
 	var title_h = 46.0 if not is_tablet else 60.0
 	var title_w = min(w * 0.72, 300.0) if not is_tablet else 400.0
 	if title_rect and title_rect.visible:
@@ -273,10 +274,20 @@ func _relayout():
 		
 		var grid_total_w = card_dim * 3.0 + h_sep * 2.0
 		# Each item has card_dim height + role label height (~20px) + separation
-		var grid_total_h = (card_dim + 24.0) * 3.0 + v_sep * 2.0
+		var rows = max(1, int(ceil(float(CHARACTERS.size()) / 3.0)))
+		var grid_total_h = (card_dim + 24.0) * rows + v_sep * (rows - 1)
 		
 		var grid_x = (w - grid_total_w) * 0.5
-		var grid_y = 118.0 if not is_tablet else 150.0
+		# Centre the grid on the screen height, but never under the title or the KEEP / SELECT button
+		var min_y = title_y + title_h + 12.0
+		var a_btn_w = min(220.0, w - 36.0) if not is_tablet else min(280.0, w - 60.0)
+		var a_btn_h = a_btn_w * (76.0 / 210.0)
+		var max_y = h - a_btn_h - (36.0 if not is_tablet else 54.0) - 16.0 - grid_total_h
+		var grid_y = (h - grid_total_h) * 0.5
+		if max_y >= min_y:
+			grid_y = clamp(grid_y, min_y, max_y)
+		else:
+			grid_y = min_y
 		grid_container.position = Vector2(grid_x, grid_y)
 		grid_container.size = Vector2(grid_total_w, grid_total_h)
 		

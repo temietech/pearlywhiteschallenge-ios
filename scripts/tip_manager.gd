@@ -70,6 +70,8 @@ var _rc: Object = null
 var _rc_initialized: bool = false
 var _pending_comment: String = ""
 var _pending_package_id: String = ""
+# Real App Store prices (already in the player's own currency), filled in by fetch_products
+var _store_prices: Dictionary = {}
 
 func _setup_native_plugin_listeners():
 	# Real RevenueCat (GodotX plugin) - only exists in iOS/Android exports
@@ -78,10 +80,36 @@ func _setup_native_plugin_listeners():
 	_rc = Engine.get_singleton(RC_SINGLETON)
 	if _rc.has_signal("purchase_result") and not _rc.is_connected("purchase_result", _on_rc_purchase_result):
 		_rc.connect("purchase_result", _on_rc_purchase_result)
+	if _rc.has_signal("products") and not _rc.is_connected("products", _on_rc_products):
+		_rc.connect("products", _on_rc_products)
 	if revenuecat_public_api_key.is_empty():
 		return
 	_rc.initialize(revenuecat_public_api_key, "", OS.is_debug_build())
 	_rc_initialized = true
+	_fetch_store_prices()
+
+## Ask the App Store (through RevenueCat) for the real, localised price of each tip
+func _fetch_store_prices():
+	if _rc == null or not _rc_initialized or not _rc.has_method("fetch_products"):
+		return
+	var ids: Array = []
+	for t in TIP_TIERS:
+		ids.append(str(t["id"]))
+	_rc.fetch_products(ids)
+
+func _on_rc_products(data: Dictionary):
+	var list = data.get("products", [])
+	for i in range(list.size()):
+		var prod = list[i]
+		var pid := str(prod.get("id", ""))
+		var price := str(prod.get("price", ""))
+		if pid != "" and price != "":
+			_store_prices[pid] = price
+	print("[TipManager] App Store prices loaded: ", _store_prices)
+
+## Price text for a tip button: the App Store's own price when known, otherwise the default
+func get_tier_price(tier: Dictionary) -> String:
+	return str(_store_prices.get(str(tier.get("id", "")), tier.get("price", "")))
 
 func _on_rc_purchase_result(data: Dictionary):
 	var err := str(data.get("error", ""))
@@ -92,6 +120,11 @@ func _on_rc_purchase_result(data: Dictionary):
 	if not err.is_empty():
 		is_processing = false
 		tip_failed.emit(err)
+		if err == "not_found":
+			# Product id not found in App Store Connect / RevenueCat (or prices not live yet)
+			_show_notice("Tip not available", "This tip isn't available right now. Please try again later.")
+		else:
+			_show_notice("Purchase failed", "The purchase didn't go through. No money was taken. Please try again.")
 		return
 	var pid := str(data.get("product_id", _pending_package_id))
 	_finalize_successful_tip(pid, "revenuecat", _pending_comment)
@@ -127,25 +160,27 @@ func support_developers(_package_id: String = ""):
 	tip_initiated.emit()
 	
 	# Kids App Safe: Require parental confirmation before triggering in-app purchase flow
-	var tree = get_tree()
-	var current_scene = tree.current_scene if tree else null
-	if current_scene and is_instance_valid(current_scene):
-		var on_gate_passed = func():
-			show_tip_jar_modal()
-		var on_gate_failed = func():
-			is_processing = false
-			tip_failed.emit("Parental gate cancelled.")
-		UIHelper.show_parental_gate(
-			current_scene,
-			on_gate_passed,
-			on_gate_failed,
-			"PARENT CONFIRMATION"
-		)
-	else:
+	# (never skipped: no host = no tip jar)
+	var host: Control = _ui_host()
+	if host == null:
+		is_processing = false
+		return
+	var on_gate_passed = func():
 		show_tip_jar_modal()
+	var on_gate_failed = func():
+		is_processing = false
+		tip_failed.emit("Parental gate cancelled.")
+	UIHelper.show_parental_gate(
+		host,
+		on_gate_passed,
+		on_gate_failed,
+		"PARENT CONFIRMATION"
+	)
 
 ## Spawns the rich Tip Jar Selection Modal with $0.99, $2.99, $4.99, $9.99 options
 func show_tip_jar_modal():
+	if _store_prices.size() < TIP_TIERS.size():
+		_fetch_store_prices()
 	if _tip_jar_modal and is_instance_valid(_tip_jar_modal):
 		_tip_jar_modal.queue_free()
 		_tip_jar_modal = null
@@ -155,9 +190,10 @@ func show_tip_jar_modal():
 		is_processing = false
 		return
 		
-	var parent_target: Node = tree.current_scene
-	if not parent_target or not is_instance_valid(parent_target):
-		parent_target = tree.root
+	var parent_target: Control = _ui_host()
+	if parent_target == null:
+		is_processing = false
+		return
 		
 	var safe_sz = UIHelper.get_viewport_safe_size(parent_target)
 	var dlg = UIHelper.create_modal_dialog(parent_target, 240, Color(0.04, 0.10, 0.24, 0.85))
@@ -306,7 +342,7 @@ func _create_tier_card(tier: Dictionary, target_w: float, comment_input: LineEdi
 	hbox.add_child(info_vbox)
 	
 	# Right side: Bubbly Price Purchase Button
-	var price_btn = UIHelper.create_bubbly_button(tier.get("price", "$4.99"), card_color)
+	var price_btn = UIHelper.create_bubbly_button(get_tier_price(tier), card_color)
 	price_btn.custom_minimum_size = Vector2(86, 42)
 	price_btn.pressed.connect(func():
 		AudioManager.play_sfx("click")
@@ -339,27 +375,60 @@ func _execute_tip_purchase(package_id: String, user_comment: String = ""):
 	_pending_package_id = package_id
 	_rc.purchase(package_id)
 
-func _show_notice(_title_text: String, body_text: String):
+## The game's main screen node (all popups go on top of it)
+func _ui_host() -> Control:
 	var tree = get_tree()
-	var host: Node = tree.current_scene if tree else null
-	if host == null or not is_instance_valid(host):
+	if tree == null or tree.root == null:
+		return null
+	var main_node = tree.root.get_node_or_null("Main")
+	if main_node is Control and is_instance_valid(main_node):
+		return main_node
+	if tree.current_scene is Control:
+		return tree.current_scene
+	return null
+
+func _show_notice(title_text: String, body_text: String):
+	# Small popup with an OK button so the player always knows what happened to the purchase
+	var host: Control = _ui_host()
+	if host == null:
 		return
-	var lbl := Label.new()
-	lbl.text = body_text
-	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
-	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.add_theme_font_size_override("font_size", 16)
-	lbl.add_theme_color_override("font_color", Color.WHITE)
-	lbl.add_theme_color_override("font_outline_color", Color(0.1, 0.1, 0.2))
-	lbl.add_theme_constant_override("outline_size", 6)
-	var layer := CanvasLayer.new()
-	layer.layer = 300
-	host.add_child(layer)
-	layer.add_child(lbl)
-	lbl.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	lbl.custom_minimum_size = Vector2(300, 0)
-	lbl.position = Vector2(40, 600)
-	get_tree().create_timer(3.0).timeout.connect(func(): if is_instance_valid(layer): layer.queue_free())
+	var dlg = UIHelper.create_modal_dialog(host, 260, Color(0.04, 0.10, 0.24, 0.75))
+	var overlay = dlg["overlay"]
+	var safe_sz = UIHelper.get_viewport_safe_size(host)
+	var card_w = clampf(safe_sz.x - 60.0, 260.0, 340.0)
+	var card = PanelContainer.new()
+	card.custom_minimum_size = Vector2(card_w, 0)
+	var st = UIHelper.create_bubbly_panel(24, Color.WHITE, Color(0.92, 0.58, 0.15), 3)
+	st.content_margin_left = 18
+	st.content_margin_right = 18
+	st.content_margin_top = 16
+	st.content_margin_bottom = 16
+	card.add_theme_stylebox_override("panel", st)
+	dlg["center"].add_child(card)
+	var vb = VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 10)
+	card.add_child(vb)
+	var t = Label.new()
+	t.text = title_text
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	UIHelper.apply_bubbly_label(t, 18, Color(0.92, 0.58, 0.15), true)
+	vb.add_child(t)
+	var b = Label.new()
+	b.text = body_text
+	b.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	b.custom_minimum_size = Vector2(card_w - 36.0, 0)
+	UIHelper.apply_bubbly_label(b, 13, Color(0.20, 0.32, 0.52), false)
+	vb.add_child(b)
+	var ok = UIHelper.create_bubbly_button("OK", Color(0.22, 0.58, 0.92))
+	ok.custom_minimum_size = Vector2(140, 44)
+	ok.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	ok.pressed.connect(func():
+		AudioManager.play_sfx("click")
+		if is_instance_valid(overlay):
+			overlay.queue_free()
+	)
+	vb.add_child(ok)
 
 func _finalize_successful_tip(package_id: String, provider: String = "test", user_comment: String = ""):
 	is_processing = false
@@ -407,9 +476,10 @@ func spawn_thank_you_modal(details: Dictionary = {}):
 	if not tree or not tree.root:
 		return
 		
-	var parent_target: Node = tree.current_scene
-	if not parent_target or not is_instance_valid(parent_target):
-		parent_target = tree.root
+	var parent_target: Control = _ui_host()
+	if parent_target == null:
+		is_processing = false
+		return
 		
 	var safe_sz = UIHelper.get_viewport_safe_size(parent_target)
 	var dlg = UIHelper.create_modal_dialog(parent_target, 250, Color(0.04, 0.10, 0.24, 0.85))

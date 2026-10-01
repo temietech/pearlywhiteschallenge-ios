@@ -395,6 +395,13 @@ func _check_new_weapon_unlocks():
 	if not weapon_to_show.is_empty():
 		UIHelper.show_dental_item_unlocked_modal(self, weapon_to_show)
 
+## Called by main.gd when the iPhone notch / home-indicator insets become known or change
+func on_safe_area_changed():
+	if is_node_ready():
+		_relayout()
+		if content_container:
+			_refresh_data()
+
 func _notification(what):
 	if what == NOTIFICATION_RESIZED:
 		if is_node_ready():
@@ -469,11 +476,16 @@ func _relayout():
 	var cur_w = safe_sz.x
 	var cur_h = safe_sz.y
 	size = safe_sz
+	# The shop is laid out full-screen (main.gd does not inset it). Points & coins pills stay up in
+	# the top corners beside the notch - like the map's avatar & settings buttons - while the
+	# title and everything below it drop beneath the notch / Dynamic Island.
+	var t: float = UIHelper.safe_top
+	var b: float = UIHelper.safe_bottom
 	
 	if bg:
 		bg.size = safe_sz
 	if header_bar:
-		header_bar.size = Vector2(cur_w, 76)
+		header_bar.size = Vector2(cur_w, 76 + t)
 	if pts_pill:
 		pts_pill.position = Vector2(8, 10)
 		pts_pill.size = Vector2(112, 44)
@@ -481,12 +493,14 @@ func _relayout():
 		coins_pill.position = Vector2(cur_w - 120, 10)
 		coins_pill.size = Vector2(112, 44)
 	if title_img:
-		title_img.position = Vector2((cur_w - 216.0) * 0.5, 4)
+		# On notched phones the title sits just under the notch; otherwise it shares the pill row
+		var title_y = (t + 2.0) if t > 1.0 else 4.0
+		title_img.position = Vector2((cur_w - 216.0) * 0.5, title_y)
 		title_img.size = Vector2(216, 60)
 	if tab_container:
 		var tab_w = min(cur_w - 32.0, 310.0)
 		var tab_h = 40.0
-		tab_container.position = Vector2((cur_w - tab_w) * 0.5, 72)
+		tab_container.position = Vector2((cur_w - tab_w) * 0.5, 72 + t)
 		tab_container.size = Vector2(tab_w, tab_h)
 		if tab_bg:
 			tab_bg.size = Vector2(tab_w, tab_h)
@@ -502,7 +516,7 @@ func _relayout():
 	if subtitle_panel:
 		var sub_w = min(cur_w - 20.0, 354.0)
 		var sub_h = 32.0
-		subtitle_panel.position = Vector2((cur_w - sub_w) * 0.5, 132)
+		subtitle_panel.position = Vector2((cur_w - sub_w) * 0.5, 132 + t)
 		subtitle_panel.size = Vector2(sub_w, sub_h)
 		if subtitle_label and is_instance_valid(subtitle_label):
 			subtitle_label.position = Vector2.ZERO
@@ -511,16 +525,17 @@ func _relayout():
 			subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			subtitle_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	if content_container:
-		var top_y = 126 if (current_tab == "powerups" and active_weapon_id != "") else (176 if (subtitle_panel and subtitle_panel.visible) else 134)
+		var top_y = t + (126 if (current_tab == "powerups" and active_weapon_id != "") else (176 if (subtitle_panel and subtitle_panel.visible) else 134))
 		content_container.position = Vector2(0, top_y)
-		content_container.size = Vector2(cur_w, cur_h - top_y - 62)
+		content_container.size = Vector2(cur_w, cur_h - top_y - 62 - b)
 		
 	if bottom_bar:
-		bottom_bar.size = Vector2(cur_w, 56)
-		bottom_bar.position = Vector2(0, cur_h - 56)
+		# Bar reaches the very bottom edge; the back button stays above the home indicator
+		bottom_bar.size = Vector2(cur_w, 56 + b)
+		bottom_bar.position = Vector2(0, cur_h - 56 - b)
 		
 	if back_btn:
-		back_btn.position = Vector2((cur_w - 116.0) * 0.5, cur_h - 49.0)
+		back_btn.position = Vector2((cur_w - 116.0) * 0.5, cur_h - 49.0 - b)
 
 # ==============================================================================
 # UI INITIALIZATION

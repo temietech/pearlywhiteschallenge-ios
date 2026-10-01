@@ -104,6 +104,11 @@ static func _ensure_bubble_title_texture() -> Texture2D:
 		return _cached_bubble_title_tex
 		
 	var path = "res://assets/images/popbubblemini/bubble_pop_title.png"
+	# Exported builds only contain the imported texture, so load through the resource system first
+	var imported_tex = UIHelper.load_texture_safe(path)
+	if imported_tex:
+		_cached_bubble_title_tex = imported_tex
+		return _cached_bubble_title_tex
 	var global_path = ProjectSettings.globalize_path(path)
 	
 	if FileAccess.file_exists(global_path):
@@ -500,32 +505,34 @@ func _relayout():
 	
 	if pause_btn:
 		pause_btn.position = Vector2(cur_w - 56, 12)
+	# Title, stats and bubble tray drop below the notch on iPhone; pause stays in the corner
+	var notch_shift = max(0.0, UIHelper.safe_top - 4.0)
 		
 	if title_rect:
 		var title_w = min(cur_w - 110.0, 280.0)
-		title_rect.position = Vector2((cur_w - title_w) * 0.5, 10)
+		title_rect.position = Vector2((cur_w - title_w) * 0.5, 10 + notch_shift)
 		title_rect.size = Vector2(title_w, 48)
 	elif title_fallback_lbl:
 		var title_w = min(cur_w - 110.0, 280.0)
-		title_fallback_lbl.position = Vector2((cur_w - title_w) * 0.5, 12)
+		title_fallback_lbl.position = Vector2((cur_w - title_w) * 0.5, 12 + notch_shift)
 		title_fallback_lbl.size = Vector2(title_w, 40)
 		
 	if stats_row:
 		var stat_w = min(cur_w - 32.0, 420.0)
-		stats_row.position = Vector2((cur_w - stat_w) * 0.5, 68)
+		stats_row.position = Vector2((cur_w - stat_w) * 0.5, 68 + notch_shift)
 		stats_row.size = Vector2(stat_w, 44)
 		
 	if tray:
 		# Maintain native ~1:1.36 aspect ratio of pop_bubble_back so borders are never clipped
 		var max_tray_w = min(cur_w - (36.0 if is_tablet else 24.0), 480.0 if is_tablet else 380.0)
-		var max_tray_h = min(cur_h - 134.0, 680.0 if is_tablet else 550.0)
+		var max_tray_h = min(cur_h - 134.0 - notch_shift, 680.0 if is_tablet else 550.0)
 		var tray_w = max_tray_w
 		var tray_h = tray_w * 1.36
 		if tray_h > max_tray_h:
 			tray_h = max_tray_h
 			tray_w = tray_h / 1.36
 		tray.size = Vector2(tray_w, tray_h)
-		tray.position = Vector2((cur_w - tray_w) * 0.5, 124.0)
+		tray.position = Vector2((cur_w - tray_w) * 0.5, 124.0 + notch_shift)
 		
 		if play_area:
 			# Recessed inner screen area inside pop_bubble_back bezel (expanded outward by ~5px horizontally & vertically)

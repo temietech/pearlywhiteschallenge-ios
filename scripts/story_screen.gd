@@ -202,16 +202,19 @@ func _relayout():
 		back_btn.size = Vector2(76, 32)
 		
 	# Top bar & progress layout
+	# Top-RIGHT corner (keeps the centre clear of the iPhone notch / Dynamic Island)
 	if unlock_label:
-		unlock_label.position = Vector2((cur_w - 220.0) * 0.5, 8.0)
-		unlock_label.size = Vector2(220, 20)
+		unlock_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		unlock_label.position = Vector2(cur_w - 16.0 - 150.0, 8.0)
+		unlock_label.size = Vector2(150, 20)
 	if unlock_progress:
-		unlock_progress.position = Vector2((cur_w - 140.0) * 0.5, 30.0)
-		unlock_progress.size = Vector2(140, 12)
+		unlock_progress.position = Vector2(cur_w - 16.0 - 120.0, 30.0)
+		unlock_progress.size = Vector2(120, 12)
 		
 	# Book Page starts flush from the left border (x = 0.0) regardless of screen width
 	var book_x = 0.0
-	var book_y = 56.0
+	# Book (with its scrapbook title) sits below the notch; back + UNLOCKED stay in the corners
+	var book_y = max(56.0, UIHelper.safe_top)
 	var book_w = cur_w
 	var book_h = cur_h - book_y - 8.0
 	

@@ -55,6 +55,28 @@ jobs:
           fi
           grep -m1 'plugins/PearlyToothbrushScanner' export_presets.cfg
 
+      - name: Add RevenueCat iOS plugin (Support Developers tip jar purchases)
+        run: |
+          # The RevenueCat native iOS frameworks are ~1 GB, far too big for GitHub,
+          # so download the official Godotx RevenueCat 2.4.0 release here instead.
+          curl -sSL -o "$RUNNER_TEMP/rc.zip" https://github.com/godot-x/revenuecat/releases/download/2.4.0/godotx_revenue_cat.zip
+          unzip -q "$RUNNER_TEMP/rc.zip" 'godotx_revenue_cat/ios/*' -d "$RUNNER_TEMP/rc"
+          rm -rf ios/plugins/revenue_cat
+          cp -R "$RUNNER_TEMP/rc/godotx_revenue_cat/ios/plugins/revenue_cat" ios/plugins/revenue_cat
+          ls ios/plugins/revenue_cat
+          # Turn the plugin on in the iOS export preset (preset.0 = iOS)
+          python3 - <<'PY'
+          import re
+          p = "export_presets.cfg"
+          s = open(p).read()
+          if "plugins/GodotxRevenueCat=" in s:
+              s = re.sub(r"plugins/GodotxRevenueCat=.*", "plugins/GodotxRevenueCat=true", s)
+          else:
+              s = s.replace("plugins/NotificationSchedulerPlugin=", "plugins/GodotxRevenueCat=true\nplugins/NotificationSchedulerPlugin=", 1)
+          open(p, "w").write(s)
+          PY
+          grep -m1 'plugins/GodotxRevenueCat' export_presets.cfg
+
       - name: Install Certificates and Provisioning Profile
         env:
           P12_BASE64: ${{ secrets.P12_BASE64 }}

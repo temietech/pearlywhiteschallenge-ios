@@ -278,24 +278,26 @@ func _relayout():
 	
 	if pause_btn:
 		pause_btn.position = Vector2(cur_w - 56, 14)
+	# Title + stats drop below the notch on iPhone; the pause button stays in the corner
+	var notch_shift = max(0.0, UIHelper.safe_top - 2.0)
 	if title_img and is_instance_valid(title_img):
 		var t_w = min(cur_w - 80.0, 360.0)
 		var t_h = 72.0
-		title_img.position = Vector2((cur_w - t_w) * 0.5, 4)
+		title_img.position = Vector2((cur_w - t_w) * 0.5, 4 + notch_shift)
 		title_img.size = Vector2(t_w, t_h)
 	elif title_lbl and is_instance_valid(title_lbl):
 		var title_w = min(cur_w - 80.0, 370.0)
-		title_lbl.position = Vector2((cur_w - title_w) * 0.5, 8)
+		title_lbl.position = Vector2((cur_w - title_w) * 0.5, 8 + notch_shift)
 		title_lbl.size = Vector2(title_w, 48)
 		title_lbl.add_theme_font_size_override("font_size", 34)
 	if best_pill:
 		best_pill.visible = false
 	if stats_hbox:
 		var stat_w = min(cur_w - 24.0, 390.0)
-		stats_hbox.position = Vector2((cur_w - stat_w) * 0.5, 78)
+		stats_hbox.position = Vector2((cur_w - stat_w) * 0.5, 78 + notch_shift)
 		stats_hbox.size = Vector2(stat_w, 52)
 	if combo_banner:
-		combo_banner.position = Vector2((cur_w - 240.0) * 0.5, 134)
+		combo_banner.position = Vector2((cur_w - 240.0) * 0.5, 134 + notch_shift)
 		
 	if holes_container:
 		var top_bound = 165.0 + UIHelper.safe_top  # Account for notch/safe area on iPhone

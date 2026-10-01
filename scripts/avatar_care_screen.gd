@@ -110,13 +110,14 @@ func _relayout():
 	if status_label:
 		var lbl_x = 110.0
 		var lbl_w = max(180.0, cur_w - 170.0)
-		status_label.position = Vector2(lbl_x, 14)
+		# Text drops below the notch on iPhone; back / settings stay in the corners
+		status_label.position = Vector2(lbl_x, max(14.0, UIHelper.safe_top + 4.0))
 		status_label.size = Vector2(lbl_w, 40)
 	if tooth_box:
 		var box_w = 250.0
 		var box_h = 270.0
 		tooth_box.size = Vector2(box_w, box_h)
-		tooth_box.position = Vector2((cur_w - box_w) * 0.5, 120)
+		tooth_box.position = Vector2((cur_w - box_w) * 0.5, max(120.0, UIHelper.safe_top + 60.0))
 
 func _spawn_cavity_spots():
 	cleaned_count = 0

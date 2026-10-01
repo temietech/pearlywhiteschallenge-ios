@@ -51,6 +51,11 @@ func _ready():
 	_build_framework()
 	_apply_safe_area()
 	get_viewport().size_changed.connect(_apply_safe_area)
+	# iOS only reports the notch / home-indicator insets once its view has finished laying out,
+	# which is usually AFTER _ready. Re-check a few times during start-up so the insets are never
+	# stuck at zero (that left titles under the notch on iPhone).
+	for delay in [0.1, 0.4, 1.0, 2.0, 4.0]:
+		get_tree().create_timer(delay).timeout.connect(_apply_safe_area)
 	_setup_keyboard_handling()
 
 	# Preload Candy Crusade 3D scene asynchronously in background
@@ -167,6 +172,19 @@ func _request_camera_permission():
 		CameraServer.monitoring_feeds = true
 
 func _continue_after_start():
+	# Right after Privacy & Terms: a grown-up must answer the adult question and create the
+	# 4-digit Tooth Fairy PIN before anything else (camera prompt, player setup).
+	# Runs once - also catches players updating from an older version that had no PIN.
+	if not GameState.has_tooth_fairy_pin():
+		if find_child("AdultCheckOverlay", false, false) or find_child("ParentalGateOverlay", false, false):
+			return  # already showing (double tap on START)
+		UIHelper.show_parental_gate(self, func():
+			_continue_after_pin()
+		, Callable(), "SET TOOTH FAIRY PIN", false, false)
+		return
+	_continue_after_pin()
+
+func _continue_after_pin():
 	_request_camera_permission()
 	var count = GameState.profiles.size()
 	if count == 0:
@@ -396,6 +414,8 @@ func navigate_to(screen_name: String, extra_args: Dictionary = {}):
 	elif screen_name == "settings":
 		new_screen.switch_profile_requested.connect(func(): navigate_to("select_player"))
 		new_screen.reset_completed.connect(func(): navigate_to("start"))
+		if new_screen.has_signal("dev_menu_requested"):
+			new_screen.dev_menu_requested.connect(func(): navigate_to("dev_menu"))
 		if new_screen.has_signal("back_pressed"):
 			new_screen.back_pressed.connect(func(): navigate_to("map"))
 	elif screen_name == "brush_check":
@@ -500,6 +520,13 @@ func _on_tab_selected(tab_name: String):
 	if tab_name != current_screen_name:
 		navigate_to(tab_name)
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_RESUMED or what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		if is_node_ready():
+			call_deferred("_apply_safe_area")
+
+var _last_safe_insets := Vector2(-1.0, -1.0)
+
 func _apply_safe_area():
 	# Handle iPhone notch / Dynamic Island / home indicator.
 	# DisplayServer.get_display_safe_area() is in real screen pixels; the game viewport is scaled
@@ -515,6 +542,18 @@ func _apply_safe_area():
 			var sy: float = vp_size.y / float(win_size.y)
 			top_inset = max(0.0, float(safe.position.y) * sy)
 			bottom_inset = max(0.0, float(win_size.y - (safe.position.y + safe.size.y)) * sy)
+		# Fallback: tall iPhones (notch / Dynamic Island, screen ratio ~2.16) always have insets.
+		# If iOS has not reported them yet, use typical values so nothing sits under the notch.
+		if os_name == "iOS" and top_inset < 1.0 and win_size.x > 0:
+			var ratio := float(win_size.y) / float(win_size.x)
+			if ratio > 2.0:
+				var pt_to_vp: float = vp_size.x / 390.0  # ~390pt wide phones
+				top_inset = 50.0 * pt_to_vp
+				bottom_inset = max(bottom_inset, 34.0 * pt_to_vp)
+	var new_insets := Vector2(top_inset, bottom_inset)
+	if new_insets.distance_to(_last_safe_insets) < 0.5:
+		return  # nothing changed - avoid needless screen rebuilds
+	_last_safe_insets = new_insets
 	UIHelper.safe_top = top_inset
 	UIHelper.safe_bottom = bottom_inset
 
@@ -526,18 +565,27 @@ func _apply_safe_area():
 		if top_bar.has_method("_relayout"):
 			top_bar.call("_relayout")
 	if bottom_nav:
-		bottom_nav.offset_top = -88.0 - bottom_inset
-		bottom_nav.offset_bottom = -bottom_inset
+		# Bottom nav sits flush on the very bottom edge of the device (not lifted above the
+		# home indicator) - matches the design; the buttons are tall enough to stay tappable.
+		bottom_nav.offset_top = -88.0
+		bottom_nav.offset_bottom = 0.0
 	_apply_content_insets()
+	# Every screen fills the whole display and lays itself out around the notch, so tell the
+	# current one to re-layout (its size does not change, so it gets no resize event by itself)
+	if current_screen_node and is_instance_valid(current_screen_node):
+		if current_screen_node.has_method("on_safe_area_changed"):
+			current_screen_node.call_deferred("on_safe_area_changed")
+		else:
+			current_screen_node.call_deferred("notification", NOTIFICATION_RESIZED)
 
 func _apply_content_insets():
-	# Every screen except the full-bleed ones (start splash + map, which have their own top bar / nav)
-	# is pushed inside the safe area so nothing hides behind the notch or home indicator.
+	# Every page fills the WHOLE screen (behind the notch and the home indicator).
+	# Each page brings its own title down below the notch using UIHelper.safe_top,
+	# while corner buttons (back / close / settings / stats) stay up in the corners.
 	if not content_container:
 		return
-	var full_bleed := (current_screen_name == "start" or current_screen_name == "map")
-	content_container.offset_top = 0.0 if full_bleed else UIHelper.safe_top
-	content_container.offset_bottom = 0.0 if full_bleed else -UIHelper.safe_bottom
+	content_container.offset_top = 0.0
+	content_container.offset_bottom = 0.0
 
 
 # ------------------------------------------------------------------

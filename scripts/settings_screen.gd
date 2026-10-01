@@ -4,8 +4,10 @@ extends Control
 signal switch_profile_requested
 signal reset_completed
 signal back_pressed
+signal dev_menu_requested
 
 var tts_enabled: bool = false
+var dev_menu_btn: Button = null
 
 var title_rect: TextureRect
 var title_lbl: Label
@@ -83,6 +85,8 @@ func _build_ui():
 			secret_taps[0] = 0
 			GameState.dev_mode = not GameState.dev_mode
 			AudioManager.play_sfx("chime")
+			if dev_menu_btn and is_instance_valid(dev_menu_btn):
+				dev_menu_btn.visible = GameState.dev_mode
 			if GameState.dev_mode:
 				GameState.push_toast("Developer Mode ON", "Free progress & 20s timers enabled!", "", "green")
 			else:
@@ -276,16 +280,17 @@ func _build_central_card():
 
 	vbox.add_child(_create_h_separator())
 
-	# Section 7: Test RevenueCat Button
-	var rc_btn = UIHelper.create_bubbly_button("TEST REVENEUECAT", Color(0.92, 0.42, 0.42))
-	rc_btn.custom_minimum_size = Vector2(300, 50)
-	rc_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	rc_btn.pressed.connect(func():
+	# Section 7: Dev Menu (hidden - appears after tapping the SETTINGS title 5 times)
+	dev_menu_btn = UIHelper.create_bubbly_button("DEV MENU", Color(0.68, 0.42, 0.92))
+	dev_menu_btn.name = "DevMenuButton"
+	dev_menu_btn.custom_minimum_size = Vector2(300, 50)
+	dev_menu_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	dev_menu_btn.visible = GameState.dev_mode
+	dev_menu_btn.pressed.connect(func():
 		AudioManager.play_sfx("click")
-		var tester = preload("res://scripts/debug_reveneuecat_tester.gd").new()
-		get_tree().root.add_child(tester)
+		dev_menu_requested.emit()
 	)
-	vbox.add_child(rc_btn)
+	vbox.add_child(dev_menu_btn)
 
 	# Section 8: Sir Crown Avatar Selection (only visible when unlocked)
 	var crown_sep = _create_h_separator()
@@ -995,7 +1000,8 @@ func _relayout():
 	
 	var title_w = min(w - 60.0, 270.0) if not is_tablet else 340.0
 	var title_h = title_w * (300.0 / 1376.0)
-	var title_y = 26.0 if not is_tablet else 36.0
+	# Whole page fills the screen; the title (and the card under it) drop below the notch
+	var title_y = max(26.0 if not is_tablet else 36.0, UIHelper.safe_top + 6.0)
 	
 	if title_rect:
 		title_rect.position = Vector2((w - title_w) * 0.5, title_y)

@@ -53,7 +53,7 @@ func _build_ui():
 
 	# Title sits directly on the sky background, so it is white with a dark blue shadow (easy to read)
 	title_lbl = Label.new()
-	title_lbl.text = "PRIVACY POLICY"
+	title_lbl.text = "PRIVACY & TERMS"
 	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	UIHelper.apply_bubbly_label(title_lbl, 38, Color.WHITE, true)
 	title_lbl.add_theme_color_override("font_shadow_color", Color(0.10, 0.32, 0.62))
@@ -64,7 +64,8 @@ func _build_ui():
 	center_vbox.add_child(title_lbl)
 
 	sub_lbl = Label.new()
-	sub_lbl.text = "Please read this before you play"
+	sub_lbl.text = "Please read our Privacy Policy and Terms & Conditions before you play"
+	sub_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	UIHelper.apply_bubbly_label(sub_lbl, 16, Color(0.95, 0.98, 1.0), true)
 	sub_lbl.add_theme_color_override("font_shadow_color", Color(0.10, 0.32, 0.62, 0.9))
@@ -138,12 +139,17 @@ func _relayout():
 	var is_tablet = safe_sz.x >= 600.0
 	var col_w = clampf(safe_sz.x - 32.0, 290.0, 640.0 if is_tablet else 460.0)
 	# Leave room for title, tick row and button; the policy card takes the rest
-	var card_h = clampf(safe_sz.y - 300.0, 240.0, 620.0)
+	var card_h = clampf(safe_sz.y - 300.0 - UIHelper.safe_top, 240.0, 620.0)
+	# Page fills the whole screen; the centred content block starts below the notch
+	if center:
+		center.offset_top = UIHelper.safe_top
 
 	center_vbox.custom_minimum_size = Vector2(col_w, 0)
 	card.custom_minimum_size = Vector2(col_w, card_h)
 	check_row.custom_minimum_size = Vector2(col_w, 0)
 	agree_lbl.custom_minimum_size = Vector2(col_w - 60.0, 0)
+	if sub_lbl:
+		sub_lbl.custom_minimum_size = Vector2(col_w, 0)
 	if title_lbl:
 		title_lbl.add_theme_font_size_override("font_size", 42 if is_tablet else 36)
 
@@ -195,4 +201,33 @@ Parents and guardians can review our official online privacy policy at any time 
 [b]pearlywhitessaga.com/games/pwc/privacy-policy[/b]
 
 For support inquiries or data privacy questions, contact us at:
-[b]game@pearlywhitessaga.com[/b]"""
+[b]game@pearlywhitessaga.com[/b]
+
+
+[color=#153866][b]TERMS & CONDITIONS OF USE (EULA)[/b][/color]
+
+Welcome to Pearly Whites Challenge. By installing or using this application, you agree to be bound by these Terms & Conditions.
+
+[color=#e0730f][b]1. Intended Purpose & Educational Use[/b][/color]
+Pearly Whites Challenge is an interactive habit-building and educational app designed for children and families to encourage healthy daily oral hygiene. The timers, facts and mini-games are for motivation and habit tracking only and are not professional dental or medical advice.
+
+[color=#e0730f][b]2. Virtual Items & In-Game Currencies[/b][/color]
+All virtual items (Molar Coins, Star Points, badges, costumes and toothbrush equipment) are non-transferable and have no cash value. They cannot be redeemed, sold or exchanged for real money.
+
+[color=#e0730f][b]3. Optional Tips[/b][/color]
+The optional "Support Developers" tips are processed by the App Store and are protected by a parent confirmation gate. Tips are voluntary and are not required to play.
+
+[color=#e0730f][b]4. Parental Supervision Recommended[/b][/color]
+Parents and legal guardians are encouraged to supervise young children during brushing routines and device use.
+
+[color=#e0730f][b]5. Intellectual Property[/b][/color]
+All artwork, characters, sound effects, music and code in Pearly Whites Challenge are owned by or licensed to the developer and are protected by copyright and intellectual property laws.
+
+[color=#e0730f][b]6. Account Deletion & Data Wiping[/b][/color]
+You can permanently delete all profiles and saved progress at any time from the Settings screen.
+
+[color=#e0730f][b]7. Limitation of Liability[/b][/color]
+The app is provided "as is" without warranties of any kind. The developers and distributors are not liable for indirect, incidental or consequential damages resulting from use of, or inability to use, the app.
+
+[color=#e0730f][b]8. Updates[/b][/color]
+These terms may change to stay compliant with Apple App Store and Google Play Store policies. You can read the latest Terms & Privacy at any time in Settings."""

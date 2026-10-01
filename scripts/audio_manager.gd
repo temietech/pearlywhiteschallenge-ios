@@ -29,6 +29,14 @@ var current_bgm_track_path: String = ""
 # Page / Screen to Background Music Mapping
 # Character voices and narration are 30% louder than music / effects
 const VOICE_GAIN := 1.3
+# While any voice (narration, character line or text-to-speech) is speaking, music drops to this
+# fraction of its normal level. Ducking starts the moment a voice is requested ("about to speak")
+# and fades back up gently after the voice ends.
+const VOICE_DUCK_FACTOR := 0.25
+const DUCK_ATTACK_SPEED := 10.0   # fast fade down (~0.1 s)
+const DUCK_RELEASE_SPEED := 2.5   # gentle fade back up (~0.4 s)
+var _duck_amount: float = 0.0     # 0 = full music, 1 = fully ducked
+var _duck_hold_until_ms: int = 0  # keep ducked at least until this time (covers TTS start-up lag)
 
 const HOME_PAGE_BGM = "res://assets/audio/music/PW Intro Audio.mp3"
 const MAP_AND_APP_BGM = "res://assets/audio/music/Candyland Dreams.mp3"
@@ -103,6 +111,7 @@ const CHAR_VOICE_MAP = {
 
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	set_process(true)
 	
 	bgm_player = AudioStreamPlayer.new()
 	bgm_player.bus = "Master"
@@ -291,6 +300,7 @@ func play_sfx(name: String, pitch_scale: float = 1.0):
 				p.stream = stream
 				p.pitch_scale = pitch_scale
 				p.volume_db = linear_to_db(sfx_volume * master_volume)
+				p.set_meta("is_voice", false)
 				p.play()
 				return
 
@@ -312,6 +322,8 @@ func play_character_voice(char_id: String):
 				p.stream = stream
 				p.pitch_scale = 1.0
 				p.volume_db = linear_to_db(sfx_volume * master_volume * 1.1 * VOICE_GAIN)
+				p.set_meta("is_voice", true)
+				begin_voice_duck(stream.get_length() if stream.has_method("get_length") else 1.5)
 				p.play()
 				return
 
@@ -504,9 +516,8 @@ func play_voice_narration(text: String, audio_path: String = "", force: bool = f
 	current_narration_audio = audio_path
 	is_narration_paused = false
 	
-	# Duck BGM during narration
-	if bgm_player and bgm_player.playing:
-		bgm_player.volume_db = linear_to_db(bgm_volume * master_volume * 0.35)
+	# Duck BGM before the narration starts speaking
+	begin_voice_duck(0.4 + text.length() * 0.06)
 	
 	var played_recorded = false
 	if audio_path != "" and ResourceLoader.exists(audio_path):
@@ -522,15 +533,61 @@ func play_voice_narration(text: String, audio_path: String = "", force: bool = f
 			var voice_id = _get_british_english_voice_id()
 			DisplayServer.tts_speak(text, voice_id)
 
+## Call right before any voice starts (recorded line or text-to-speech) so the music dips first.
+## hold_seconds keeps the music low for at least that long, even if the OS speech engine is slow
+## to report that it is speaking.
+func begin_voice_duck(hold_seconds: float = 1.0) -> void:
+	var until := Time.get_ticks_msec() + int(max(0.3, hold_seconds) * 1000.0)
+	_duck_hold_until_ms = max(_duck_hold_until_ms, until)
+	_duck_amount = max(_duck_amount, 0.6)
+	_apply_bgm_volume()
+
+## Speaks text with the device voice (TTS), dipping the music first.
+func speak_tts(text: String) -> void:
+	if is_muted or text == "":
+		return
+	if not DisplayServer.has_feature(DisplayServer.FEATURE_TEXT_TO_SPEECH):
+		return
+	begin_voice_duck(0.4 + text.length() * 0.06)
+	DisplayServer.tts_speak(text, _get_british_english_voice_id())
+
+func _is_voice_active() -> bool:
+	if Time.get_ticks_msec() < _duck_hold_until_ms:
+		return true
+	if narration_player and narration_player.playing and not narration_player.stream_paused:
+		return true
+	for p in sfx_players:
+		if p.playing and bool(p.get_meta("is_voice", false)):
+			return true
+	if not is_narration_paused and DisplayServer.has_feature(DisplayServer.FEATURE_TEXT_TO_SPEECH) and DisplayServer.tts_is_speaking():
+		return true
+	return false
+
+func _apply_bgm_volume() -> void:
+	if not bgm_player:
+		return
+	var factor: float = lerp(1.0, VOICE_DUCK_FACTOR, _duck_amount)
+	bgm_player.volume_db = linear_to_db(max(0.0001, bgm_volume * master_volume * factor))
+
+func _process(delta: float) -> void:
+	if not bgm_player or not bgm_player.playing:
+		_duck_amount = 0.0
+		return
+	var target := 1.0 if _is_voice_active() else 0.0
+	if target > _duck_amount:
+		_duck_amount = min(target, _duck_amount + delta * DUCK_ATTACK_SPEED)
+	elif target < _duck_amount:
+		_duck_amount = max(target, _duck_amount - delta * DUCK_RELEASE_SPEED)
+	_apply_bgm_volume()
+
 func pause_narration():
 	if narration_player and narration_player.playing:
 		narration_player.stream_paused = true
 	if DisplayServer.has_feature(DisplayServer.FEATURE_TEXT_TO_SPEECH) and DisplayServer.tts_is_speaking():
 		DisplayServer.tts_pause()
 	is_narration_paused = true
-	# Restore BGM while paused
-	if bgm_player:
-		bgm_player.volume_db = linear_to_db(bgm_volume * master_volume)
+	# Music comes back up while paused (_process fades it)
+	_duck_hold_until_ms = 0
 
 func resume_narration():
 	if is_muted:
@@ -541,8 +598,7 @@ func resume_narration():
 		if DisplayServer.has_feature(DisplayServer.FEATURE_TEXT_TO_SPEECH):
 			DisplayServer.tts_resume()
 	is_narration_paused = false
-	if bgm_player and bgm_player.playing:
-		bgm_player.volume_db = linear_to_db(bgm_volume * master_volume * 0.35)
+	begin_voice_duck(0.5)
 
 func stop_narration():
 	if narration_player:
@@ -553,8 +609,8 @@ func stop_narration():
 	is_narration_paused = false
 	current_narration_text = ""
 	current_narration_audio = ""
-	if bgm_player:
-		bgm_player.volume_db = linear_to_db(bgm_volume * master_volume)
+	# Music fades back up smoothly in _process once nothing is speaking
+	_duck_hold_until_ms = 0
 
 func toggle_narration(text: String, audio_path: String = "") -> bool:
 	if is_narrating():

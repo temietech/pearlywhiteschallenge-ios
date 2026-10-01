@@ -373,7 +373,8 @@ func _relayout():
 	if title:
 		var title_w = min(cur_w - 32.0, 410.0)
 		title.size = Vector2(title_w, 70)
-		title.position = Vector2((cur_w - title_w) * 0.5, max(52.0, cur_h * 0.08))
+		# Title stays clear of the notch on iPhone
+		title.position = Vector2((cur_w - title_w) * 0.5, max(max(52.0, cur_h * 0.08), UIHelper.safe_top + 6.0))
 		
 	if cam_card:
 		var card_y = max(title.position.y + title.size.y + 10.0, cur_h * 0.18)

@@ -1854,6 +1854,9 @@ func _build_dev_and_clear_panels() -> void:
 	add_child(_clear_panel)
 	_clear_panel.visible = false
 
+var _instructions_overlay: Control = null
+var _instructions_on_start: Callable = Callable()
+
 func show_level1_instructions_modal(on_start: Callable) -> void:
 	# Only the very first Candy Crusade explains how to play
 	var gs = get_node_or_null("/root/GameState")
@@ -1863,39 +1866,70 @@ func show_level1_instructions_modal(on_start: Callable) -> void:
 			on_start.call()
 		return
 
+	# select_region() can fire several times while the arena boots.
+	# Never stack a second HOW TO PLAY window - just keep the latest callback.
+	if _instructions_overlay != null and is_instance_valid(_instructions_overlay):
+		_instructions_on_start = on_start
+		get_tree().paused = true
+		return
+	_instructions_on_start = on_start
+
 	get_tree().paused = true
 	var dlg = UIHelper.create_modal_dialog(self, 300, Color(0.04, 0.08, 0.20, 0.85))
 	var overlay = dlg["overlay"]
 	var center = dlg["center"]
 	overlay.process_mode = Node.PROCESS_MODE_ALWAYS
+	_instructions_overlay = overlay
+
+	# Size the card to the visible screen so nothing spills off the edges
+	# (the overlay lives under Main, so measure ITS viewport, not the 3D sub-viewport)
+	var vp_size: Vector2 = overlay.get_viewport().get_visible_rect().size
+	var card_w: float = clampf(vp_size.x - 32.0, 280.0, 500.0)
+	var card_h_max: float = maxf(vp_size.y - 48.0, 320.0)
+	var inner_w: float = card_w - 36.0
+	var is_narrow: bool = card_w < 420.0
 
 	var card = PanelContainer.new()
-	card.custom_minimum_size = Vector2(500, 0)
+	card.custom_minimum_size = Vector2(card_w, 0)
+	card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var card_style = UIHelper.create_bubbly_panel(28, Color.WHITE, Color(0.35, 0.72, 0.96), 4)
-	card_style.content_margin_left = 24
-	card_style.content_margin_right = 24
-	card_style.content_margin_top = 20
-	card_style.content_margin_bottom = 22
+	card_style.content_margin_left = 18
+	card_style.content_margin_right = 18
+	card_style.content_margin_top = 16
+	card_style.content_margin_bottom = 18
 	card.add_theme_stylebox_override("panel", card_style)
 	center.add_child(card)
 
-	var vbox = VBoxContainer.new()
-	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox.add_theme_constant_override("separation", 10)
-	card.add_child(vbox)
+	var outer = VBoxContainer.new()
+	outer.add_theme_constant_override("separation", 10)
+	card.add_child(outer)
 
 	var title = Label.new()
 	title.text = "HOW TO PLAY"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	UIHelper.apply_bubbly_label(title, 28, Color(0.18, 0.44, 0.78), true)
-	vbox.add_child(title)
+	UIHelper.apply_bubbly_label(title, 24 if is_narrow else 28, Color(0.18, 0.44, 0.78), true)
+	outer.add_child(title)
+
+	# Scrollable instructions area (scrolls on small screens instead of overflowing)
+	var scroll = ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var scroll_max_h: float = minf(card_h_max - 150.0, 560.0)
+	scroll.custom_minimum_size = Vector2(inner_w, 120.0)
+	scroll.process_mode = Node.PROCESS_MODE_ALWAYS
+	outer.add_child(scroll)
+
+	var vbox = VBoxContainer.new()
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vbox.add_theme_constant_override("separation", 8)
+	scroll.add_child(vbox)
 
 	var goal = Label.new()
 	goal.text = "Blue Candor's candy army is attacking! Blast the minions, then beat Blue Candor to save your teeth."
 	goal.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	goal.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	goal.custom_minimum_size = Vector2(450, 0)
-	UIHelper.apply_bubbly_label(goal, 15, Color(0.30, 0.42, 0.60), false)
+	goal.custom_minimum_size = Vector2(inner_w - 12.0, 0)
+	UIHelper.apply_bubbly_label(goal, 13 if is_narrow else 15, Color(0.30, 0.42, 0.60), false)
 	vbox.add_child(goal)
 
 	var instructions = [
@@ -1914,7 +1948,7 @@ func show_level1_instructions_modal(on_start: Callable) -> void:
 		vbox.add_child(row)
 
 		var tag_panel = PanelContainer.new()
-		tag_panel.custom_minimum_size = Vector2(118, 0)
+		tag_panel.custom_minimum_size = Vector2(92 if is_narrow else 118, 0)
 		var tag_sb = StyleBoxFlat.new()
 		tag_sb.bg_color = Color(0.93, 0.96, 1.0)
 		tag_sb.set_corner_radius_all(10)
@@ -1931,19 +1965,21 @@ func show_level1_instructions_modal(on_start: Callable) -> void:
 		tag.text = inst[0]
 		tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		tag.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		UIHelper.apply_bubbly_label(tag, 12, Color(0.18, 0.44, 0.78), true)
+		tag.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		UIHelper.apply_bubbly_label(tag, 10 if is_narrow else 12, Color(0.18, 0.44, 0.78), true)
 		tag_panel.add_child(tag)
 
 		var lbl = Label.new()
 		lbl.text = inst[1]
 		lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		lbl.custom_minimum_size = Vector2(inner_w - (92.0 if is_narrow else 118.0) - 24.0, 0)
 		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		UIHelper.apply_bubbly_label(lbl, 13, Color(0.15, 0.25, 0.42), false)
+		UIHelper.apply_bubbly_label(lbl, 12 if is_narrow else 13, Color(0.15, 0.25, 0.42), false)
 		row.add_child(lbl)
 
 	var start_btn = UIHelper.create_bubbly_button("START BATTLE", UIHelper.VIBRANT_GREEN)
-	start_btn.custom_minimum_size = Vector2(260, 52)
+	start_btn.custom_minimum_size = Vector2(minf(260.0, inner_w), 52)
 	start_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	start_btn.pressed.connect(func():
 		if gs != null and not prof.is_empty():
@@ -1951,11 +1987,26 @@ func show_level1_instructions_modal(on_start: Callable) -> void:
 			if gs.has_method("save_game"):
 				gs.save_game()
 		overlay.queue_free()
+		_instructions_overlay = null
 		get_tree().paused = false
-		if on_start.is_valid():
-			on_start.call()
+		var cb: Callable = _instructions_on_start
+		_instructions_on_start = Callable()
+		if cb.is_valid():
+			cb.call()
 	)
-	vbox.add_child(start_btn)
+	outer.add_child(start_btn)
+
+	# Once laid out, make the scroll area exactly as tall as its content (up to the
+	# screen limit). Short content = no blank gap, long content = it scrolls.
+	_fit_instructions_scroll(scroll, vbox, scroll_max_h)
+
+func _fit_instructions_scroll(scroll: ScrollContainer, content: Control, max_h: float) -> void:
+	for i in range(2):
+		await get_tree().process_frame
+		if not is_instance_valid(scroll) or not is_instance_valid(content):
+			return
+		var want: float = content.get_combined_minimum_size().y
+		scroll.custom_minimum_size.y = clampf(want, 120.0, max_h)
 
 func _toggle_pause_menu() -> void:
 	if _pause_panel == null:

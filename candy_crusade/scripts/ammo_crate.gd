@@ -41,6 +41,10 @@ const BOB_HEIGHT := 0.025
 const LIFETIME := 16.0
 const OPEN_DISPLAY_TIME := 1.0
 const LOOT_HOVER_Y := 0.74
+## Items are normalised to ~0.22m. With the 75 degree camera, 0.5m away x 1.1 scale fills
+## ~55% of the screen width on a normal phone and ~70% on a very tall one (big, never clipped).
+const LOOT_CLOSEUP_DIST := 0.50   # metres in front of the camera
+const LOOT_CLOSEUP_SCALE := 1.1   # how big the item gets when it's up close
 
 var _age := 0.0
 var _base_y := 0.06
@@ -556,8 +560,8 @@ func _spawn_loot_item() -> void:
 	if cam != null and is_instance_valid(cam):
 		var fwd := -cam.global_transform.basis.z.normalized()
 		var up := cam.global_transform.basis.y.normalized()
-		# Position ~0.90m in front of camera (closer than before) at comfortable size
-		target_pos = cam.global_position + fwd * 0.90 + up * (-0.06)
+		# Bring the item RIGHT UP to the camera (~0.40m away, centred) so it fills the screen
+		target_pos = cam.global_position + fwd * LOOT_CLOSEUP_DIST + up * (-0.02)
 		_loot_item_root.look_at(cam.global_position, Vector3.UP)
 		_loot_item_root.rotate_y(PI) # face camera
 		
@@ -569,12 +573,12 @@ func _spawn_loot_item() -> void:
 		var spin_tw := loot_node.create_tween().set_loops()
 		spin_tw.tween_property(_loot_visual, "rotation:y", TAU, 2.2).as_relative()
 		
-	# 1. Fly forward in front of camera with normal, comfortable scale
+	# 1. Fly up out of the chest and zoom right up to the camera, growing big
 	var rise_tw := loot_node.create_tween()
 	rise_tw.set_parallel(true)
-	rise_tw.tween_property(loot_node, "global_position", target_pos, 0.45)\
+	rise_tw.tween_property(loot_node, "global_position", target_pos, 0.55)\
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	rise_tw.tween_property(loot_node, "scale", Vector3(0.95, 0.95, 0.95), 0.40)\
+	rise_tw.tween_property(loot_node, "scale", Vector3.ONE * LOOT_CLOSEUP_SCALE, 0.50)\
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		
 	# 2. Arrive in front of camera: trigger celebratory sparkles
@@ -584,8 +588,8 @@ func _spawn_loot_item() -> void:
 			spawn_foreground_sparkles(target_pos, loot_node.get_tree())
 	)
 	
-	# 3. Hold in front of screen for 1.0 second (0.7s longer showcase)
-	rise_tw.chain().tween_interval(1.0)
+	# 3. Hold close-up in front of the screen
+	rise_tw.chain().tween_interval(1.2)
 	
 	# 4. Fade out smoothly and remove completely
 	rise_tw.chain().tween_callback(func():
@@ -606,7 +610,7 @@ func _spawn_loot_item() -> void:
 	
 	# 5. Safety fallback timer - absolute guarantee that the item disappears
 	if tree != null:
-		tree.create_timer(2.2).timeout.connect(func():
+		tree.create_timer(2.8).timeout.connect(func():
 			if is_instance_valid(loot_node):
 				loot_node.queue_free()
 		)

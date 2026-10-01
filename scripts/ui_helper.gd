@@ -1070,7 +1070,130 @@ static func get_modal_card_texture(kind: String = "portrait") -> Texture2D:
 		_cached_modal_card_square = tex
 		return tex
 
-static func show_parental_gate(parent_node: Node, on_success: Callable, on_cancel: Callable = Callable(), title_override: String = ""):
+const _ADULT_NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"]
+
+## Grown-ups-only check (Apple Kids Category style parental gate): a multiplication question
+## written in WORDS that young children can't read or solve, answered with the number keypad.
+## Shown before a parent creates the Tooth Fairy PIN, and when a parent has forgotten the PIN,
+## so a child can never set (or reset) the PIN themselves.
+static func show_adult_check(parent_node: Node, on_pass: Callable, on_cancel: Callable = Callable(), reason_text: String = "", allow_cancel: bool = true):
+	var target_parent: Node = parent_node
+	if parent_node.is_inside_tree():
+		var main_node = parent_node.get_tree().root.get_node_or_null("Main")
+		if main_node and is_instance_valid(main_node):
+			target_parent = main_node
+
+	var safe_sz = get_viewport_safe_size(target_parent)
+	var card_w = clamp(safe_sz.x - 48.0, 300.0, 360.0)
+	var card_h = 330.0
+
+	var dlg = create_modal_dialog(target_parent, 251, Color(0.04, 0.10, 0.22, 0.80))
+	var overlay = dlg["overlay"]
+	var center = dlg["center"]
+	overlay.name = "AdultCheckOverlay"
+	# Sit in the upper part of the screen so the number keypad never covers the answer box
+	var lift_card = func():
+		if is_instance_valid(center) and is_instance_valid(overlay):
+			center.size = Vector2(overlay.size.x, overlay.size.y * 0.70)
+	overlay.resized.connect(lift_card)
+	lift_card.call()
+
+	var card = Panel.new()
+	card.custom_minimum_size = Vector2(card_w, card_h)
+	card.size = Vector2(card_w, card_h)
+	card.add_theme_stylebox_override("panel", create_bubbly_panel(28, Color.WHITE, Color(0.35, 0.72, 0.96), 3))
+	center.add_child(card)
+
+	if allow_cancel:
+		var close_btn = create_close_button(Vector2(30, 30))
+		close_btn.position = Vector2(card_w - 38.0, 10)
+		close_btn.pressed.connect(func():
+			_play_sfx_safe("click")
+			overlay.queue_free()
+			if on_cancel.is_valid():
+				on_cancel.call()
+		)
+		card.add_child(close_btn)
+
+	var vbox = VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.offset_left = 20.0
+	vbox.offset_right = -20.0
+	vbox.offset_top = 18.0
+	vbox.offset_bottom = -18.0
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 10)
+	card.add_child(vbox)
+
+	var title_lbl = Label.new()
+	title_lbl.text = "GROWN-UPS ONLY"
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	apply_bubbly_label(title_lbl, 18, Color(0.18, 0.40, 0.70), true)
+	vbox.add_child(title_lbl)
+
+	var sub_lbl = Label.new()
+	sub_lbl.text = reason_text if reason_text != "" else "Please ask a parent or guardian to answer this question."
+	sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	apply_bubbly_label(sub_lbl, 11, Color(0.35, 0.48, 0.65), false)
+	vbox.add_child(sub_lbl)
+
+	var q_lbl = Label.new()
+	q_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	q_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	apply_bubbly_label(q_lbl, 16, Color(0.10, 0.22, 0.45), true)
+	vbox.add_child(q_lbl)
+
+	var answer = [0]
+	var new_question = func():
+		var a = randi_range(6, 12)
+		var b = randi_range(6, 9)
+		answer[0] = a * b
+		q_lbl.text = "What is %s multiplied by %s?" % [_ADULT_NUMBER_WORDS[a], _ADULT_NUMBER_WORDS[b]]
+	new_question.call()
+
+	var err_lbl = Label.new()
+	err_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	apply_bubbly_label(err_lbl, 11, Color(0.92, 0.25, 0.20), true)
+	err_lbl.visible = false
+	vbox.add_child(err_lbl)
+
+	var ans_input = LineEdit.new()
+	ans_input.placeholder_text = "Type the answer"
+	ans_input.max_length = 3
+	ans_input.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_NUMBER
+	ans_input.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ans_input.custom_minimum_size = Vector2(180, 44)
+	var in_st = create_bubbly_panel(22, Color(0.94, 0.97, 1.0), Color(0.80, 0.88, 0.98), 2)
+	in_st.content_margin_left = 10
+	in_st.content_margin_right = 10
+	ans_input.add_theme_stylebox_override("normal", in_st)
+	ans_input.add_theme_color_override("font_color", Color(0.10, 0.15, 0.30))
+	ans_input.add_theme_color_override("font_placeholder_color", Color(0.15, 0.25, 0.45, 0.90))
+	ans_input.add_theme_font_size_override("font_size", 20)
+	var ans_center = CenterContainer.new()
+	ans_center.add_child(ans_input)
+	vbox.add_child(ans_center)
+
+	# "submit" uses the game's SUBMIT ANSWER button art (same as the weekly quiz)
+	var ok_btn = create_bubbly_button("submit", VIBRANT_GREEN)
+	ok_btn.custom_minimum_size = Vector2(card_w - 48.0, 48)
+	ok_btn.pressed.connect(func():
+		var txt = ans_input.text.strip_edges()
+		if txt.is_valid_int() and int(txt) == answer[0]:
+			_play_sfx_safe("pop")
+			overlay.queue_free()
+			on_pass.call()
+		else:
+			_play_sfx_safe("click")
+			err_lbl.text = "Not quite - here is a new question."
+			err_lbl.visible = true
+			ans_input.text = ""
+			new_question.call()
+	)
+	vbox.add_child(ok_btn)
+
+static func show_parental_gate(parent_node: Node, on_success: Callable, on_cancel: Callable = Callable(), title_override: String = "", adult_checked: bool = false, allow_cancel: bool = true):
 	var target_parent: Node = parent_node
 	if parent_node.is_inside_tree():
 		var main_node = parent_node.get_tree().root.get_node_or_null("Main")
@@ -1081,12 +1204,27 @@ static func show_parental_gate(parent_node: Node, on_success: Callable, on_cance
 	var card_w = clamp(safe_sz.x - 48.0, 300.0, 360.0)
 	var gs = _get_game_state()
 	var is_setup = not (gs and gs.has_method("has_tooth_fairy_pin") and gs.has_tooth_fairy_pin())
-	var card_h = 360.0 if is_setup else 310.0
+
+	# No PIN yet: a grown-up must pass the adult check BEFORE they can create the PIN,
+	# otherwise a child could simply make their own PIN and get past the gate.
+	if is_setup and not adult_checked:
+		show_adult_check(parent_node, func():
+			show_parental_gate(parent_node, on_success, on_cancel, title_override, true, allow_cancel)
+		, on_cancel, "Before you create the 4-digit Tooth Fairy PIN, please answer this grown-up question.", allow_cancel)
+		return
+
+	var card_h = 360.0 if is_setup else 340.0
 
 	var dlg = create_modal_dialog(target_parent, 250, Color(0.04, 0.10, 0.22, 0.75))
 	var overlay = dlg["overlay"]
 	var center = dlg["center"]
 	overlay.name = "ParentalGateOverlay"
+	# Sit in the upper part of the screen so the number keypad never covers the PIN boxes
+	var lift_card = func():
+		if is_instance_valid(center) and is_instance_valid(overlay):
+			center.size = Vector2(overlay.size.x, overlay.size.y * 0.70)
+	overlay.resized.connect(lift_card)
+	lift_card.call()
 	
 	var card = Panel.new()
 	card.custom_minimum_size = Vector2(card_w, card_h)
@@ -1095,15 +1233,17 @@ static func show_parental_gate(parent_node: Node, on_success: Callable, on_cance
 	card.add_theme_stylebox_override("panel", card_style)
 	center.add_child(card)
 	
-	var close_btn = create_close_button(Vector2(30, 30))
-	close_btn.position = Vector2(card_w - 38.0, 10)
-	close_btn.pressed.connect(func():
-		_play_sfx_safe("click")
-		overlay.queue_free()
-		if on_cancel.is_valid():
-			on_cancel.call()
-	)
-	card.add_child(close_btn)
+	# First-launch PIN setup can't be skipped (no close button)
+	if allow_cancel:
+		var close_btn = create_close_button(Vector2(30, 30))
+		close_btn.position = Vector2(card_w - 38.0, 10)
+		close_btn.pressed.connect(func():
+			_play_sfx_safe("click")
+			overlay.queue_free()
+			if on_cancel.is_valid():
+				on_cancel.call()
+		)
+		card.add_child(close_btn)
 	
 	var vbox = VBoxContainer.new()
 	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1138,6 +1278,7 @@ static func show_parental_gate(parent_node: Node, on_success: Callable, on_cance
 	if is_setup:
 		var pin_input = LineEdit.new()
 		pin_input.placeholder_text = "Enter 4-digit PIN..."
+		pin_input.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_NUMBER
 		pin_input.secret = true
 		pin_input.max_length = 4
 		pin_input.alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1153,6 +1294,7 @@ static func show_parental_gate(parent_node: Node, on_success: Callable, on_cance
 		
 		var conf_input = LineEdit.new()
 		conf_input.placeholder_text = "Confirm 4-digit PIN..."
+		conf_input.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_NUMBER
 		conf_input.secret = true
 		conf_input.max_length = 4
 		conf_input.alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1190,6 +1332,7 @@ static func show_parental_gate(parent_node: Node, on_success: Callable, on_cance
 	else:
 		var pin_input = LineEdit.new()
 		pin_input.placeholder_text = "• • • •"
+		pin_input.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_NUMBER
 		pin_input.secret = true
 		pin_input.max_length = 4
 		pin_input.alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1222,6 +1365,27 @@ static func show_parental_gate(parent_node: Node, on_success: Callable, on_cance
 				_play_sfx_safe("click")
 		)
 		vbox.add_child(unlock_btn)
+
+		# Forgot PIN: a grown-up answers the adult check, then sets a brand-new PIN
+		var forgot_btn = Button.new()
+		forgot_btn.text = "Forgot PIN?"
+		forgot_btn.flat = true
+		forgot_btn.focus_mode = Control.FOCUS_NONE
+		forgot_btn.add_theme_font_size_override("font_size", 12)
+		forgot_btn.add_theme_color_override("font_color", Color(0.20, 0.45, 0.80))
+		forgot_btn.add_theme_color_override("font_hover_color", Color(0.20, 0.45, 0.80))
+		forgot_btn.add_theme_color_override("font_pressed_color", Color(0.12, 0.30, 0.60))
+		forgot_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		forgot_btn.pressed.connect(func():
+			_play_sfx_safe("click")
+			overlay.queue_free()
+			show_adult_check(parent_node, func():
+				if gs and gs.has_method("set_tooth_fairy_pin"):
+					gs.set_tooth_fairy_pin("")
+				show_parental_gate(parent_node, on_success, on_cancel, "SET A NEW PIN", true)
+			, on_cancel, "Forgot the PIN? Answer this grown-up question to set a new one.")
+		)
+		vbox.add_child(forgot_btn)
 
 static func show_dental_item_unlocked_modal(parent_node: Node, w_def: Dictionary, on_close: Callable = Callable()):
 	if not parent_node:

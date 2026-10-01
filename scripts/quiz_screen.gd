@@ -576,11 +576,15 @@ func _relayout():
 		
 	var title_w = min(cur_w - 60.0, 310.0 if not is_tablet else 420.0)
 	var title_h = 58.0 if not is_tablet else 76.0
+	# Title, progress dots and question card drop below the notch on iPhone;
+	# back button and coin / point pills stay up in the corners
+	var title_y = max(10.0, UIHelper.safe_top + 4.0)
+	var notch_shift = title_y - 10.0
 	if title_rect:
-		title_rect.position = Vector2((cur_w - title_w) * 0.5, 10.0)
+		title_rect.position = Vector2((cur_w - title_w) * 0.5, title_y)
 		title_rect.size = Vector2(title_w, title_h)
 	elif title_lbl:
-		title_lbl.position = Vector2((cur_w - title_w) * 0.5, 10.0)
+		title_lbl.position = Vector2((cur_w - title_w) * 0.5, title_y)
 		title_lbl.size = Vector2(title_w, title_h)
 		title_lbl.add_theme_font_size_override("font_size", 32 if not is_tablet else 40)
 		
@@ -589,13 +593,13 @@ func _relayout():
 		dots_hbox.anchor_right = 1.0
 		dots_hbox.offset_left = 0.0
 		dots_hbox.offset_right = 0.0
-		dots_hbox.position = Vector2(0.0, 76.0 if not is_tablet else 94.0)
+		dots_hbox.position = Vector2(0.0, (76.0 if not is_tablet else 94.0) + notch_shift)
 		dots_hbox.size = Vector2(cur_w, 20.0)
 		dots_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
 		
 	if card:
 		var card_w = min(380.0 if not is_tablet else 480.0, cur_w - 32.0)
-		var card_top = 138.0 if not is_tablet else 160.0
+		var card_top = (138.0 if not is_tablet else 160.0) + notch_shift
 		var card_h = clamp(cur_h - card_top - 20.0, 440.0, 580.0)
 		card.size = Vector2(card_w, card_h)
 		card.position = Vector2((cur_w - card_w) * 0.5, card_top)

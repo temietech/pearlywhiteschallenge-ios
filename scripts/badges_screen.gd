@@ -265,6 +265,12 @@ func _notification(what):
 
 var _last_built_size: Vector2 = Vector2.ZERO
 
+## Called by main.gd when the iPhone notch insets become known or change
+func on_safe_area_changed():
+	if is_node_ready():
+		_last_built_size = Vector2.ZERO
+		_rebuild_ui()
+
 func _rebuild_ui():
 	# Only rebuild when the size REALLY changed: rebuilding frees the back button, and a rebuild
 	# landing between finger-down and finger-up made the back button feel dead on phones.
@@ -371,6 +377,8 @@ func _build_ui():
 	var bg = TextureRect.new()
 	UIHelper.setup_fullscreen_bg(bg)
 	bg.texture = UIHelper.load_texture_safe("res://assets/images/badgescreen/badges_background.jpg")
+	# Decorative only: never let the full-screen background swallow taps
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 	
 	# Top Back Button - Only create once and preserve across rebuilds
@@ -399,8 +407,8 @@ func _build_ui():
 		back_btn.pressed.connect(go_back)
 		add_child(back_btn)
 	# Update position on each rebuild
-	# Keep the button below the notch / status bar so iPhone and iPad taps reach it
-	back_btn.position = Vector2(10, 10 + UIHelper.safe_top)
+	# Corner button: stays up in the top-left corner beside the notch (only the title moves down)
+	back_btn.position = Vector2(10, 10)
 	
 	# Header Title: Graphic Image (Clean transparent PNG) or Styled Bubbly Font
 	var title_tex = _ensure_trophy_title_texture()
@@ -414,15 +422,18 @@ func _build_ui():
 		var th = tw * aspect
 		title_rect.custom_minimum_size = Vector2(tw, th)
 		title_rect.size = Vector2(tw, th)
-		title_rect.position = Vector2((cur_w - tw) * 0.5, 8.0)
+		# Title drops below the notch on iPhone; the back button stays in the corner
+		title_rect.position = Vector2((cur_w - tw) * 0.5, max(8.0, UIHelper.safe_top + 4.0))
 		title_rect.z_index = 15
+		title_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(title_rect)
 	else:
 		var title_vbox = VBoxContainer.new()
-		title_vbox.position = Vector2(0, 8)
+		title_vbox.position = Vector2(0, max(8.0, UIHelper.safe_top + 4.0))
 		title_vbox.size = Vector2(cur_w, 65)
 		title_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 		title_vbox.add_theme_constant_override("separation", -6)
+		title_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(title_vbox)
 		
 		var font = UIHelper.get_main_font()
@@ -524,6 +535,15 @@ func _build_ui():
 					_show_badge_detail(b, status)
 				)
 				add_child(badge_btn)
+
+	# ROOT CAUSE of the dead back button: on a phone the screen is resized after it opens
+	# (safe-area insets), _rebuild_ui() then re-adds the full-screen background AFTER the
+	# preserved back button, so the background sat on top of it and ate every tap.
+	# Always keep the back button as the top-most child (detail popup above it when open).
+	if back_btn and is_instance_valid(back_btn):
+		move_child(back_btn, get_child_count() - 1)
+	if detail_modal and is_instance_valid(detail_modal) and detail_modal.get_parent() == self:
+		move_child(detail_modal, get_child_count() - 1)
 
 func _show_badge_detail(b: Dictionary, status: Dictionary):
 	if detail_modal:

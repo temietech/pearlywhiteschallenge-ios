@@ -371,7 +371,8 @@ func _relayout():
 	# Phase 1: Prompt layout
 	if prompt_container:
 		if prompt_title:
-			prompt_title.position = Vector2(20, max(24.0, cur_h * 0.08))
+			# Title stays clear of the notch on iPhone; back button stays in the corner
+			prompt_title.position = Vector2(20, max(max(24.0, cur_h * 0.08), UIHelper.safe_top + 6.0))
 			prompt_title.size = Vector2(cur_w - 40.0, 50)
 		if prompt_card:
 			var card_w = clamp(cur_w - 40.0, 310.0, 420.0)
@@ -381,18 +382,21 @@ func _relayout():
 			
 	# Phase 2: Flossing Sequence layout
 	if flossing_container:
+		# Everything in this phase drops just enough to clear the notch on iPhone
+		var ft_base = max(18.0, cur_h * 0.06)
+		var ft_shift = max(0.0, (UIHelper.safe_top + 6.0) - ft_base)
 		if flossing_title:
-			flossing_title.position = Vector2(20, max(18.0, cur_h * 0.06))
+			flossing_title.position = Vector2(20, ft_base + ft_shift)
 			flossing_title.size = Vector2(cur_w - 40.0, 44)
 		if timer_capsule:
 			var cap_w = 120.0
 			var cap_h = 44.0
 			timer_capsule.size = Vector2(cap_w, cap_h)
-			timer_capsule.position = Vector2((cur_w - cap_w) * 0.5, max(68.0, cur_h * 0.12))
+			timer_capsule.position = Vector2((cur_w - cap_w) * 0.5, max(68.0, cur_h * 0.12) + ft_shift)
 		if video_card:
 			var v_w = clamp(cur_w - 40.0, 310.0, 420.0)
 			var v_h = clamp(cur_h * 0.44, 260.0, 340.0)
-			var v_y = max(124.0, cur_h * 0.20)
+			var v_y = max(124.0, cur_h * 0.20) + ft_shift
 			video_card.size = Vector2(v_w, v_h)
 			video_card.position = Vector2((cur_w - v_w) * 0.5, v_y)
 			if video_mat:

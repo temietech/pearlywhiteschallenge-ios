@@ -31,6 +31,12 @@ func _ensure_facts_title_texture() -> Texture2D:
 		return _cached_facts_title_tex
 		
 	var path = "res://assets/images/journal/daily_dental_facts_title.png"
+	# Exported builds (iPhone/iPad) only contain the imported texture, not the raw PNG,
+	# so load through the resource system first (raw-file fallback below is editor-only).
+	var imported_tex = UIHelper.load_texture_safe(path)
+	if imported_tex:
+		_cached_facts_title_tex = imported_tex
+		return _cached_facts_title_tex
 	var global_path = ProjectSettings.globalize_path(path)
 	
 	if FileAccess.file_exists(global_path):
@@ -138,10 +144,11 @@ func _relayout():
 		var tw = min(cur_w - 110.0, 340.0 if is_tablet else 270.0)
 		var th = tw * (tex_sz.y / tex_sz.x)
 		title_img.size = Vector2(tw, th)
-		title_img.position = Vector2((cur_w - tw) * 0.5, 12.0)
+		# Title drops below the notch on iPhone; the back button stays in the corner
+		title_img.position = Vector2((cur_w - tw) * 0.5, max(12.0, UIHelper.safe_top + 6.0))
 	elif title_vbox:
 		title_vbox.size = Vector2(cur_w, 68)
-		title_vbox.position = Vector2(0, 10)
+		title_vbox.position = Vector2(0, max(10.0, UIHelper.safe_top + 4.0))
 	if notepad_rect:
 		var tex_aspect = 1.48
 		if notepad_rect.texture and notepad_rect.texture.get_width() > 0:

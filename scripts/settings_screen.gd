@@ -273,8 +273,21 @@ func _build_central_card():
 			GameState.push_toast("Coming Soon", "Support Developers feature coming soon!", "", "blue")
 	)
 	vbox.add_child(support_btn)
-	
-	# Section 7: Sir Crown Avatar Selection (only visible when unlocked)
+
+	vbox.add_child(_create_h_separator())
+
+	# Section 7: Test RevenueCat Button
+	var rc_btn = UIHelper.create_bubbly_button("TEST REVENEUECAT", Color(0.92, 0.42, 0.42))
+	rc_btn.custom_minimum_size = Vector2(300, 50)
+	rc_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	rc_btn.pressed.connect(func():
+		AudioManager.play_sfx("click")
+		var tester = preload("res://scripts/debug_reveneuecat_tester.gd").new()
+		get_tree().root.add_child(tester)
+	)
+	vbox.add_child(rc_btn)
+
+	# Section 8: Sir Crown Avatar Selection (only visible when unlocked)
 	var crown_sep = _create_h_separator()
 	crown_sep.name = "CrownSep"
 	vbox.add_child(crown_sep)

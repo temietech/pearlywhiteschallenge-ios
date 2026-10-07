@@ -5,4 +5,11 @@
 # Summer Engine local-only state (SummerGit, caches, locks)
 .summer/local/
 githubtokencode.txt
-githubtokencode.txt
+
+# Local archives and clones
+godotx_revenue_cat.zip
+pearlywhiteschallenge-ios/
+Claude outputs/
+scripts/map_screen-2.gd*
+scripts/debug_reveneuecat_tester*
+

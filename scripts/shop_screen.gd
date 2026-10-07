@@ -2836,8 +2836,8 @@ func _show_owned_weapon_breakdown_popup(w_def: Dictionary, lvl: int):
 	var w_id = str(w_def.get("id", ""))
 	var w_data = WEAPON_BREAKDOWN_DATA.get(w_id, {}).get(lvl, {})
 	
-	var win_w = min(safe_sz.x - 28.0, 350.0)
-	var win_h = min(safe_sz.y - 36.0, 530.0)
+	var win_w = min(safe_sz.x - 28.0, 360.0)
+	var win_h = min(safe_sz.y - 36.0, 560.0)
 	var win = _create_nine_patch("res://assets/images/shop/game_blue_window_tall.png", 32)
 	win.custom_minimum_size = Vector2(win_w, win_h)
 	win.size = Vector2(win_w, win_h)
@@ -2862,7 +2862,7 @@ func _show_owned_weapon_breakdown_popup(w_def: Dictionary, lvl: int):
 	
 	# Top Badge
 	var badge_panel = Panel.new()
-	var b_w = min(win_w - 40.0, 240.0)
+	var b_w = min(win_w - 40.0, 250.0)
 	badge_panel.custom_minimum_size = Vector2(b_w, 24)
 	badge_panel.size = Vector2(b_w, 24)
 	var badge_color = w_data.get("badge_color", Color(0.20, 0.60, 0.95))
@@ -2890,15 +2890,15 @@ func _show_owned_weapon_breakdown_popup(w_def: Dictionary, lvl: int):
 		var name_lbl = Label.new()
 		name_lbl.text = get_weapon_full_name(w_def, lvl)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		UIHelper.apply_bubbly_label(name_lbl, 16, Color.WHITE, true)
+		UIHelper.apply_bubbly_label(name_lbl, 15, Color.WHITE, true)
 		vbox.add_child(name_lbl)
 		
 	# Artwork Icon in Center with gentle float animation
 	var img_box = CenterContainer.new()
-	img_box.custom_minimum_size = Vector2(win_w - 40.0, 72)
+	img_box.custom_minimum_size = Vector2(win_w - 40.0, 68)
 	vbox.add_child(img_box)
 	
-	var img_sz = Vector2(76, 76) if is_lvl3 else Vector2(68, 68)
+	var img_sz = Vector2(72, 72) if is_lvl3 else Vector2(64, 64)
 	var img = _create_aspect_rect(w_def["images"][lvl - 1], img_sz)
 	img.pivot_offset = img_sz * 0.5
 	img_box.add_child(img)
@@ -2910,8 +2910,8 @@ func _show_owned_weapon_breakdown_popup(w_def: Dictionary, lvl: int):
 	# Damage & Type Stats Pill
 	var stats_pill = Panel.new()
 	var sp_w = win_w - 36.0
-	stats_pill.custom_minimum_size = Vector2(sp_w, 32)
-	stats_pill.size = Vector2(sp_w, 32)
+	stats_pill.custom_minimum_size = Vector2(sp_w, 30)
+	stats_pill.size = Vector2(sp_w, 30)
 	var sp_color = Color(0.08, 0.22, 0.42, 0.95) if is_lvl3 else Color(0.12, 0.32, 0.55, 0.95)
 	var sp_st = UIHelper.create_bubbly_panel(16, sp_color, Color(0.70, 0.88, 1.0), 1.5)
 	stats_pill.add_theme_stylebox_override("panel", sp_st)
@@ -2924,7 +2924,7 @@ func _show_owned_weapon_breakdown_popup(w_def: Dictionary, lvl: int):
 	
 	var dmg_lbl = Label.new()
 	dmg_lbl.text = "%s" % w_data.get("damage_text", "Damage")
-	UIHelper.apply_bubbly_label(dmg_lbl, 11, Color(1.0, 0.88, 0.30), true)
+	UIHelper.apply_bubbly_label(dmg_lbl, 10, Color(1.0, 0.88, 0.30), true)
 	stats_hbox.add_child(dmg_lbl)
 	
 	var type_lbl = Label.new()
@@ -2936,25 +2936,30 @@ func _show_owned_weapon_breakdown_popup(w_def: Dictionary, lvl: int):
 	bc_stats.add_child(stats_pill)
 	vbox.add_child(bc_stats)
 	
-	# Description Box (What It Does & How Amazing It Is)
+	# Description Box (What It Does & How Amazing It Is) with internal scroll if needed
 	var desc_panel = Panel.new()
 	var dp_w = win_w - 36.0
-	var dp_h = clampf(win_h - 300.0, 110.0, 160.0)
+	var dp_h = clampf(win_h - 290.0, 110.0, 175.0)
 	desc_panel.custom_minimum_size = Vector2(dp_w, dp_h)
 	desc_panel.size = Vector2(dp_w, dp_h)
 	var dp_color = Color(0.04, 0.12, 0.25, 0.90)
 	var dp_st = UIHelper.create_bubbly_panel(14, dp_color, Color(0.50, 0.75, 1.0, 0.6), 1.0)
 	desc_panel.add_theme_stylebox_override("panel", dp_st)
 	
+	var desc_scroll = ScrollContainer.new()
+	desc_scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
+	desc_scroll.offset_left = 8
+	desc_scroll.offset_right = -8
+	desc_scroll.offset_top = 6
+	desc_scroll.offset_bottom = -6
+	desc_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	desc_panel.add_child(desc_scroll)
+	
 	var desc_vbox = VBoxContainer.new()
-	desc_vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	desc_vbox.offset_left = 10
-	desc_vbox.offset_right = -10
-	desc_vbox.offset_top = 8
-	desc_vbox.offset_bottom = -8
+	desc_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	desc_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	desc_vbox.add_theme_constant_override("separation", 6)
-	desc_panel.add_child(desc_vbox)
+	desc_vbox.add_theme_constant_override("separation", 4)
+	desc_scroll.add_child(desc_vbox)
 	
 	var what_lbl = Label.new()
 	what_lbl.text = "%s" % w_data.get("what_it_does", "")

@@ -290,6 +290,45 @@ func reset_all_data():
 	profile_changed.emit({})
 	push_toast("Data Reset", "All game data and profiles have been cleared.", "", "blue")
 
+func reset_active_profile():
+	var p = get_active_profile()
+	if p.is_empty():
+		return
+	var player_name = p.get("name", "Player")
+	var avatar = p.get("avatar", "chip")
+	var age = int(p.get("age", 8))
+	var p_id = p.get("id", "")
+	
+	# Generate fresh profile schema while keeping player identity
+	var fresh_p = make_new_profile(player_name, avatar, age)
+	fresh_p["id"] = p_id
+	fresh_p["totalMinutes"] = 0
+	fresh_p["totalBrushingSeconds"] = 0
+	fresh_p["brushing_time"] = 0
+	fresh_p["brushing_history"] = []
+	fresh_p["quizAnswers"] = {}
+	fresh_p["quizzesCompleted"] = 0
+	fresh_p["quizPerfect"] = false
+	fresh_p["unlockedStory"] = []
+	fresh_p["factsCollected"] = []
+	fresh_p["factsRead"] = 0
+	fresh_p["minionsDefeated"] = 0
+	fresh_p["bossesDefeated"] = 0
+	fresh_p["cavityLevel"] = 0
+	fresh_p["streak"] = 0
+	fresh_p["points"] = 0
+	fresh_p["coins"] = 0
+	fresh_p["currentNode"] = 0
+	
+	for i in range(profiles.size()):
+		if profiles[i].get("id") == p_id:
+			profiles[i] = fresh_p
+			break
+			
+	save_game()
+	profile_changed.emit(fresh_p)
+	push_toast("Profile Reset", "%s's progress and stats have been reset." % player_name, "", "blue")
+
 func leave_family_code():
 	family_code = ""
 	family_mode = false
@@ -1327,15 +1366,7 @@ func get_total_brushing_minutes(p: Dictionary = {}) -> int:
 	if mins <= 0:
 		var secs = int(round(float(p.get("totalBrushingSeconds", p.get("brushing_time", 0)))))
 		mins = secs / 60
-		
-	if mins <= 0:
-		var streak = int(round(float(p.get("streak", 0))))
-		var cur_node = int(round(float(p.get("currentNode", 1))))
-		var completed_nodes = max(0, cur_node - 1)
-		var estimated_sessions = max(completed_nodes, streak * 2)
-		mins = estimated_sessions * 2
-
-	return mins
+	return max(0, mins)
 
 # ------------------------------------------------------------------
 # Candy Crusade background preloading

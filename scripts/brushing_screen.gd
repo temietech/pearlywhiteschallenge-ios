@@ -1200,12 +1200,12 @@ func _relayout():
 		avatar_w = crown_box
 		avatar_h = crown_box
 		avatar_x = crown_x
-		avatar_y = cur_h - 6.0 - CROWN_VIS_BOTTOM * crown_box
+		avatar_y = cur_h - 6.0 - CROWN_VIS_BOTTOM * crown_box - 10.0
 	else:
 		avatar_h = 165.0 if not is_tablet else 210.0
 		avatar_w = avatar_h * (120.0 / 134.0)
 		avatar_x = 4.0 if not is_tablet else cx - avatar_w - 70.0
-		avatar_y = floor_y - avatar_h
+		avatar_y = floor_y - avatar_h - 10.0
 	
 	if char_rect:
 		char_rect.visible = true
@@ -1218,8 +1218,8 @@ func _relayout():
 		char_rect.pivot_offset = Vector2(avatar_w * 0.5, avatar_h)
 		char_rect.z_index = 80
 		
-	# Speech bubble: fills all the free room between the mouth card and the button row,
-	# keeps the artwork's own aspect ratio (tail bottom-left points at the avatar)
+	# Speech bubble: fills the room between mouth card and buttons,
+	# scaled down cleanly and raised by 50px per user request
 	if speech_bubble:
 		var tex_aspect := 1.40
 		if speech_bubble.texture and speech_bubble.texture.get_height() > 0:
@@ -1227,7 +1227,8 @@ func _relayout():
 		var bubble_left: float = (crown_vis_right - 55.0) if is_sircrown else (avatar_x + avatar_w * 0.70)
 		var bubble_top: float = mc_bottom + 2.0
 		var bubble_bottom: float = btn_y - 2.0
-		var bubble_h: float = maxf(110.0, bubble_bottom - bubble_top)
+		# Reduced by 15% so it's not oversized
+		var bubble_h: float = maxf(95.0, (bubble_bottom - bubble_top) * 0.85)
 		var bubble_w: float = bubble_h * tex_aspect
 		var bubble_max_w: float = cur_w - bubble_left - 6.0
 		if bubble_w > bubble_max_w:
@@ -1239,14 +1240,15 @@ func _relayout():
 			speech_bubble.position = custom_bubble_pos
 		else:
 			var bubble_x = clampf(bubble_left, 4.0, cur_w - bubble_w - 4.0)
-			speech_bubble.position = Vector2(bubble_x, bubble_bottom - bubble_h)
+			# Raised up by 50 pixels
+			speech_bubble.position = Vector2(bubble_x, bubble_bottom - bubble_h - 50.0)
 		speech_bubble.z_index = 85
 		if bubble_label:
 			# Text area = the rounded body of the bubble artwork (excludes border and tail)
 			bubble_label.position = Vector2(bubble_w * 0.07, bubble_h * 0.06)
 			bubble_label.size = Vector2(bubble_w * 0.86, bubble_h * 0.64)
 			bubble_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			UIHelper.apply_bubbly_label(bubble_label, 22 if not is_tablet else 26, Color(0.10, 0.30, 0.55), true)
+			UIHelper.apply_bubbly_label(bubble_label, 20 if not is_tablet else 24, Color(0.10, 0.30, 0.55), true)
 			_bubble_fit_key = ""
 
 		
@@ -1271,9 +1273,9 @@ func _relayout():
 		active_brush_controls.position = Vector2.ZERO
 		active_brush_controls.size = safe_sz
 
-	# Top Right Circular Pause Button
+	# Top Right Circular Pause Button (shifted left by 15px)
 	if pause_btn:
-		pause_btn.position = Vector2(cur_w - 56.0, 12.0)
+		pause_btn.position = Vector2(cur_w - 71.0, 12.0)
 		pause_btn.size = Vector2(46, 46)
 		pause_btn.z_index = 100
 		

@@ -402,8 +402,7 @@ func _build_ui():
 			get_tree().create_timer(0.6).timeout.connect(func(): back_fired[0] = false)
 			# main.gd connects back_pressed -> navigate_to("map")
 			back_pressed.emit()
-		# Fire on finger-DOWN so the button can never be lost to a layout rebuild mid-tap
-		back_btn.button_down.connect(go_back)
+		# Fire cleanly on button release (pressed)
 		back_btn.pressed.connect(go_back)
 		add_child(back_btn)
 	# Update position on each rebuild

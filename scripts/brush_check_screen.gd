@@ -47,6 +47,8 @@ var scan_duration: float = 0.0
 const SCAN_TIMEOUT_SECONDS: float = 6.0
 var failed_scan_attempts: int = 0
 const MAX_ATTEMPTS_BEFORE_OVERRIDE: int = 3
+var live_hold_time: float = 0.0
+const REQUIRED_HOLD_TIME: float = 0.8
 
 func _ready():
 	set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -82,13 +84,25 @@ func _process(delta: float):
 		if scanline_laser and is_instance_valid(scanline_laser):
 			scanline_laser.position.y = scanline_pos
 
-		# 2. Update Progress Bar
-		if pbar:
-			pbar.value = clamp(current_confidence, 0.0, 100.0)
+		# 2. Update Progress Bar & require steady physical hold
+		if current_confidence >= 60.0:
+			live_hold_time += delta
+			var hold_pct = clamp(live_hold_time / REQUIRED_HOLD_TIME, 0.0, 1.0)
+			if pbar:
+				pbar.value = max(current_confidence, hold_pct * 100.0)
+			if msg and not is_verified:
+				msg.text = "Toothbrush detected! Hold steady (%.0f%%)..." % [hold_pct * 100.0]
+				msg.add_theme_color_override("font_color", Color(0.35, 0.90, 1.0))
+			if live_hold_time >= REQUIRED_HOLD_TIME and not is_verified:
+				_on_toothbrush_verified()
+		else:
+			live_hold_time = max(0.0, live_hold_time - delta * 1.5)
+			if pbar:
+				pbar.value = clamp(current_confidence, 0.0, 100.0)
 
 		# 3. Track scan duration timeout
 		scan_duration += delta
-		if scan_duration >= SCAN_TIMEOUT_SECONDS and current_confidence < 65.0:
+		if scan_duration >= SCAN_TIMEOUT_SECONDS and current_confidence < 60.0:
 			_on_scan_timeout()
 
 func _init_android_plugin():
@@ -116,6 +130,7 @@ func _start_scanner_session():
 	is_verified = false
 	current_confidence = 0.0
 	scan_duration = 0.0
+	live_hold_time = 0.0
 	scanline_pos = 10.0
 	scanline_dir = 1.0
 	native_preview_live = false
@@ -124,10 +139,10 @@ func _start_scanner_session():
 		retry_btn.visible = false
 
 	if sub_lbl:
-		sub_lbl.text = "POINT REAR CAMERA AT YOUR TOOTHBRUSH..."
+		sub_lbl.text = "HOLD YOUR TOOTHBRUSH UP TO THE CAMERA..."
 		sub_lbl.add_theme_color_override("font_color", Color.WHITE)
 	if msg:
-		msg.text = "Hold your toothbrush in front of your rear camera!"
+		msg.text = "Toothbrush detector scanning..."
 		msg.add_theme_color_override("font_color", Color.WHITE)
 
 	# 1. Start Native Android Plugin if available
@@ -222,7 +237,7 @@ func _on_native_toothbrush_detected(confidence: float, label: String):
 	current_confidence = confidence
 	if confidence_lbl:
 		if confidence > 0.0:
-			confidence_lbl.text = "AI: %s (%.1f%%)" % [label.capitalize(), confidence]
+			confidence_lbl.text = "%s Detected (%.1f%%)" % [label.capitalize(), confidence]
 		else:
 			confidence_lbl.text = "Searching for Toothbrush..."
 
@@ -476,14 +491,14 @@ func _build_ui():
 	rear_cam_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var rcb_lbl = Label.new()
 	rcb_lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
-	rcb_lbl.text = "REAR CAM"
+	rcb_lbl.text = "CAMERA ACTIVE"
 	rcb_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	rcb_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	UIHelper.apply_bubbly_label(rcb_lbl, 9, Color(0.30, 0.95, 0.55), true)
 	rear_cam_badge.add_child(rcb_lbl)
 	inner_box.add_child(rear_cam_badge)
 	
-	# TFLite Hardware Badge (top right)
+	# Toothbrush Detector Badge (top right)
 	tflite_badge = Panel.new()
 	var tfb_st = UIHelper.create_bubbly_panel(10, Color(0.02, 0.08, 0.18, 0.85), Color(0.35, 0.75, 1.0), 1)
 	tflite_badge.add_theme_stylebox_override("panel", tfb_st)
@@ -492,7 +507,7 @@ func _build_ui():
 	tflite_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var tfb_lbl = Label.new()
 	tfb_lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
-	tfb_lbl.text = "AI SCANNER"
+	tfb_lbl.text = "TOOTHBRUSH DETECTOR"
 	tfb_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	tfb_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	UIHelper.apply_bubbly_label(tfb_lbl, 9, Color(0.60, 0.88, 1.0), true)

@@ -411,9 +411,10 @@ func _build_audio_card():
 	header_badge.add_child(hb_lbl)
 	vbox.add_child(header_badge)
 	
-	# 1. Sounds Slider Row
+	# 1. Sound & Character Voices Slider Row (Voice + SFX)
 	var s_snd = _create_audio_slider_row(
-		"Sounds",
+		"Sound & Voices",
+		"Character speech, voices & sound effects",
 		AudioManager.saved_sfx_volume if AudioManager.saved_sfx_volume > 0.05 else AudioManager.sfx_volume,
 		AudioManager.is_sound_enabled(),
 		func(val): AudioManager.set_sfx_volume(val),
@@ -424,6 +425,7 @@ func _build_audio_card():
 	# 2. Music Slider Row
 	var s_mus = _create_audio_slider_row(
 		"Music",
+		"Background melodies & soundtracks",
 		AudioManager.saved_bgm_volume if AudioManager.saved_bgm_volume > 0.05 else AudioManager.bgm_volume,
 		AudioManager.is_music_enabled(),
 		func(val): AudioManager.set_bgm_volume(val),
@@ -696,19 +698,47 @@ func _build_parental_card():
 	vbox.add_child(_create_h_separator())
 	
 	# 4. Advanced Data Management & Reset (Centered)
+	var data_box = VBoxContainer.new()
+	data_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	data_box.add_theme_constant_override("separation", 10)
 	
+	var data_title = Label.new()
+	data_title.text = "Data Management & Progress Reset"
+	data_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	UIHelper.apply_bubbly_label(data_title, 14, Color(0.18, 0.40, 0.70), true)
+	data_box.add_child(data_title)
+	
+	# Option A: Reset Active Player Progress (Leaves other family profiles intact)
+	var reset_player_btn = UIHelper.create_bubbly_button("RESET THIS PLAYER'S PROGRESS", Color(0.95, 0.55, 0.15))
+	reset_player_btn.custom_minimum_size = Vector2(280, 42)
+	reset_player_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	reset_player_btn.pressed.connect(func():
+		AudioManager.play_sfx("click")
+		_show_reset_player_modal()
+	)
+	data_box.add_child(reset_player_btn)
+	
+	var reset_player_sub = Label.new()
+	reset_player_sub.text = "Resets active player's day, streak & brushing stats (keeps other players safe)."
+	reset_player_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	reset_player_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	UIHelper.apply_bubbly_label(reset_player_sub, 9, Color(0.45, 0.55, 0.68), false)
+	data_box.add_child(reset_player_sub)
+	
+	# Option B: Wipe All Game Data (Full reset)
 	var reset_btn = UIHelper.create_image_button("res://assets/images/buttons/datawipe-resetbtn.png", Vector2(270, 48))
 	if not reset_btn.texture_normal:
 		reset_btn = UIHelper.create_themed_button("datawipe", Vector2(270, 48))
 	if not reset_btn.texture_normal:
-		reset_btn = UIHelper.create_bubbly_button("WIPE & RESET GAME DATA", Color(0.92, 0.35, 0.25))
+		reset_btn = UIHelper.create_bubbly_button("WIPE & RESET ALL PROFILES", Color(0.92, 0.35, 0.25))
 		reset_btn.custom_minimum_size = Vector2(270, 42)
 	reset_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	reset_btn.pressed.connect(func():
 		AudioManager.play_sfx("click")
 		_show_reset_confirmation_modal()
 	)
-	vbox.add_child(reset_btn)
+	data_box.add_child(reset_btn)
+	vbox.add_child(data_box)
 	
 	# Bottom Back Button
 	var back_to_set_btn = UIHelper.create_image_button("res://assets/images/buttons/backtosettings_btn.png", Vector2(280, 48))
@@ -860,21 +890,6 @@ func _refresh_parental_insights():
 			tf_tot += 1
 			if qa[k] == true:
 				tf_corr += 1
-	elif GameState.profiles.size() <= 1:
-		# Older saves: fall back to the device-wide quiz log (only safe with a single player)
-		var local_data = FirebaseManager.get_challenge_data()
-		var quiz_records = local_data.get("quiz_records", {})
-		for day_key in quiz_records:
-			if str(day_key) == "day_00":
-				continue
-			var day_dict = quiz_records[day_key]
-			if typeof(day_dict) == TYPE_DICTIONARY:
-				for q_id in day_dict:
-					var entry = day_dict[q_id]
-					if typeof(entry) == TYPE_DICTIONARY and str(entry.get("question_type", "")) == "true_false":
-						tf_tot += 1
-						if entry.get("is_correct", false) == true:
-							tf_corr += 1
 							
 	var quiz_val_str = ""
 	var quiz_pct_text = ""
@@ -1100,19 +1115,58 @@ func _create_toggle_row(label_text: String, on_toggle: Callable, initial_state: 
 	hbox.add_child(btn)
 	return hbox
 
-func _create_audio_slider_row(label_text: String, initial_val: float, is_enabled: bool, on_val_change: Callable, on_toggle: Callable) -> Control:
+func _create_audio_slider_row(label_text: String, sub_text: String, initial_val: float, is_enabled: bool, on_val_change: Callable, on_toggle: Callable) -> Control:
 	var root = VBoxContainer.new()
 	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	root.add_theme_constant_override("separation", 4)
+	root.add_theme_constant_override("separation", 6)
 	
 	var top_row = HBoxContainer.new()
 	top_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	
+	# Left text block
+	var text_vbox = VBoxContainer.new()
+	text_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text_vbox.add_theme_constant_override("separation", 2)
 	
 	var lbl = Label.new()
 	lbl.text = label_text
-	lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	UIHelper.apply_bubbly_label(lbl, 13, Color(0.18, 0.40, 0.70), true)
-	top_row.add_child(lbl)
+	text_vbox.add_child(lbl)
+	
+	var sub_lbl = Label.new()
+	sub_lbl.text = sub_text
+	UIHelper.apply_bubbly_label(sub_lbl, 9, Color(0.45, 0.55, 0.70), false)
+	text_vbox.add_child(sub_lbl)
+	top_row.add_child(text_vbox)
+	
+	# Right controls row (Dial % Pill + Toggle)
+	var right_box = HBoxContainer.new()
+	right_box.alignment = BoxContainer.ALIGNMENT_END
+	right_box.add_theme_constant_override("separation", 8)
+	
+	# Dial / Level Badge Pill
+	var dial_pill = PanelContainer.new()
+	dial_pill.custom_minimum_size = Vector2(48, 26)
+	var pill_st = StyleBoxFlat.new()
+	pill_st.bg_color = Color(0.88, 0.94, 1.0)
+	pill_st.border_color = Color(0.40, 0.72, 0.98)
+	pill_st.set_border_width_all(1)
+	pill_st.set_corner_radius_all(10)
+	pill_st.content_margin_left = 6
+	pill_st.content_margin_right = 6
+	pill_st.content_margin_top = 2
+	pill_st.content_margin_bottom = 2
+	dial_pill.add_theme_stylebox_override("panel", pill_st)
+	
+	var dial_lbl = Label.new()
+	dial_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	dial_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var cur_pct = int(round(initial_val * 100.0))
+	dial_lbl.text = ("%d%%" % cur_pct) if (is_enabled and cur_pct > 0) else "OFF"
+	UIHelper.apply_bubbly_label(dial_lbl, 10, Color(0.15, 0.45, 0.80) if is_enabled else Color(0.60, 0.65, 0.75), true)
+	dial_pill.add_child(dial_lbl)
+	right_box.add_child(dial_pill)
 	
 	var on_tex = UIHelper.get_button_texture("on")
 	var off_tex = UIHelper.get_button_texture("off")
@@ -1136,7 +1190,8 @@ func _create_audio_slider_row(label_text: String, initial_val: float, is_enabled
 		tw.tween_property(toggle_btn, "scale", Vector2.ONE, 0.08)
 	)
 	
-	top_row.add_child(toggle_btn)
+	right_box.add_child(toggle_btn)
+	top_row.add_child(right_box)
 	root.add_child(top_row)
 	
 	var slider = _create_slider(initial_val if is_enabled else 0.0, Callable())
@@ -1145,6 +1200,21 @@ func _create_audio_slider_row(label_text: String, initial_val: float, is_enabled
 	root.add_child(slider)
 	
 	var state = {"is_on": is_enabled, "saved_val": initial_val if initial_val > 0.05 else 0.75}
+	
+	var update_dial_display = func():
+		var is_on = state["is_on"]
+		var val = slider.value
+		var pct = int(round(val * 100.0))
+		if is_on and pct > 0:
+			dial_lbl.text = "%d%%" % pct
+			dial_lbl.add_theme_color_override("font_color", Color(0.15, 0.45, 0.80))
+			pill_st.bg_color = Color(0.88, 0.94, 1.0)
+			pill_st.border_color = Color(0.40, 0.72, 0.98)
+		else:
+			dial_lbl.text = "OFF"
+			dial_lbl.add_theme_color_override("font_color", Color(0.60, 0.65, 0.75))
+			pill_st.bg_color = Color(0.94, 0.94, 0.96)
+			pill_st.border_color = Color(0.78, 0.80, 0.85)
 	
 	slider.value_changed.connect(func(v: float):
 		if not state["is_on"] and v > 0.01:
@@ -1160,6 +1230,7 @@ func _create_audio_slider_row(label_text: String, initial_val: float, is_enabled
 		if v > 0.01:
 			state["saved_val"] = v
 		on_val_change.call(v)
+		update_dial_display.call()
 	)
 	
 	toggle_btn.pressed.connect(func():
@@ -1179,6 +1250,7 @@ func _create_audio_slider_row(label_text: String, initial_val: float, is_enabled
 			slider.modulate.a = 0.45
 			on_toggle.call(false)
 			on_val_change.call(0.0)
+		update_dial_display.call()
 	)
 	
 	return root
@@ -1297,6 +1369,68 @@ func _create_difficulty_row() -> Control:
 	update_btn_styles.call()
 	return root
 
+func _show_reset_player_modal():
+	var p = GameState.get_active_profile()
+	var player_name = p.get("name", "Player") if not p.is_empty() else "Player"
+	
+	var dlg = UIHelper.create_modal_dialog(self, 300, Color(0, 0, 0, 0.6))
+	var overlay = dlg["overlay"]
+	var center = dlg["center"]
+	
+	var card = Panel.new()
+	var card_style = UIHelper.create_bubbly_panel(28, Color.WHITE, Color(0.95, 0.55, 0.20), 3)
+	card.add_theme_stylebox_override("panel", card_style)
+	card.custom_minimum_size = Vector2(380, 310)
+	card.size = Vector2(380, 310)
+	card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	center.add_child(card)
+	
+	var vbox = VBoxContainer.new()
+	vbox.position = Vector2(24, 25)
+	vbox.size = Vector2(332, 260)
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 14)
+	card.add_child(vbox)
+	
+	var title = Label.new()
+	title.text = "RESET %s'S STATS?" % player_name.to_upper()
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	UIHelper.apply_bubbly_label(title, 18, Color(0.90, 0.45, 0.15), true)
+	vbox.add_child(title)
+	
+	var desc = Label.new()
+	desc.text = "This will reset %s's challenge progress, streak, brushing stats, and quiz answers back to Day 1.\n\nOther family players will NOT be affected!" % player_name
+	desc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	UIHelper.apply_bubbly_label(desc, 12, Color(0.35, 0.40, 0.50), false)
+	vbox.add_child(desc)
+	
+	var btn_row = HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 12)
+	vbox.add_child(btn_row)
+	
+	var cancel_btn = UIHelper.create_themed_button("cancel", Vector2(130, 44))
+	if not cancel_btn.texture_normal:
+		cancel_btn = UIHelper.create_bubbly_button("CANCEL", Color(0.65, 0.72, 0.80))
+		cancel_btn.custom_minimum_size = Vector2(130, 44)
+	cancel_btn.pressed.connect(func():
+		AudioManager.play_sfx("click")
+		overlay.queue_free()
+	)
+	btn_row.add_child(cancel_btn)
+	
+	var confirm_btn = UIHelper.create_bubbly_button("RESET PLAYER", Color(0.95, 0.50, 0.15))
+	confirm_btn.custom_minimum_size = Vector2(140, 44)
+	confirm_btn.pressed.connect(func():
+		AudioManager.play_sfx("pop")
+		GameState.reset_active_profile()
+		_refresh_parental_insights()
+		overlay.queue_free()
+	)
+	btn_row.add_child(confirm_btn)
+
 func _show_reset_confirmation_modal():
 	var dlg = UIHelper.create_modal_dialog(self, 300, Color(0, 0, 0, 0.6))
 	var overlay = dlg["overlay"]
@@ -1355,6 +1489,7 @@ func _show_reset_confirmation_modal():
 	confirm_btn.pressed.connect(func():
 		AudioManager.play_sfx("pop")
 		GameState.reset_all_data()
+		_refresh_parental_insights()
 		overlay.queue_free()
 		reset_completed.emit()
 	)

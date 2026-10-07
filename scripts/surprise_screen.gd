@@ -471,16 +471,19 @@ func _build_ui():
 	# Main Play Window / Tray (pop_bubble_back.png 3D device frame)
 	tray = Control.new()
 	tray.mouse_filter = Control.MOUSE_FILTER_PASS
+	tray.gui_input.connect(_on_tray_gui_input)
 	add_child(tray)
 	
 	var tray_bg = TextureRect.new()
 	tray_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	tray_bg.anchor_right = 1.0
 	tray_bg.anchor_bottom = 1.0
+	tray_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tray_bg.texture = UIHelper.load_texture_safe("res://assets/images/popbubblemini/pop_bubble_back.png")
 	if not tray_bg.texture:
 		var tray_panel = Panel.new()
 		tray_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+		tray_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tray_panel.add_theme_stylebox_override("panel", UIHelper.create_bubbly_panel(38, Color(0.45, 0.65, 0.85, 0.5), Color(0.9, 0.95, 1.0, 0.9), 4))
 		tray.add_child(tray_panel)
 	else:
@@ -490,6 +493,8 @@ func _build_ui():
 	
 	play_area = Control.new()
 	play_area.clip_contents = true
+	play_area.mouse_filter = Control.MOUSE_FILTER_STOP
+	play_area.gui_input.connect(_on_play_area_gui_input)
 	tray.add_child(play_area)
 	
 	timer = Timer.new()
@@ -703,6 +708,60 @@ func _start_game():
 		
 	timer.start()
 
+func _on_play_area_gui_input(event: InputEvent) -> void:
+	if not is_playing or is_paused:
+		return
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			_handle_touch_at(event.position)
+	elif event is InputEventMouseButton:
+		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			_handle_touch_at(event.position)
+	elif event is InputEventScreenDrag:
+		_handle_touch_at(event.position)
+	elif event is InputEventMouseMotion:
+		if (event.button_mask & MOUSE_BUTTON_MASK_LEFT) != 0:
+			_handle_touch_at(event.position)
+
+func _on_tray_gui_input(event: InputEvent) -> void:
+	if not is_playing or is_paused or not play_area:
+		return
+	var local_pos = play_area.to_local(event.global_position)
+	if event is InputEventScreenTouch and event.pressed:
+		_handle_touch_at(local_pos)
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_handle_touch_at(local_pos)
+
+func _handle_touch_at(pos: Vector2) -> bool:
+	if not is_playing or is_paused:
+		return false
+	
+	var closest_bubble: Dictionary = {}
+	var closest_dist: float = 999999.0
+	
+	# Iterate in reverse order so newer / top-drawn bubbles are preferred
+	for i in range(active_bubbles.size() - 1, -1, -1):
+		var b = active_bubbles[i]
+		if not is_instance_valid(b.get("btn", null)) or b.get("popping", false):
+			continue
+		
+		var b_size: float = b.get("size", 64.0)
+		var center = b["pos"] + Vector2(b_size * 0.5, b_size * 0.5)
+		var dist = pos.distance_to(center)
+		
+		# Generous circular hit detection:
+		# Accounts for fingertip contact surface and fast successive taps
+		var hit_radius = max(b_size * 0.52, b_size * _bubble_radius_ratio + 12.0)
+		if dist <= hit_radius and dist < closest_dist:
+			closest_dist = dist
+			closest_bubble = b
+	
+	if not closest_bubble.is_empty():
+		_pop_bubble(closest_bubble)
+		return true
+		
+	return false
+
 func _spawn_bubble(force_gift: bool = false):
 	if not is_playing or not play_area: return
 	
@@ -711,18 +770,17 @@ func _spawn_bubble(force_gift: bool = false):
 	
 	_ensure_bubble_resources()
 	var b_size = randf_range(52.0, 82.0)
-	var btn = TextureButton.new()
-	btn.texture_normal = _bubble_tex
-	if not btn.texture_normal:
-		btn.texture_normal = UIHelper.load_texture_safe("res://assets/images/createprofilescreen/transparent_bubble.png")
-	if _bubble_click_mask:
-		btn.texture_click_mask = _bubble_click_mask
+	var btn = TextureRect.new()
+	btn.texture = _bubble_tex
+	if not btn.texture:
+		btn.texture = UIHelper.load_texture_safe("res://assets/images/createprofilescreen/transparent_bubble.png")
 		
 	btn.custom_minimum_size = Vector2(b_size, b_size)
 	btn.size = Vector2(b_size, b_size)
-	btn.ignore_texture_size = true
-	btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	btn.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	btn.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	btn.pivot_offset = Vector2(b_size * 0.5, b_size * 0.5)
+	btn.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	# Try to find a non-overlapping spawn position inside play_area based on actual radius
 	var r = b_size * _bubble_radius_ratio
@@ -765,13 +823,13 @@ func _spawn_bubble(force_gift: bool = false):
 		"vel": vel,
 		"size": b_size,
 		"wobble": randf_range(0.0, 10.0),
-		"is_gift": false
+		"is_gift": false,
+		"popping": false
 	}
 	
 	if force_gift:
 		_attach_gift_to_bubble(b_dict)
 	
-	btn.pressed.connect(func(): _pop_bubble(b_dict))
 	play_area.add_child(btn)
 	active_bubbles.append(b_dict)
 	
@@ -805,7 +863,7 @@ func _make_bubble_gift() -> void:
 	# Pick an existing non-gift bubble in play_area and turn it into a gift bubble
 	var candidate_bubbles: Array[Dictionary] = []
 	for b in active_bubbles:
-		if not b.get("is_gift", false) and is_instance_valid(b.get("btn", null)):
+		if not b.get("is_gift", false) and not b.get("popping", false) and is_instance_valid(b.get("btn", null)):
 			candidate_bubbles.append(b)
 			
 	if not candidate_bubbles.is_empty():
@@ -816,7 +874,7 @@ func _make_bubble_gift() -> void:
 		_spawn_bubble(true)
 
 func _attach_gift_to_bubble(b_dict: Dictionary) -> void:
-	var btn: TextureButton = b_dict.get("btn", null)
+	var btn: Control = b_dict.get("btn", null)
 	if not is_instance_valid(btn): return
 	if b_dict.get("is_gift", false): return
 	
@@ -843,8 +901,15 @@ func _attach_gift_to_bubble(b_dict: Dictionary) -> void:
 
 func _pop_bubble(b_dict: Dictionary):
 	if not is_playing or is_paused: return
-	var btn: TextureButton = b_dict.get("btn", null)
+	if b_dict.get("popping", false): return
+	b_dict["popping"] = true
+	
+	var btn: Control = b_dict.get("btn", null)
 	if not is_instance_valid(btn): return
+	
+	btn.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if btn is BaseButton:
+		btn.disabled = true
 	
 	active_bubbles.erase(b_dict)
 	AudioManager.play_sfx("pop")
@@ -868,7 +933,7 @@ func _pop_bubble(b_dict: Dictionary):
 	
 	# Pop Animation
 	var tw = btn.create_tween()
-	tw.tween_property(btn, "scale", Vector2(1.4, 1.4), 0.08)
+	tw.tween_property(btn, "scale", Vector2(1.35, 1.35), 0.08)
 	tw.tween_property(btn, "modulate:a", 0.0, 0.08)
 	tw.tween_callback(func():
 		if is_instance_valid(btn):
@@ -876,11 +941,14 @@ func _pop_bubble(b_dict: Dictionary):
 	)
 	
 	# Spawn replacement bubble inside window
-	var t = get_tree().create_timer(0.2)
-	t.timeout.connect(func():
-		if is_playing and active_bubbles.size() < 7:
-			_spawn_bubble()
-	)
+	if active_bubbles.size() < 3:
+		_spawn_bubble()
+	else:
+		var t = get_tree().create_timer(0.18)
+		t.timeout.connect(func():
+			if is_playing and active_bubbles.size() < 7:
+				_spawn_bubble()
+		)
 
 func _trigger_surprise_drop(pop_pos: Vector2):
 	AudioManager.play_sfx("sparkle")

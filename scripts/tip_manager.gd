@@ -104,12 +104,22 @@ func _on_rc_products(data: Dictionary):
 		var pid := str(prod.get("id", ""))
 		var price := str(prod.get("price", ""))
 		if pid != "" and price != "":
-			_store_prices[pid] = price
+			_store_prices[pid] = _sanitize_price_string(price)
 	print("[TipManager] App Store prices loaded: ", _store_prices)
+
+## Cleans up any UTF-8 / ASCII double-encoding artifacts (like "Â£" or "A£") from store price strings
+func _sanitize_price_string(p_str: String) -> String:
+	var clean = p_str.strip_edges()
+	clean = clean.replace("Â", "").replace("Ã‚", "")
+	# If a rogue 'A' or non-ASCII artifact precedes a currency symbol (£, $, €, ¥), strip it
+	if clean.begins_with("A£") or clean.begins_with("A$") or clean.begins_with("A€"):
+		clean = clean.substr(1)
+	return clean
 
 ## Price text for a tip button: the App Store's own price when known, otherwise the default
 func get_tier_price(tier: Dictionary) -> String:
-	return str(_store_prices.get(str(tier.get("id", "")), tier.get("price", "")))
+	var raw = str(_store_prices.get(str(tier.get("id", "")), tier.get("price", "")))
+	return _sanitize_price_string(raw)
 
 func _on_rc_purchase_result(data: Dictionary):
 	var err := str(data.get("error", ""))

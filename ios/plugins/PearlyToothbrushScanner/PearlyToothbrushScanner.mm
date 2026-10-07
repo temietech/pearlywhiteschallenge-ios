@@ -26,8 +26,8 @@
 
 // ---- Tunables ---------------------------------------------------------------
 static const int kToothbrushClassIndex = 89;   // COCO label map index (0-based, 90 classes)
-static const float kVerifyThreshold = 0.40f;   // probability needed on a frame
-static const int kRequiredConsecutiveHits = 2; // frames in a row above threshold
+static const float kVerifyThreshold = 0.52f;   // probability needed on a frame (filters 2D screen noise)
+static const int kRequiredConsecutiveHits = 4; // frames in a row above threshold for physical presence
 static const int kPreviewWidth = 240;          // preview image sent to Godot
 static const double kDetectedSignalInterval = 0.2; // seconds between toothbrush_detected signals
 

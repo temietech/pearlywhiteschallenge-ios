@@ -1655,21 +1655,26 @@ static func show_dental_item_unlocked_modal(parent_node: Node, w_def: Dictionary
 	
 	var label_vbox = VBoxContainer.new()
 	label_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	label_vbox.custom_minimum_size = Vector2(content_w, 0)
 	label_vbox.add_theme_constant_override("separation", 6)
 	
 	var name_lbl = Label.new()
 	name_lbl.text = item_title
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	apply_bubbly_label(name_lbl, 24 if not is_tablet else 30, Color.WHITE, true)
+	name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_lbl.custom_minimum_size = Vector2(content_w, 0)
+	apply_bubbly_label(name_lbl, 20 if not is_tablet else 26, Color.WHITE, true)
 	name_lbl.add_theme_color_override("font_shadow_color", Color(0.06, 0.22, 0.48, 0.95))
 	name_lbl.add_theme_constant_override("shadow_offset_y", 2)
-	name_lbl.add_theme_constant_override("shadow_outline_size", 5)
+	name_lbl.add_theme_constant_override("shadow_outline_size", 4)
 	label_vbox.add_child(name_lbl)
 	
 	var sub_lbl = Label.new()
 	sub_lbl.text = "Special Upgrade! Now Available in the Shop!"
 	sub_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	apply_bubbly_label(sub_lbl, 15 if not is_tablet else 18, Color(0.85, 0.95, 1.0), true)
+	sub_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sub_lbl.custom_minimum_size = Vector2(content_w, 0)
+	apply_bubbly_label(sub_lbl, 13 if not is_tablet else 16, Color(0.85, 0.95, 1.0), true)
 	sub_lbl.add_theme_color_override("font_shadow_color", Color(0.06, 0.22, 0.48, 0.85))
 	sub_lbl.add_theme_constant_override("shadow_offset_y", 1)
 	label_vbox.add_child(sub_lbl)

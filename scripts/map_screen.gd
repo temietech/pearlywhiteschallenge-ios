@@ -747,14 +747,9 @@ func _create_node_button(id: int, day: int, n_type: String, is_completed: bool, 
 			elif is_active:
 				AudioManager.play_sfx("click")
 				if n_type == "intro":
-					if node_stage == 0:
-						UIHelper.show_node0_story_intro_modal(self, func():
-							GameState.preload_candy_crusade_in_background()
-							UIHelper.create_candy_crusade_loading_overlay(self)
-							launch_node.emit(0, "combat")
-						)
-					else:
+					UIHelper.show_node0_story_intro_modal(self, func():
 						launch_node.emit(0, "quiz")
+					)
 				elif n_type == "morning":
 					if node_stage == 0:
 						if not GameState.dev_mode:

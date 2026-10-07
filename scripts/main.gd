@@ -58,9 +58,6 @@ func _ready():
 		get_tree().create_timer(delay).timeout.connect(_apply_safe_area)
 	_setup_keyboard_handling()
 
-	# Preload Candy Crusade 3D scene asynchronously in background
-	call_deferred("_preload_background_assets")
-
 	# Cold boot: always show Start Screen
 	navigate_to("start")
 
@@ -274,6 +271,7 @@ func navigate_to(screen_name: String, extra_args: Dictionary = {}):
 			navigate_to("profiles")
 		)
 	elif screen_name == "map":
+		call_deferred("_preload_background_assets")
 		new_screen.launch_node.connect(_on_map_node_launched)
 		new_screen.launch_minigame.connect(func(game): navigate_to(game))
 	elif screen_name == "floss":

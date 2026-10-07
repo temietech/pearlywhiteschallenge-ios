@@ -267,6 +267,7 @@ func _relayout():
 	var safe_sz = UIHelper.get_viewport_safe_size(self)
 	var cur_w = safe_sz.x
 	var cur_h = safe_sz.y
+	var is_tablet = cur_w >= 560.0
 	
 	if bg_rect and is_instance_valid(bg_rect):
 		bg_rect.size = safe_sz
@@ -276,42 +277,82 @@ func _relayout():
 		reward_layer.size = safe_sz
 		reward_layer.position = Vector2.ZERO
 	
-	if pause_btn:
-		pause_btn.position = Vector2(cur_w - 56, 14)
-	# Title + stats drop below the notch on iPhone; the pause button stays in the corner
-	var notch_shift = max(0.0, UIHelper.safe_top - 2.0)
+	var notch_shift = max(0.0, UIHelper.safe_top)
+	
+	# 1. Top Right Circular Pause Button
+	if pause_btn and is_instance_valid(pause_btn):
+		var p_sz = 46.0 if is_tablet else 40.0
+		var p_top = 8.0 + max(0.0, UIHelper.safe_top - 4.0)
+		pause_btn.size = Vector2(p_sz, p_sz)
+		pause_btn.custom_minimum_size = Vector2(p_sz, p_sz)
+		pause_btn.position = Vector2(cur_w - p_sz - (16.0 if is_tablet else 10.0), p_top)
+
+	# 2. Title: Centered at top below notch
+	var title_y = 6.0 + notch_shift
+	var t_h = 68.0 if is_tablet else 50.0
 	if title_img and is_instance_valid(title_img):
-		var t_w = min(cur_w - 80.0, 360.0)
-		var t_h = 72.0
-		title_img.position = Vector2((cur_w - t_w) * 0.5, 4 + notch_shift)
+		var t_w = min(cur_w - (120.0 if is_tablet else 80.0), 360.0 if is_tablet else 250.0)
+		title_img.position = Vector2((cur_w - t_w) * 0.5, title_y)
 		title_img.size = Vector2(t_w, t_h)
 	elif title_lbl and is_instance_valid(title_lbl):
-		var title_w = min(cur_w - 80.0, 370.0)
-		title_lbl.position = Vector2((cur_w - title_w) * 0.5, 8 + notch_shift)
-		title_lbl.size = Vector2(title_w, 48)
-		title_lbl.add_theme_font_size_override("font_size", 34)
+		var title_w = min(cur_w - 80.0, 360.0 if is_tablet else 260.0)
+		title_lbl.position = Vector2((cur_w - title_w) * 0.5, title_y)
+		title_lbl.size = Vector2(title_w, t_h)
+		title_lbl.add_theme_font_size_override("font_size", 32 if is_tablet else 24)
+
 	if best_pill:
 		best_pill.visible = false
-	if stats_hbox:
-		var stat_w = min(cur_w - 24.0, 390.0)
-		stats_hbox.position = Vector2((cur_w - stat_w) * 0.5, 78 + notch_shift)
-		stats_hbox.size = Vector2(stat_w, 52)
-	if combo_banner:
-		combo_banner.position = Vector2((cur_w - 240.0) * 0.5, 134 + notch_shift)
-		
-	if holes_container:
-		var top_bound = 165.0 + UIHelper.safe_top  # Account for notch/safe area on iPhone
-		var bottom_bound = cur_h - 75.0 - UIHelper.safe_bottom # Above foreground candy decorations
-		var board_h = max(420.0, bottom_bound - top_bound)
-		var board_w = min(cur_w - 24.0, 680.0)
 
-		holes_container.position = Vector2((cur_w - board_w) * 0.5, top_bound)
-		holes_container.size = Vector2(board_w, board_h)
+	# 3. Stats Pills: POINTS (live count), TIME (countdown), COINS (live count)
+	var stats_y = title_y + t_h + 4.0
+	var stat_w = min(cur_w - (32.0 if is_tablet else 16.0), 420.0 if is_tablet else 340.0)
+	var sep = 10.0 if is_tablet else 6.0
+	var pill_h = 48.0 if is_tablet else 42.0
+	if stats_hbox and is_instance_valid(stats_hbox):
+		stats_hbox.position = Vector2((cur_w - stat_w) * 0.5, stats_y)
+		stats_hbox.size = Vector2(stat_w, pill_h)
+		stats_hbox.add_theme_constant_override("separation", int(sep))
+		var pill_w = floor((stat_w - sep * 2.0) / 3.0)
+		for ch in stats_hbox.get_children():
+			if ch is Control:
+				ch.custom_minimum_size = Vector2(pill_w, pill_h)
+				ch.size = Vector2(pill_w, pill_h)
+
+	# 4. Combo Banner
+	var combo_y = stats_y + pill_h + 4.0
+	if combo_banner and is_instance_valid(combo_banner):
+		var cb_w = min(cur_w - 40.0, 300.0 if is_tablet else 240.0)
+		var cb_h = 36.0 if is_tablet else 28.0
+		combo_banner.size = Vector2(cb_w, cb_h)
+		combo_banner.pivot_offset = Vector2(cb_w * 0.5, cb_h * 0.5)
+		combo_banner.position = Vector2((cur_w - cb_w) * 0.5, combo_y)
 		
-		var col_spacing = board_w / 3.0
-		var row_spacing = board_h / 3.0
-		var hole_w = min(210.0, col_spacing * 0.94)
-		var hole_h = round(hole_w * 0.58) # Proportional 3D hole height
+	# 5. 3x3 Holes Board in Open Meadow Area
+	if holes_container and is_instance_valid(holes_container):
+		var top_bound = combo_y + (16.0 if is_tablet else 8.0)
+		var bottom_bound = cur_h - (24.0 if is_tablet else 12.0) - UIHelper.safe_bottom
+		var avail_w = cur_w - (32.0 if is_tablet else 16.0)
+		var avail_h = max(240.0, bottom_bound - top_bound)
+		
+		# Proportional grid sizing
+		var max_board_w = min(avail_w, 640.0 if is_tablet else 380.0)
+		var col_spacing = max_board_w / 3.0
+		var hole_w = min(190.0 if is_tablet else 116.0, col_spacing * 0.94)
+		var hole_h = round(hole_w * 0.58) # Natural 3D hole aspect ratio
+		
+		# Calculate row spacing so 3 rows sit naturally inside the meadow without stretching or overflowing
+		var min_row_spacing = hole_h + (16.0 if is_tablet else 8.0)
+		var max_row_spacing = hole_h * (1.65 if is_tablet else 1.45)
+		var row_spacing = clamp(avail_h / 3.0, min_row_spacing, max_row_spacing)
+		
+		var board_w = col_spacing * 3.0
+		var board_h = row_spacing * 3.0
+		
+		# Center the 3x3 grid cleanly in the available meadow space
+		var board_x = (cur_w - board_w) * 0.5
+		var board_y = top_bound + (avail_h - board_h) * 0.5
+		holes_container.position = Vector2(board_x, board_y)
+		holes_container.size = Vector2(board_w, board_h)
 		
 		for r in range(3):
 			for c in range(3):
@@ -325,10 +366,10 @@ func _relayout():
 					
 					# Reposition minion inside hole
 					var m_btn = minion_buttons[idx]
-					var m_w = hole_w * 0.88
-					var m_h = m_w * 0.72
+					var m_w = hole_w * 0.86
+					var m_h = m_w * 0.82
 					m_btn.size = Vector2(m_w, m_h)
-					m_btn.position = Vector2((hole_w - m_w) * 0.5, (hole_h * 0.38) - m_h * 0.75)
+					m_btn.position = Vector2((hole_w - m_w) * 0.5, (hole_h * 0.35) - m_h * 0.78)
 					m_btn.pivot_offset = Vector2(m_w * 0.5, m_h)
 					
 					var hit_z = hc.get_node_or_null("HitZone") as Button
@@ -342,8 +383,8 @@ func _relayout():
 
 func _create_icon_badge(title: String, icon_path: String, val_lbl: Label) -> Control:
 	var pill = PanelContainer.new()
-	pill.custom_minimum_size = Vector2(104, 48)
-	var p_style = UIHelper.create_bubbly_panel(22, Color(0.24, 0.48, 0.78, 0.95), Color.WHITE, 1)
+	pill.custom_minimum_size = Vector2(0, 42)
+	var p_style = UIHelper.create_bubbly_panel(20, Color(0.24, 0.48, 0.78, 0.95), Color.WHITE, 1)
 	pill.add_theme_stylebox_override("panel", p_style)
 	
 	var vbox = VBoxContainer.new()
@@ -378,8 +419,8 @@ func _create_icon_badge(title: String, icon_path: String, val_lbl: Label) -> Con
 
 func _create_time_pill(val_lbl: Label) -> Control:
 	var pill = PanelContainer.new()
-	pill.custom_minimum_size = Vector2(104, 48)
-	var p_style = UIHelper.create_bubbly_panel(22, Color(0.24, 0.48, 0.78, 0.95), Color.WHITE, 1)
+	pill.custom_minimum_size = Vector2(0, 42)
+	var p_style = UIHelper.create_bubbly_panel(20, Color(0.24, 0.48, 0.78, 0.95), Color.WHITE, 1)
 	pill.add_theme_stylebox_override("panel", p_style)
 	
 	var vbox = VBoxContainer.new()
@@ -402,8 +443,8 @@ func _create_time_pill(val_lbl: Label) -> Control:
 
 func _create_stat_pill(title: String, initial_val: String, val_lbl: Label) -> Control:
 	var pill = PanelContainer.new()
-	pill.custom_minimum_size = Vector2(104, 48)
-	var p_style = UIHelper.create_bubbly_panel(22, Color(0.24, 0.48, 0.78, 0.95), Color.WHITE, 1)
+	pill.custom_minimum_size = Vector2(0, 42)
+	var p_style = UIHelper.create_bubbly_panel(20, Color(0.24, 0.48, 0.78, 0.95), Color.WHITE, 1)
 	pill.add_theme_stylebox_override("panel", p_style)
 	
 	var vbox = VBoxContainer.new()

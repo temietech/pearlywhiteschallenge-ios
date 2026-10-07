@@ -305,7 +305,7 @@ func play_sfx(name: String, pitch_scale: float = 1.0):
 				return
 
 func play_character_voice(char_id: String):
-	if is_muted or master_volume <= 0.01 or sfx_volume <= 0.01:
+	if is_muted or not is_sound_enabled() or master_volume <= 0.01:
 		return
 	var key = char_id.to_lower().strip_edges()
 	var stream: AudioStream = null
@@ -329,6 +329,11 @@ func play_character_voice(char_id: String):
 
 func set_sfx_volume(v: float):
 	sfx_volume = clamp(v, 0.0, 1.0)
+	if sfx_volume <= 0.01:
+		stop_narration()
+		for p in sfx_players:
+			if p.playing and bool(p.get_meta("is_voice", false)):
+				p.stop()
 
 func set_bgm_volume(v: float):
 	bgm_volume = clamp(v, 0.0, 1.0)
@@ -355,6 +360,10 @@ func set_sound_enabled(enabled: bool):
 		if sfx_volume > 0.01:
 			saved_sfx_volume = sfx_volume
 		sfx_volume = 0.0
+		stop_narration()
+		for p in sfx_players:
+			if p.playing and bool(p.get_meta("is_voice", false)):
+				p.stop()
 
 func set_music_enabled(enabled: bool):
 	music_enabled = enabled
@@ -508,7 +517,7 @@ func _get_british_english_voice_id() -> String:
 	return ""
 
 func play_voice_narration(text: String, audio_path: String = "", force: bool = false):
-	if (not tts_enabled and not force and not is_auto_narration_preferred()) or is_muted:
+	if (not tts_enabled and not force and not is_auto_narration_preferred()) or is_muted or not is_sound_enabled():
 		return
 	
 	stop_narration()
@@ -524,7 +533,7 @@ func play_voice_narration(text: String, audio_path: String = "", force: bool = f
 		var res = load(audio_path)
 		if res is AudioStream:
 			narration_player.stream = res
-			narration_player.volume_db = linear_to_db(master_volume * VOICE_GAIN)
+			narration_player.volume_db = linear_to_db(sfx_volume * master_volume * VOICE_GAIN)
 			narration_player.play()
 			played_recorded = true
 			
@@ -544,7 +553,7 @@ func begin_voice_duck(hold_seconds: float = 1.0) -> void:
 
 ## Speaks text with the device voice (TTS), dipping the music first.
 func speak_tts(text: String) -> void:
-	if is_muted or text == "":
+	if is_muted or not is_sound_enabled() or text == "":
 		return
 	if not DisplayServer.has_feature(DisplayServer.FEATURE_TEXT_TO_SPEECH):
 		return

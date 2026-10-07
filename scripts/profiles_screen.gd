@@ -228,16 +228,6 @@ func _create_player_card(p: Dictionary, card_sz: Vector2) -> Control:
 	name_lbl.add_theme_constant_override("outline_size", 2)
 	vbox.add_child(name_lbl)
 	
-	var safe_sz = UIHelper.get_viewport_safe_size(self)
-	var is_tablet = (safe_sz.x >= 600.0)
-	var edit_sz = Vector2(56, 56) if is_tablet else Vector2(50, 50)
-	var edit_badge = UIHelper.create_themed_button("edit", edit_sz)
-	edit_badge.custom_minimum_size = edit_sz
-	edit_badge.size = edit_sz
-	edit_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	edit_badge.z_index = 5
-	vbox.add_child(edit_badge)
-	
 	# Transparent overlay button to trigger edit
 	var btn = Button.new()
 	btn.flat = true

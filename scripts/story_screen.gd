@@ -61,6 +61,11 @@ func _notification(what):
 			_relayout()
 			_render_page()
 
+func on_safe_area_changed():
+	if is_node_ready():
+		_relayout()
+		_render_page()
+
 func _build_ui():
 	var safe_sz = UIHelper.get_viewport_safe_size(self)
 	var cur_w = safe_sz.x
@@ -196,25 +201,26 @@ func _relayout():
 	var cur_w = safe_sz.x
 	var cur_h = safe_sz.y
 	
+	# Dynamically adapt top corner elements to notch depth
+	var corner_top = max(10.0, UIHelper.safe_top * 0.35)
 	if back_btn:
-		back_btn.position = Vector2(16.0, 14.0)
+		back_btn.position = Vector2(16.0, corner_top)
 		back_btn.custom_minimum_size = Vector2(76, 32)
 		back_btn.size = Vector2(76, 32)
 		
-	# Top bar & progress layout
-	# Top-RIGHT corner (keeps the centre clear of the iPhone notch / Dynamic Island)
+	# Top bar & progress layout (Right corner, clear of wide notch)
 	if unlock_label:
 		unlock_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		unlock_label.position = Vector2(cur_w - 16.0 - 150.0, 8.0)
+		unlock_label.position = Vector2(cur_w - 16.0 - 150.0, corner_top)
 		unlock_label.size = Vector2(150, 20)
 	if unlock_progress:
-		unlock_progress.position = Vector2(cur_w - 16.0 - 120.0, 30.0)
+		unlock_progress.position = Vector2(cur_w - 16.0 - 120.0, corner_top + 22.0)
 		unlock_progress.size = Vector2(120, 12)
 		
 	# Book Page starts flush from the left border (x = 0.0) regardless of screen width
 	var book_x = 0.0
-	# Book (with its scrapbook title) sits below the notch; back + UNLOCKED stay in the corners
-	var book_y = max(56.0, UIHelper.safe_top)
+	# Book (with its scrapbook title) sits cleanly below the full notch height
+	var book_y = max(58.0, UIHelper.safe_top + 10.0)
 	var book_w = cur_w
 	var book_h = cur_h - book_y - 8.0
 	
